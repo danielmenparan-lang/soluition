@@ -57,6 +57,21 @@ if (
   failed = true;
 }
 
+// Supavisor pooler requires postgres.PROJECT_REF username — not plain "postgres".
+if (databaseUrl.includes("pooler.supabase.com")) {
+  const userMatch = databaseUrl.match(/^postgres(ql)?:\/\/([^:@/]+)/i);
+  const dbUser = userMatch?.[2] ?? "";
+  if (!dbUser.includes(".")) {
+    console.error(
+      "[env] Pooler DATABASE_URL username must be postgres.PROJECT_REF (from Supabase Connect), not plain postgres.",
+    );
+    console.error(
+      "[env] Example: postgresql://postgres.brmcddfmkgvsfbmtvtwf:PASSWORD@aws-0-REGION.pooler.supabase.com:5432/postgres",
+    );
+    failed = true;
+  }
+}
+
 if (failed) {
   console.error(
     "[env] Fix Environment variables in Render Dashboard, then redeploy.",

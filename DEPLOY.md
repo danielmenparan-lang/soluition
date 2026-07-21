@@ -151,7 +151,8 @@ git push
 | בעיה | פתרון |
 |------|--------|
 | **Build failed** `DATABASE_URL` / `P1012` | ב-Render חייב `DATABASE_URL=postgresql://...` (לא SQLite, לא ריק) |
-| **Deploy timeout** / URL לא עובד | `DATABASE_URL` עם **Session pooler** (לא `db.*.supabase.co`) |
+| **Deploy timeout** | בדוק Logs: `[startup] Database setup failed` = DATABASE_URL; `[startup] MISSING` = env חסר ב-Render |
+| **סיסמה עם תווים מיוחדים** | ב-DATABASE_URL קודד `!`→`%21`, `@`→`%40`, `#`→`%23` בתוך הסיסמה |
 | **`fetch failed` (Supabase)** | ודא `SUPABASE_URL` + `SERVICE_ROLE_KEY` מאותו פרויקט Supabase |
 | **Supabase INACTIVE** | Supabase Dashboard → Restore project (פרויקטים ישנים «נרדמים») |
 | Shopify `example.com` | עדכן `SHOPIFY_APP_URL` + `npm run deploy` |

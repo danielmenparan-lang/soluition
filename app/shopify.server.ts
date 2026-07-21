@@ -7,9 +7,14 @@ import {
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 
+export const isShopifyConfigured = Boolean(
+  process.env.SHOPIFY_API_KEY?.trim() && process.env.SHOPIFY_API_SECRET?.trim(),
+);
+
+// Placeholders allow the server to boot on Render while env vars are being configured.
 const shopify = shopifyApp({
-  apiKey: process.env.SHOPIFY_API_KEY,
-  apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
+  apiKey: process.env.SHOPIFY_API_KEY || "not-configured",
+  apiSecretKey: process.env.SHOPIFY_API_SECRET || "not-configured",
   apiVersion: ApiVersion.October25,
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",
