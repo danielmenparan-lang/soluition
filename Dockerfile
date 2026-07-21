@@ -15,18 +15,19 @@ RUN npm prune --omit=dev
 FROM node:20-alpine
 RUN apk add --no-cache openssl
 
-ENV PORT=10000
-ENV HOST=0.0.0.0
-EXPOSE 10000
-WORKDIR /app
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV NODE_OPTIONS=--max-old-space-size=384
 
-COPY package.json package-lock.json* ./
-COPY extensions ./extensions
+WORKDIR /app
+
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/build ./build
 COPY --from=build /app/public ./public
 COPY --from=build /app/prisma ./prisma
-COPY --from=build /app/scripts ./scripts
+COPY --from=build /app/package.json ./package.json
 
-CMD ["node", "scripts/start-production.mjs"]
+# Render sets PORT at runtime — react-router-serve reads process.env.PORT
+EXPOSE 10000
+
+CMD ["node", "./node_modules/@react-router/serve/dist/cli.js", "./build/server/index.js"]
