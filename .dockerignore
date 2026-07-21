@@ -1,0 +1,16 @@
+node_modules
+.git
+.env
+.env.*
+!.env.example
+*.sqlite
+*.sqlite-journal
+.react-router
+.shopify
+build
+Dockerfile
+fly.toml
+README.md
+supabase
+scripts
+terminals

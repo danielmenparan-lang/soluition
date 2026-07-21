@@ -1,0 +1,34 @@
+{% comment %}
+  Marketing Solution — Visitor Tracking
+  Add your Tracking ID from the app dashboard Overview page.
+{% endcomment %}
+
+{% if block.settings.tracking_id != blank %}
+<script
+  src="{{ block.settings.tracker_url }}/tracker.js"
+  data-tracking-id="{{ block.settings.tracking_id }}"
+  async
+></script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Marketing Tracker",
+  "target": "head",
+  "settings": [
+    {
+      "type": "text",
+      "id": "tracking_id",
+      "label": "Tracking ID",
+      "info": "Find this in the Marketing Solution app dashboard"
+    },
+    {
+      "type": "text",
+      "id": "tracker_url",
+      "label": "Tracker Script URL",
+      "default": "https://your-app-url.com",
+      "info": "Your app's public URL (without trailing slash)"
+    }
+  ]
+}
+{% endschema %}
