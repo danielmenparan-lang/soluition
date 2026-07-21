@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "00eb38f774ffba914d98a6800f4c5df5"
-application_url = "https://example.com"
+application_url = "https://shopify-marketing-solution.onrender.com"
 embedded = true
 name = "solution"
 
@@ -10,7 +10,7 @@ name = "solution"
 scopes = "read_analytics,read_content,read_customers,read_orders,read_products,write_script_tags"
 
 [auth]
-redirect_urls = [ "https://example.com/auth/callback" ]
+redirect_urls = [ "https://shopify-marketing-solution.onrender.com/auth/callback" ]
 
 [webhooks]
 api_version = "2026-10"
