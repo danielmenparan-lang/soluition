@@ -144,9 +144,27 @@ git push
 
 ## פתרון בעיות
 
-| בעיה | פתור |
-|------|------|
-| Build failed | Render → Logs → בדוק שגיאות |
-| `fetch failed` (Supabase) | ודא `SUPABASE_URL` + `SERVICE_ROLE_KEY` |
+| בעיה | פתרון |
+|------|--------|
+| **Build failed** `DATABASE_URL` / `P1012` | ב-Render חייב `DATABASE_URL=postgresql://...` (לא SQLite, לא ריק) |
+| **Deploy timeout** / URL לא עובד | השרת נופל בהפעלה — Render → **Logs** → חפש `[env] Missing` |
+| **`fetch failed` (Supabase)** | ודא `SUPABASE_URL` + `SERVICE_ROLE_KEY` מאותו פרויקט Supabase |
+| **Supabase INACTIVE** | Supabase Dashboard → Restore project (פרויקטים ישנים «נרדמים») |
 | Shopify `example.com` | עדכן `SHOPIFY_APP_URL` + `npm run deploy` |
 | איטי בפתיחה ראשונה | Free tier — upgrade ל-Starter |
+
+### Render Environment — checklist חובה
+
+```
+DATABASE_URL=postgresql://postgres:...@db.xxx.supabase.co:5432/postgres
+SHOPIFY_API_KEY=...
+SHOPIFY_API_SECRET=...
+SHOPIFY_APP_URL=https://shopify-marketing-solution.onrender.com
+SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=...
+ANTHROPIC_API_KEY=...
+HOST=0.0.0.0
+PORT=10000
+```
+
+> **DATABASE_URL** — Supabase → Settings → Database → **Connection string** → URI → פורט **5432**.

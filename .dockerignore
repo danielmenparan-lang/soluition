@@ -12,5 +12,4 @@ Dockerfile
 fly.toml
 README.md
 supabase
-scripts
 terminals

@@ -7,13 +7,15 @@ services:
     runtime: docker
     plan: free
     region: frankfurt
-    healthCheckPath: /
+    healthCheckPath: /health
     autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      - key: HOST
+        value: 0.0.0.0
       - key: SCOPES
         value: read_analytics,read_content,read_customers,read_orders,read_products,write_script_tags
       - key: DATABASE_URL
