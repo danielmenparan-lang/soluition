@@ -54,11 +54,15 @@ git push -u origin main
 | `SUPABASE_URL` | Supabase → Settings → API → Project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role |
 | `ANTHROPIC_API_KEY` | Anthropic dashboard |
-| `DATABASE_URL` | Supabase → Settings → Database → **URI** (Direct connection, port **5432**) |
+| `DATABASE_URL` | Supabase → **Connect** → URI → **Session pooler** (פורט 5432) |
 
-> **DATABASE_URL** — חייב להיות Postgres ישיר (לא pooler 6543):
-> `postgresql://postgres.[ref]:[PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres`
-> או: `postgresql://postgres:[PASSWORD]@db.brmcddfmkgvsfbmtvtwf.supabase.co:5432/postgres`
+> **חשוב ל-Render:** Render הוא **IPv4 בלבד**.  
+> **לא** להשתמש ב-`db.xxx.supabase.co` (Direct) — זה נתקע!  
+> **כן** להשתמש ב-**Session pooler**:
+> ```
+> postgresql://postgres.brmcddfmkgvsfbmtvtwf:PASSWORD@aws-0-REGION.pooler.supabase.com:5432/postgres?connect_timeout=30
+> ```
+> העתק את ה-REGION המדויק מ-Supabase → כפתור **Connect** למעלה.
 
 ### Prisma Sessions (פעם אחת, מהמחשב)
 
@@ -147,7 +151,7 @@ git push
 | בעיה | פתרון |
 |------|--------|
 | **Build failed** `DATABASE_URL` / `P1012` | ב-Render חייב `DATABASE_URL=postgresql://...` (לא SQLite, לא ריק) |
-| **Deploy timeout** / URL לא עובד | השרת נופל בהפעלה — Render → **Logs** → חפש `[env] Missing` |
+| **Deploy timeout** / URL לא עובד | `DATABASE_URL` עם **Session pooler** (לא `db.*.supabase.co`) |
 | **`fetch failed` (Supabase)** | ודא `SUPABASE_URL` + `SERVICE_ROLE_KEY` מאותו פרויקט Supabase |
 | **Supabase INACTIVE** | Supabase Dashboard → Restore project (פרויקטים ישנים «נרדמים») |
 | Shopify `example.com` | עדכן `SHOPIFY_APP_URL` + `npm run deploy` |

@@ -10,7 +10,6 @@ RUN npm ci
 COPY . .
 RUN npm run build
 RUN npx prisma generate
-RUN npx prisma migrate deploy
 RUN npm prune --omit=dev
 
 FROM node:20-alpine
