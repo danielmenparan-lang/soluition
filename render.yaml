@@ -16,6 +16,8 @@ services:
         value: 10000
       - key: HOST
         value: 0.0.0.0
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=460
       - key: SCOPES
         value: read_analytics,read_content,read_customers,read_orders,read_products,write_script_tags
       - key: DATABASE_URL

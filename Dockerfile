@@ -29,4 +29,4 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/scripts ./scripts
 
-CMD ["npm", "run", "docker-start"]
+CMD ["node", "scripts/start-production.mjs"]
