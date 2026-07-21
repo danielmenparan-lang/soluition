@@ -54,9 +54,11 @@ git push -u origin main
 | `SUPABASE_URL` | Supabase → Settings → API → Project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role |
 | `ANTHROPIC_API_KEY` | Anthropic dashboard |
-| `DATABASE_URL` | Supabase → Settings → Database → URI (Session mode) |
+| `DATABASE_URL` | Supabase → Settings → Database → **URI** (Direct connection, port **5432**) |
 
-> **DATABASE_URL** — Supabase Postgres ל-Sessions של Shopify (לא ה-REST URL).
+> **DATABASE_URL** — חייב להיות Postgres ישיר (לא pooler 6543):
+> `postgresql://postgres.[ref]:[PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres`
+> או: `postgresql://postgres:[PASSWORD]@db.brmcddfmkgvsfbmtvtwf.supabase.co:5432/postgres`
 
 ### Prisma Sessions (פעם אחת, מהמחשב)
 
