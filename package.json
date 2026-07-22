@@ -10,6 +10,7 @@
     "config:use": "shopify app config use",
     "env": "shopify app env",
     "start": "react-router-serve ./build/server/index.js",
+    "start:render": "node ./node_modules/@react-router/serve/dist/cli.js ./build/server/index.js",
     "docker-start": "node scripts/start-production.mjs",
     "setup": "prisma generate && prisma migrate deploy",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",

@@ -1,19 +1,19 @@
 # Render Blueprint — Shopify Marketing Solution
-# Docs: https://render.com/docs/blueprint-spec
+# Native Node (more stable on free tier than Docker)
 
 services:
   - type: web
     name: shopify-marketing-solution
-    runtime: docker
+    runtime: node
     plan: free
     region: frankfurt
+    buildCommand: npm ci && npm run build && npx prisma generate
+    startCommand: node ./node_modules/@react-router/serve/dist/cli.js ./build/server/index.js
     healthCheckPath: /health
     autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
       - key: HOST
         value: 0.0.0.0
       - key: NODE_OPTIONS

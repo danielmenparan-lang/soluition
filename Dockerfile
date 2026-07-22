@@ -1,5 +1,5 @@
-FROM node:20-alpine AS build
-RUN apk add --no-cache openssl
+FROM node:20-bookworm-slim AS build
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -12,8 +12,8 @@ RUN npm run build
 RUN npx prisma generate
 RUN npm prune --omit=dev
 
-FROM node:20-alpine
-RUN apk add --no-cache openssl
+FROM node:20-bookworm-slim
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
@@ -27,7 +27,6 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/package.json ./package.json
 
-# Render sets PORT at runtime — react-router-serve reads process.env.PORT
 EXPOSE 10000
 
 CMD ["node", "./node_modules/@react-router/serve/dist/cli.js", "./build/server/index.js"]
