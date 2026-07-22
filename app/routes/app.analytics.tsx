@@ -3,22 +3,26 @@ import { useLoaderData } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { getOrCreateShop } from "../services/shop.server";
-import { getDashboardMetrics, getHighBouncePages } from "../services/analytics.server";
+import { getDashboardMetrics, getHighBouncePages, getHighTrafficLowConversionPages } from "../services/analytics.server";
+import { getProductExitDrivers } from "../services/product-intelligence.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
 
-  const [metrics, bouncePages] = await Promise.all([
+  const [metrics, bouncePages, lowConversionPages, productExitDrivers] = await Promise.all([
     getDashboardMetrics(shop.id),
     getHighBouncePages(shop.id),
+    getHighTrafficLowConversionPages(shop.id),
+    getProductExitDrivers(shop.id),
   ]);
 
-  return { metrics, bouncePages };
+  return { metrics, bouncePages, lowConversionPages, productExitDrivers };
 };
 
 export default function Analytics() {
-  const { metrics, bouncePages } = useLoaderData<typeof loader>();
+  const { metrics, bouncePages, lowConversionPages, productExitDrivers } =
+    useLoaderData<typeof loader>();
 
   return (
     <s-page heading="אנליטיקה">
@@ -102,6 +106,50 @@ export default function Analytics() {
             </s-box>
           ))}
         </s-grid>
+      </s-section>
+
+      <s-section heading="דפים עם traffic גבוה ו-conversion נמוך">
+        <s-table>
+          <s-table-header-row>
+            <s-table-header>URL</s-table-header>
+            <s-table-header>כותרת</s-table-header>
+            <s-table-header>צפיות</s-table-header>
+            <s-table-header>יציאות</s-table-header>
+            <s-table-header>Exit Rate</s-table-header>
+          </s-table-header-row>
+          <s-table-body>
+            {lowConversionPages.map((p) => (
+              <s-table-row key={p.url}>
+                <s-table-cell>{p.url}</s-table-cell>
+                <s-table-cell>{p.pageTitle ?? "—"}</s-table-cell>
+                <s-table-cell>{p.views}</s-table-cell>
+                <s-table-cell>{p.exits}</s-table-cell>
+                <s-table-cell>{p.exitRate}%</s-table-cell>
+              </s-table-row>
+            ))}
+          </s-table-body>
+        </s-table>
+      </s-section>
+
+      <s-section heading="מוצרים שגורמים לנטישה">
+        <s-table>
+          <s-table-header-row>
+            <s-table-header>מוצר</s-table-header>
+            <s-table-header>צפיות</s-table-header>
+            <s-table-header>נטישות</s-table-header>
+            <s-table-header>Exit Rate</s-table-header>
+          </s-table-header-row>
+          <s-table-body>
+            {productExitDrivers.map((p) => (
+              <s-table-row key={p.productId}>
+                <s-table-cell>{p.productTitle}</s-table-cell>
+                <s-table-cell>{p.viewCount}</s-table-cell>
+                <s-table-cell>{p.exitCount}</s-table-cell>
+                <s-table-cell>{p.exitRate}%</s-table-cell>
+              </s-table-row>
+            ))}
+          </s-table-body>
+        </s-table>
       </s-section>
 
       <s-section heading="דפים עם נטישה גבוהה">

@@ -14,8 +14,9 @@
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role | `eyJ...` |
 | `ANTHROPIC_API_KEY` | Anthropic dashboard | `sk-ant-...` |
 | `HOST` | קבוע | `0.0.0.0` |
-| `PORT` | קבוע | `10000` |
 | `SCOPES` | קבוע | `read_products,read_orders,read_customers,read_analytics,write_script_tags,read_content` |
+
+> **אל תגדיר `PORT` ידנית** — Render מזריק את הפורט הנכון אוטומטית. override שגוי = 502.
 
 ## DATABASE_URL — טעויות נפוצות
 

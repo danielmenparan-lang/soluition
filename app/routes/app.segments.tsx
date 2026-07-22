@@ -75,6 +75,17 @@ export default function Segments() {
         </s-grid>
       </s-section>
 
+      <s-section heading="פילוח לפי מקור תנועה">
+        <s-grid gridTemplateColumns="repeat(4, 1fr)" gap="base">
+          {breakdown.byTrafficSource.slice(0, 8).map((s) => (
+            <s-box key={s.source} padding="base" background="subdued" borderRadius="base">
+              <s-text type="strong">{s.source}</s-text>
+              <s-paragraph>{s.count} sessions</s-paragraph>
+            </s-box>
+          ))}
+        </s-grid>
+      </s-section>
+
       <s-section heading="פילוח לפי מדינה">
         <s-grid gridTemplateColumns="repeat(4, 1fr)" gap="base">
           {breakdown.byCountry.slice(0, 8).map((c) => (

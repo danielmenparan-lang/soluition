@@ -313,6 +313,10 @@ export type SegmentType =
   | "high_intent"
   | "window_shoppers"
   | "returning_customers"
+  | "facebook_mobile"
+  | "google_desktop"
+  | "tiktok_traffic"
+  | "international"
   | "custom";
 
 export type TrafficSource =

@@ -16,11 +16,19 @@ export interface ProductInsight {
     | "high_views_low_sales"
     | "high_conversion"
     | "growth_potential"
-    | "returning_driver";
+    | "exit_driver";
   productId: string;
   productTitle: string;
   metric: number;
   description: string;
+}
+
+export interface ProductExitDriver {
+  productId: string;
+  productTitle: string;
+  exitCount: number;
+  viewCount: number;
+  exitRate: number;
 }
 
 export async function getProductMetrics(
@@ -105,6 +113,110 @@ export function analyzeProducts(metrics: ProductMetrics[]): ProductInsight[] {
   }
 
   return insights.slice(0, 20);
+}
+
+export async function getProductExitDrivers(
+  shopId: string,
+  days = 30,
+  limit = 10,
+): Promise<ProductExitDriver[]> {
+  const supabase = getSupabase();
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  const { data: exitSessions } = await supabase
+    .from("visitor_sessions")
+    .select("id")
+    .eq("shop_id", shopId)
+    .eq("converted", false)
+    .not("ended_at", "is", null)
+    .gte("started_at", since.toISOString());
+
+  const sessionIds = (exitSessions ?? []).map((s) => s.id);
+  if (sessionIds.length === 0) return [];
+
+  const exitMap = new Map<string, { productTitle: string; exitCount: number }>();
+
+  for (let i = 0; i < sessionIds.length; i += 100) {
+    const chunk = sessionIds.slice(i, i + 100);
+    const { data: events } = await supabase
+      .from("events")
+      .select("session_uuid, event_type, product_id, product_title, created_at")
+      .in("session_uuid", chunk)
+      .in("event_type", ["product_view", "session_end", "purchase"])
+      .order("created_at", { ascending: true });
+
+    const bySession = new Map<string, typeof events>();
+    for (const event of events ?? []) {
+      const list = bySession.get(event.session_uuid) ?? [];
+      list.push(event);
+      bySession.set(event.session_uuid, list);
+    }
+
+    for (const sessionEvents of bySession.values()) {
+      if (sessionEvents.some((event) => event.event_type === "purchase")) {
+        continue;
+      }
+
+      const productViews = sessionEvents.filter(
+        (event) => event.event_type === "product_view" && event.product_id,
+      );
+      if (productViews.length === 0) continue;
+
+      const hasSessionEnd = sessionEvents.some(
+        (event) => event.event_type === "session_end",
+      );
+      if (!hasSessionEnd) continue;
+
+      const lastProduct = productViews[productViews.length - 1];
+      if (!lastProduct.product_id) continue;
+
+      const existing = exitMap.get(lastProduct.product_id) ?? {
+        productTitle: lastProduct.product_title ?? lastProduct.product_id,
+        exitCount: 0,
+      };
+      existing.exitCount += 1;
+      exitMap.set(lastProduct.product_id, existing);
+    }
+  }
+
+  const metrics = await getProductMetrics(shopId, days);
+  const viewsByProduct = new Map(
+    metrics.map((metric) => [metric.productId, metric.views]),
+  );
+
+  return Array.from(exitMap.entries())
+    .map(([productId, info]) => {
+      const viewCount = viewsByProduct.get(productId) ?? 0;
+      const exitRate =
+        viewCount > 0
+          ? Math.round((info.exitCount / viewCount) * 10000) / 100
+          : 100;
+      return {
+        productId,
+        productTitle: info.productTitle,
+        exitCount: info.exitCount,
+        viewCount,
+        exitRate,
+      };
+    })
+    .sort((a, b) => b.exitCount - a.exitCount || b.exitRate - a.exitRate)
+    .slice(0, limit);
+}
+
+export function analyzeProductExitDrivers(
+  drivers: ProductExitDriver[],
+): ProductInsight[] {
+  return drivers
+    .filter((driver) => driver.exitCount >= 3)
+    .slice(0, 10)
+    .map((driver) => ({
+      type: "exit_driver" as const,
+      productId: driver.productId,
+      productTitle: driver.productTitle,
+      metric: driver.exitCount,
+      description: `${driver.exitCount} visitors left the site after viewing this product (${driver.exitRate}% exit rate) — review pricing, images, or page layout`,
+    }));
 }
 
 export async function upsertProductAnalytics(

@@ -18,6 +18,7 @@ const trackEventSchema = z.object({
   utmTerm: z.string().optional(),
   utmContent: z.string().optional(),
   productId: z.string().optional(),
+  productHandle: z.string().optional(),
   productTitle: z.string().optional(),
   collectionId: z.string().optional(),
   orderValue: z.number().optional(),
@@ -34,8 +35,13 @@ const trackEventSchema = z.object({
 
 export type TrackEventPayload = z.infer<typeof trackEventSchema>;
 
+export interface TrackGeoContext {
+  country?: string;
+}
+
 export async function processTrackEvent(
   rawPayload: unknown,
+  geoContext: TrackGeoContext = {},
 ): Promise<{ success: boolean; error?: string }> {
   const parsed = trackEventSchema.safeParse(rawPayload);
   if (!parsed.success) {
@@ -44,6 +50,7 @@ export async function processTrackEvent(
 
   const payload = parsed.data;
   const supabase = getSupabase();
+  const resolvedCountry = geoContext.country ?? payload.country;
 
   const { data: shop } = await supabase
     .from("shops")
@@ -75,7 +82,7 @@ export async function processTrackEvent(
         is_returning: true,
         visit_count: existingVisitor.visit_count + 1,
         last_seen_at: new Date().toISOString(),
-        country: payload.country ?? existingVisitor.country,
+        country: resolvedCountry ?? existingVisitor.country,
         city: payload.city ?? existingVisitor.city,
         device_type: payload.deviceType ?? existingVisitor.device_type,
         browser: payload.browser ?? existingVisitor.browser,
@@ -88,7 +95,7 @@ export async function processTrackEvent(
       .insert({
         shop_id: shopId,
         visitor_id: payload.visitorId,
-        country: payload.country,
+        country: resolvedCountry,
         city: payload.city,
         device_type: payload.deviceType,
         browser: payload.browser,
@@ -130,9 +137,12 @@ export async function processTrackEvent(
     } = {
       exit_page: payload.url ?? existingSession.exit_page,
     };
-    if (payload.eventType === "session_end" && payload.timeOnPage) {
+    if (payload.eventType === "session_end") {
       updates.ended_at = new Date().toISOString();
-      updates.duration_seconds = payload.timeOnPage;
+      if (payload.timeOnPage) {
+        updates.duration_seconds =
+          (existingSession.duration_seconds ?? 0) + payload.timeOnPage;
+      }
     }
     if (payload.eventType === "purchase") {
       updates.converted = true;
@@ -179,8 +189,27 @@ export async function processTrackEvent(
       url: payload.url,
       page_title: payload.pageTitle,
       time_on_page_seconds: payload.timeOnPage,
-      is_exit: eventType === "session_end",
+      is_exit: false,
     });
+  }
+
+  if (payload.eventType === "session_end" && payload.url) {
+    await supabase.from("page_views").insert({
+      shop_id: shopId,
+      session_uuid: sessionUuid,
+      visitor_uuid: visitorUuid,
+      url: payload.url,
+      page_title: payload.pageTitle,
+      time_on_page_seconds: payload.timeOnPage,
+      is_exit: true,
+    });
+  }
+
+  const eventData: Record<string, unknown> = {
+    ...(payload.eventData ?? {}),
+  };
+  if (payload.productHandle) {
+    eventData.productHandle = payload.productHandle;
   }
 
   // Record event
@@ -189,8 +218,8 @@ export async function processTrackEvent(
     session_uuid: sessionUuid,
     visitor_uuid: visitorUuid,
     event_type: eventType,
-    event_data: (payload.eventData ?? {}) as Json,
-    product_id: payload.productId,
+    event_data: eventData as Json,
+    product_id: payload.productId ?? payload.productHandle,
     product_title: payload.productTitle,
     collection_id: payload.collectionId,
     order_value: payload.orderValue,

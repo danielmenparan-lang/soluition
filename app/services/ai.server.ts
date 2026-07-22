@@ -1,7 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
 import getSupabase from "../supabase.server";
 import { prepareAnalyticsSummary } from "./analytics.server";
-import { analyzeProducts, getProductMetrics } from "./product-intelligence.server";
+import {
+  analyzeProducts,
+  analyzeProductExitDrivers,
+  getProductExitDrivers,
+  getProductMetrics,
+} from "./product-intelligence.server";
 import {
   computeAttributionMetrics,
   findWastefulSources,
@@ -79,7 +84,10 @@ export async function generateRecommendations(
   const supabase = getSupabase();
   const analyticsSummary = await prepareAnalyticsSummary(shopId);
   const productMetrics = await getProductMetrics(shopId);
-  const productInsights = analyzeProducts(productMetrics);
+  const productInsights = [
+    ...analyzeProducts(productMetrics),
+    ...analyzeProductExitDrivers(await getProductExitDrivers(shopId)),
+  ];
   const segments = await getSegments(shopId);
 
   const prompt = `Analyze this Shopify store data and generate marketing recommendations.

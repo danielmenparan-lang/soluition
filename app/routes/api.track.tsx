@@ -1,5 +1,20 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { resolveCountryFromRequest } from "../services/geo.server";
 import { processTrackEvent } from "../services/tracking.server";
+
+async function parseTrackPayload(request: Request): Promise<unknown> {
+  const contentType = request.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    return request.json();
+  }
+
+  const text = await request.text();
+  if (!text) {
+    throw new Error("Empty request body");
+  }
+
+  return JSON.parse(text);
+}
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -22,8 +37,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   try {
-    const payload = await request.json();
-    const result = await processTrackEvent(payload);
+    const payload = await parseTrackPayload(request);
+    const country =
+      typeof payload === "object" &&
+      payload !== null &&
+      "country" in payload &&
+      typeof payload.country === "string"
+        ? payload.country
+        : await resolveCountryFromRequest(request);
+
+    const result = await processTrackEvent(payload, { country: country ?? undefined });
 
     return Response.json(result, {
       status: result.success ? 200 : 400,

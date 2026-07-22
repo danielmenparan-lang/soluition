@@ -3,7 +3,11 @@ import {
   computeAttributionMetrics,
   type AttributionMetrics,
 } from "./attribution.server";
-import { getProductMetrics, type ProductMetrics } from "./product-intelligence.server";
+import {
+  getProductMetrics,
+  getProductExitDrivers,
+  type ProductMetrics,
+} from "./product-intelligence.server";
 
 export interface DashboardMetrics {
   totalVisitors: number;
@@ -156,12 +160,71 @@ export async function getHighBouncePages(
     .slice(0, limit);
 }
 
+export async function getHighTrafficLowConversionPages(
+  shopId: string,
+  days = 30,
+  limit = 10,
+): Promise<
+  Array<{
+    url: string;
+    pageTitle: string | null;
+    views: number;
+    exits: number;
+    exitRate: number;
+  }>
+> {
+  const supabase = getSupabase();
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  const { data: pageViews } = await supabase
+    .from("page_views")
+    .select("url, page_title, is_exit")
+    .eq("shop_id", shopId)
+    .gte("viewed_at", since.toISOString());
+
+  const map = new Map<
+    string,
+    { pageTitle: string | null; views: number; exits: number }
+  >();
+
+  for (const pageView of pageViews ?? []) {
+    const existing = map.get(pageView.url) ?? {
+      pageTitle: pageView.page_title,
+      views: 0,
+      exits: 0,
+    };
+    existing.views += 1;
+    if (pageView.is_exit) existing.exits += 1;
+    map.set(pageView.url, existing);
+  }
+
+  return Array.from(map.entries())
+    .map(([url, info]) => ({
+      url,
+      pageTitle: info.pageTitle,
+      views: info.views,
+      exits: info.exits,
+      exitRate:
+        info.views > 0
+          ? Math.round((info.exits / info.views) * 10000) / 100
+          : 0,
+    }))
+    .filter((page) => page.views >= 10 && page.exitRate >= 50)
+    .sort((a, b) => b.views - a.views || b.exitRate - a.exitRate)
+    .slice(0, limit);
+}
+
 export async function prepareAnalyticsSummary(
   shopId: string,
   days = 30,
 ): Promise<string> {
   const metrics = await getDashboardMetrics(shopId, days);
-  const bouncePages = await getHighBouncePages(shopId, days, 5);
+  const [bouncePages, lowConversionPages, productExitDrivers] = await Promise.all([
+    getHighBouncePages(shopId, days, 5),
+    getHighTrafficLowConversionPages(shopId, days, 5),
+    getProductExitDrivers(shopId, days, 5),
+  ]);
 
   return JSON.stringify(
     {
@@ -185,6 +248,8 @@ export async function prepareAnalyticsSummary(
       topCountries: metrics.topCountries.slice(0, 5),
       peakConversionHours: metrics.peakConversionHours,
       highBouncePages: bouncePages,
+      highTrafficLowConversionPages: lowConversionPages,
+      productExitDrivers,
     },
     null,
     2,

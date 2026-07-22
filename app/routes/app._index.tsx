@@ -81,6 +81,19 @@ export default function Overview() {
         {fetcher.state !== "idle" ? "מעבד..." : "יצירת המלצות AI"}
       </s-button>
 
+      <s-section heading="פתיחה נכונה של האפליקציה">
+        <s-banner tone="warning">
+          <s-paragraph>
+            אל תפתח כתובות <s-text type="strong">trycloudflare.com</s-text> — הן זמניות
+            ונמחקות. פתח תמיד דרך Shopify Admin → Apps → solution.
+          </s-paragraph>
+        </s-banner>
+        <s-paragraph>
+          כתובת production:{" "}
+          <s-text type="strong">https://shopify-marketing-solution.onrender.com</s-text>
+        </s-paragraph>
+      </s-section>
+
       <s-section heading="מזהה מעקב">
         <s-paragraph>
           הוסף את סקריפט המעקב לחנות שלך. Tracking ID:{" "}
