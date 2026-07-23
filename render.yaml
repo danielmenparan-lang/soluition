@@ -1,5 +1,4 @@
 # Render Blueprint — Shopify Marketing Solution
-# Native Node (more stable on free tier than Docker)
 
 services:
   - type: web
@@ -7,9 +6,8 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    # NODE_ENV=production skips devDependencies during npm ci — include dev tools for build.
-    buildCommand: npm ci --include=dev && npm run build && npx prisma generate && npm prune --omit=dev
-    startCommand: node scripts/render-start.mjs
+    buildCommand: npm ci --include=dev && npm run build && npx prisma generate
+    startCommand: node ./node_modules/@react-router/serve/dist/cli.js ./build/server/index.js
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -20,7 +18,7 @@ services:
       - key: HOST
         value: 0.0.0.0
       - key: NODE_OPTIONS
-        value: --max-old-space-size=460
+        value: --max-old-space-size=384
       - key: SCOPES
         value: read_analytics,read_content,read_customers,read_orders,read_products,write_script_tags
       - key: DATABASE_URL

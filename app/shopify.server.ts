@@ -11,6 +11,19 @@ export const isShopifyConfigured = Boolean(
   process.env.SHOPIFY_API_KEY?.trim() && process.env.SHOPIFY_API_SECRET?.trim(),
 );
 
+const prismaSessionStorage = new PrismaSessionStorage(prisma, {
+  connectionRetries: 2,
+  connectionRetryIntervalMs: 3000,
+});
+
+void prismaSessionStorage.isReady().then((ready) => {
+  if (!ready) {
+    console.error(
+      "[shopify] Session storage unavailable. Check DATABASE_URL (Session pooler) and run supabase/session-table.sql",
+    );
+  }
+});
+
 // Placeholders allow the server to boot on Render while env vars are being configured.
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY || "not-configured",
@@ -19,7 +32,7 @@ const shopify = shopifyApp({
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
-  sessionStorage: new PrismaSessionStorage(prisma),
+  sessionStorage: prismaSessionStorage,
   distribution: AppDistribution.AppStore,
   future: {
     expiringOfflineAccessTokens: true,

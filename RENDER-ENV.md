@@ -24,6 +24,20 @@
 - ❌ `postgresql://postgres:pass@pooler...` (חסר `.brmcddfmkgvsfbmtvtwf` אחרי postgres)
 - ✅ `postgresql://postgres.brmcddfmkgvsfbmtvtwf:pass@aws-0-REGION.pooler.supabase.com:5432/postgres`
 
+## אם עדיין 502 — עדכן ידנית ב-Render Dashboard → Settings
+
+**Build Command:**
+```
+npm ci --include=dev && npm run build && npx prisma generate
+```
+
+**Start Command:**
+```
+node ./node_modules/@react-router/serve/dist/cli.js ./build/server/index.js
+```
+
+**מחק** את משתנה `PORT` מ-Environment אם קיים.
+
 ## בדיקה
 
 ```
