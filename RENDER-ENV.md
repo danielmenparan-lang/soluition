@@ -33,10 +33,10 @@ npm ci --include=dev && npm run build && npx prisma generate
 
 **Start Command:**
 ```
-node ./node_modules/@react-router/serve/dist/cli.js ./build/server/index.js
+node scripts/render-start.mjs
 ```
 
-**מחק** את משתנה `PORT` מ-Environment אם קיים.
+**מחק** את משתנה `PORT` מ-Environment — Render מזריק PORT אוטומטית. override שגוי = "Port scan timeout".
 
 ## בדיקה
 

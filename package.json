@@ -19,7 +19,9 @@
     "shopify": "shopify",
     "prisma": "prisma",
     "typecheck": "react-router typegen && tsc --noEmit",
-    "db:seed": "tsx scripts/seed-demo-data.ts"
+    "db:seed": "tsx scripts/seed-demo-data.ts",
+    "db:test": "node scripts/test-database-url.mjs",
+    "db:migrate": "prisma migrate deploy"
   },
   "type": "module",
   "engines": {

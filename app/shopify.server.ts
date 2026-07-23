@@ -11,9 +11,13 @@ export const isShopifyConfigured = Boolean(
   process.env.SHOPIFY_API_KEY?.trim() && process.env.SHOPIFY_API_SECRET?.trim(),
 );
 
+process.on("unhandledRejection", (reason) => {
+  console.error("[shopify-app] Unhandled rejection (non-fatal):", reason);
+});
+
 const prismaSessionStorage = new PrismaSessionStorage(prisma, {
-  connectionRetries: 2,
-  connectionRetryIntervalMs: 3000,
+  connectionRetries: 1,
+  connectionRetryIntervalMs: 1000,
 });
 
 void prismaSessionStorage.isReady().then((ready) => {

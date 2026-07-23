@@ -7,7 +7,7 @@ services:
     plan: free
     region: frankfurt
     buildCommand: npm ci --include=dev && npm run build && npx prisma generate
-    startCommand: node ./node_modules/@react-router/serve/dist/cli.js ./build/server/index.js
+    startCommand: node scripts/render-start.mjs
     healthCheckPath: /health
     autoDeploy: true
     envVars:
