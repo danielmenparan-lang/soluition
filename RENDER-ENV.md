@@ -2,29 +2,50 @@
 
 > Render → shopify-marketing-solution → **Environment** → Add each variable → **Save** → **Deploy**
 
+## ⚠️ בעיה נפוצה — מפתחות של Profit Brain
+
+אם האפליקציה פותחת `profit-brain-ai.fly.dev` — **SHOPIFY_API_KEY שגוי ב-Render**.
+
+| ❌ שגוי (Profit Brain) | ✅ נכון (solution) |
+|------------------------|-------------------|
+| `fe4d228456a8721ec3e9a21a78448ec6` | `00eb38f774ffba914d98a6800f4c5df5` |
+| `https://profit-brain-ai.fly.dev` | `https://shopify-marketing-solution.onrender.com` |
+
 ## חובה
 
-| Key | מאיפה | דוגמה |
-|-----|--------|--------|
-| `DATABASE_URL` | Supabase → **Connect** → Session pooler → URI | `postgresql://postgres.brmcddfmkgvsfbmtvtwf:PASSWORD@aws-0-REGION.pooler.supabase.com:5432/postgres?connect_timeout=30` |
-| `SHOPIFY_API_KEY` | dev.shopify.com → solution → Client ID | `00eb38f774ffba914d98a6800f4c5df5` |
-| `SHOPIFY_API_SECRET` | dev.shopify.com → solution → Client secret → Reveal | `shpss_...` |
-| `SHOPIFY_APP_URL` | כתובת Render | `https://shopify-marketing-solution.onrender.com` |
-| `SUPABASE_URL` | Supabase → Settings → API | `https://brmcddfmkgvsfbmtvtwf.supabase.co` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role | `eyJ...` |
-| `ANTHROPIC_API_KEY` | Anthropic dashboard | `sk-ant-...` |
-| `HOST` | קבוע | `0.0.0.0` |
-| `SCOPES` | קבוע | `read_products,read_orders,read_customers,read_analytics,write_script_tags,read_content` |
+| Key | ערך נכון |
+|-----|----------|
+| `SHOPIFY_API_KEY` | `00eb38f774ffba914d98a6800f4c5df5` |
+| `SHOPIFY_API_SECRET` | מ-Partners → **solution** → Client secret (לא Profit Brain!) |
+| `SHOPIFY_APP_URL` | `https://shopify-marketing-solution.onrender.com` |
+| `DATABASE_URL` | Supabase Session pooler (ראה למטה) |
+| `SUPABASE_URL` | `https://brmcddfmkgvsfbmtvtwf.supabase.co` |
+| `SUPABASE_SERVICE_ROLE_KEY` | מ-Supabase → Settings → API |
+| `ANTHROPIC_API_KEY` | מ-Anthropic |
+| `HOST` | `0.0.0.0` |
+| `SCOPES` | `read_products,read_orders,read_customers,read_analytics,write_script_tags,read_content` |
 
-> **אל תגדיר `PORT` ידנית** — Render מזריק את הפורט הנכון אוטומטית. override שגוי = 502.
+> **אל תגדיר `PORT` ידנית** — Render מזריק PORT אוטומטית.
 
-## DATABASE_URL — טעויות נפוצות
+## DATABASE_URL
 
-- ❌ `db.xxx.supabase.co` (Direct — לא עובד ב-Render, IPv4)
-- ❌ `postgresql://postgres:pass@pooler...` (חסר `.brmcddfmkgvsfbmtvtwf` אחרי postgres)
-- ✅ `postgresql://postgres.brmcddfmkgvsfbmtvtwf:pass@aws-0-REGION.pooler.supabase.com:5432/postgres`
+```
+postgresql://postgres.brmcddfmkgvsfbmtvtwf:PASSWORD@aws-0-REGION.pooler.supabase.com:5432/postgres
+```
 
-## אם עדיין 502 — עדכן ידנית ב-Render Dashboard → Settings
+### ECIRCUITBREAKER (too many authentication failures)
+
+1. Supabase → **Database** → **Reset database password**
+2. Connect → Session pooler → העתק URI **חדש**
+3. Render → עדכן `DATABASE_URL`
+4. **המתן 15–30 דקות** (Supabase חוסם זמנית)
+5. Manual Deploy
+
+### Session table
+
+הרץ `supabase/session-table.sql` ב-Supabase SQL Editor.
+
+## Settings
 
 **Build Command:**
 ```
@@ -36,19 +57,19 @@ npm ci --include=dev && npm run build && npx prisma generate
 node scripts/render-start.mjs
 ```
 
-**מחק** את משתנה `PORT` מ-Environment — Render מזריק PORT אוטומטית. override שגוי = "Port scan timeout".
-
 ## בדיקה
 
 ```
-https://shopify-marketing-solution.onrender.com/health  →  ok
+https://shopify-marketing-solution.onrender.com/health
 ```
 
-## אחרי Live
+חפש:
+- `"apiKeyPrefix": "00eb38f7"`
+- `"apiKeyMatchesApp": true`
+- `"appUrlMatches": true`
+- `"connected": true`
+- `"sessionTableReady": true`
 
-```powershell
-cd C:\Users\User\Projects\shopify-marketing-solution
-npm run deploy
-```
+## פתיחת האפליקציה
 
-(מעדכן URL ב-Shopify Partners)
+https://admin.shopify.com/store/solution-vyndgruj/apps/00eb38f774ffba914d98a6800f4c5df5
