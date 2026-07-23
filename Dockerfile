@@ -27,6 +27,7 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/package.json ./package.json
 
-EXPOSE 10000
+EXPOSE 8080
 
+ENV PORT=8080
 CMD ["node", "./node_modules/@react-router/serve/dist/cli.js", "./build/server/index.js"]

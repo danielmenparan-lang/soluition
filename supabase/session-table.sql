@@ -1,4 +1,6 @@
--- Shopify session storage (Prisma) — run once in Supabase SQL Editor if Render DB migrate failed
+-- Shopify OAuth sessions (Prisma) — run in Supabase SQL Editor
+-- Project: brmcddfmkgvsfbmtvtwf → SQL → New query → Run
+
 CREATE TABLE IF NOT EXISTS "Session" (
     "id" TEXT NOT NULL,
     "shop" TEXT NOT NULL,
@@ -19,3 +21,8 @@ CREATE TABLE IF NOT EXISTS "Session" (
     "refreshTokenExpires" TIMESTAMP(3),
     CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
 );
+
+-- Verify (should return 1 row with tablename = Session)
+SELECT tablename
+FROM pg_tables
+WHERE schemaname = 'public' AND tablename = 'Session';

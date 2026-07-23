@@ -6,6 +6,10 @@ import {
 } from "@shopify/shopify-app-react-router/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
+import {
+  isSupabaseSessionStorageConfigured,
+  SupabaseSessionStorage,
+} from "./services/supabase-session-storage.server";
 
 export const isShopifyConfigured = Boolean(
   process.env.SHOPIFY_API_KEY?.trim() && process.env.SHOPIFY_API_SECRET?.trim(),
@@ -15,18 +19,33 @@ process.on("unhandledRejection", (reason) => {
   console.error("[shopify-app] Unhandled rejection (non-fatal):", reason);
 });
 
-const prismaSessionStorage = new PrismaSessionStorage(prisma, {
-  connectionRetries: 1,
-  connectionRetryIntervalMs: 1000,
-});
+const useSupabaseSessions = isSupabaseSessionStorageConfigured();
 
-void prismaSessionStorage.isReady().then((ready) => {
-  if (!ready) {
-    console.error(
-      "[shopify] Session storage unavailable. Check DATABASE_URL (Session pooler) and run supabase/session-table.sql",
-    );
-  }
-});
+const sessionStorageImpl = useSupabaseSessions
+  ? new SupabaseSessionStorage()
+  : new PrismaSessionStorage(prisma, {
+      connectionRetries: 1,
+      connectionRetryIntervalMs: 1000,
+    });
+
+if (useSupabaseSessions) {
+  console.log("[shopify] Using Supabase REST for OAuth sessions (no DATABASE_URL needed)");
+  void (sessionStorageImpl as SupabaseSessionStorage).isReady().then((ready) => {
+    if (!ready) {
+      console.error(
+        "[shopify] Session storage unavailable. Run supabase/session-table.sql in Supabase SQL Editor",
+      );
+    }
+  });
+} else {
+  void (sessionStorageImpl as PrismaSessionStorage).isReady().then((ready) => {
+    if (!ready) {
+      console.error(
+        "[shopify] Session storage unavailable. Set SUPABASE keys or fix DATABASE_URL",
+      );
+    }
+  });
+}
 
 // Placeholders allow the server to boot on Render while env vars are being configured.
 const shopify = shopifyApp({
@@ -36,7 +55,7 @@ const shopify = shopifyApp({
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
-  sessionStorage: prismaSessionStorage,
+  sessionStorage: sessionStorageImpl,
   distribution: AppDistribution.AppStore,
   future: {
     expiringOfflineAccessTokens: true,
@@ -54,3 +73,4 @@ export const unauthenticated = shopify.unauthenticated;
 export const login = shopify.login;
 export const registerWebhooks = shopify.registerWebhooks;
 export const sessionStorage = shopify.sessionStorage;
+export const sessionStorageMode = useSupabaseSessions ? "supabase" : "prisma";

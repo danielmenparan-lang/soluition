@@ -1,34 +1,26 @@
-import prisma from "../db.server";
 import { getShopifyConfigStatus } from "../config/shopify-app.server";
+import {
+  checkSupabaseSessionTable,
+  isSupabaseSessionStorageConfigured,
+} from "../services/supabase-session-storage.server";
 
 export const loader = async () => {
-  const databaseUrl = process.env.DATABASE_URL?.trim() ?? "";
   const shopifyConfig = getShopifyConfigStatus();
+  const sessionStorageMode = isSupabaseSessionStorageConfigured()
+    ? "supabase"
+    : "prisma";
+  const sessionCheck = await checkSupabaseSessionTable();
 
-  let dbConnected = false;
-  let sessionTableReady = false;
-  let dbError: string | null = null;
-
-  if (databaseUrl.startsWith("postgres")) {
-    try {
-      await prisma.$queryRaw`SELECT 1`;
-      dbConnected = true;
-      sessionTableReady =
-        (await prisma.session.count().catch(() => -1)) >= 0;
-    } catch (error) {
-      dbError = error instanceof Error ? error.message : "Database connection failed";
-    }
-  }
-
+  const sessionReady = sessionCheck.ready;
   const configOk =
     shopifyConfig.apiKeyMatchesApp &&
     shopifyConfig.appUrlMatches &&
-    dbConnected &&
-    sessionTableReady;
+    sessionReady;
 
   return Response.json(
     {
       ok: configOk,
+      sessionStorage: sessionStorageMode,
       shopify: {
         apiKeySet: Boolean(process.env.SHOPIFY_API_KEY?.trim()),
         apiSecretSet: Boolean(process.env.SHOPIFY_API_SECRET?.trim()),
@@ -39,12 +31,10 @@ export const loader = async () => {
         appUrlMatches: shopifyConfig.appUrlMatches,
         expectedAppUrl: shopifyConfig.expectedAppUrl,
       },
-      database: {
-        configured: databaseUrl.startsWith("postgres"),
-        usesPooler: databaseUrl.includes("pooler.supabase.com"),
-        connected: dbConnected,
-        sessionTableReady,
-        error: dbError,
+      sessions: {
+        provider: sessionStorageMode,
+        tableReady: sessionReady,
+        error: sessionCheck.error,
       },
       supabase: {
         urlSet: Boolean(process.env.SUPABASE_URL?.trim()),
@@ -52,16 +42,13 @@ export const loader = async () => {
       },
       hints: [
         !shopifyConfig.apiKeyMatchesApp
-          ? "SHOPIFY_API_KEY in Render is WRONG — must be 00eb38f774ffba914d98a6800f4c5df5 (solution app, NOT Profit Brain fe4d2284...)"
+          ? "SHOPIFY_API_KEY wrong — must be 00eb38f774ffba914d98a6800f4c5df5"
           : null,
         !shopifyConfig.appUrlMatches
-          ? "SHOPIFY_APP_URL must be https://shopify-marketing-solution.onrender.com (NOT fly.dev)"
+          ? "SHOPIFY_APP_URL must be https://shopify-marketing-solution.onrender.com"
           : null,
-        dbError?.includes("ECIRCUITBREAKER")
-          ? "Supabase blocked connections — reset DB password in Supabase, update DATABASE_URL, wait 15 min"
-          : null,
-        dbConnected && !sessionTableReady
-          ? "Run supabase/session-table.sql in Supabase SQL Editor"
+        !sessionReady
+          ? "Run supabase/session-table.sql in Supabase SQL Editor (creates Session table)"
           : null,
       ].filter(Boolean),
     },

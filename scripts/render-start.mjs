@@ -2,8 +2,10 @@
 /**
  * Render production entrypoint — must bind PORT in THIS process (no spawn wrapper).
  */
+import { execSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { validateDatabaseUrl } from "./validate-database-url.mjs";
 
 const EXPECTED_CLIENT_ID = "00eb38f774ffba914d98a6800f4c5df5";
 const EXPECTED_APP_URL = "https://shopify-marketing-solution.onrender.com";
@@ -33,6 +35,37 @@ if (appUrl && appUrl.includes("fly.dev")) {
   console.error(
     `[render-start] WRONG SHOPIFY_APP_URL (${appUrl}) — must be ${EXPECTED_APP_URL}`,
   );
+}
+
+const databaseUrl = process.env.DATABASE_URL?.trim() ?? "";
+const dbCheck = validateDatabaseUrl(databaseUrl);
+
+if (!dbCheck.valid) {
+  console.error("[render-start] DATABASE_URL problems:");
+  for (const issue of dbCheck.issues) {
+    console.error(`  - ${issue}`);
+  }
+} else if (dbCheck.parsed) {
+  console.log(
+    `[render-start] DATABASE_URL format OK (user=${dbCheck.parsed.username}, host=${dbCheck.parsed.host}:${dbCheck.parsed.port})`,
+  );
+
+  try {
+    console.log("[render-start] Running prisma migrate deploy (creates Session table)...");
+    execSync("npx prisma migrate deploy", {
+      cwd: appRoot,
+      stdio: "inherit",
+      env: process.env,
+    });
+    console.log("[render-start] Prisma migrate deploy: OK");
+  } catch (error) {
+    console.error(
+      "[render-start] prisma migrate deploy failed — fix DATABASE_URL in Render, then redeploy once.",
+    );
+    if (error instanceof Error && error.message) {
+      console.error(`[render-start] ${error.message}`);
+    }
+  }
 }
 
 process.on("unhandledRejection", (reason) => {
