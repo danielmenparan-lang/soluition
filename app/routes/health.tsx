@@ -47,7 +47,10 @@ export const loader = async () => {
         !shopifyConfig.appUrlMatches
           ? "SHOPIFY_APP_URL must be https://shopify-marketing-solution.onrender.com"
           : null,
-        !sessionReady
+        !sessionReady && sessionCheck.error?.includes("WebSocket")
+          ? "WebSocket fix deploying — upgrade Node to 22 or wait for next deploy"
+          : null,
+        !sessionReady && !sessionCheck.error?.includes("WebSocket")
           ? "Run supabase/session-table.sql in Supabase SQL Editor (creates Session table)"
           : null,
       ].filter(Boolean),
