@@ -21,19 +21,19 @@ export function ProductJourney({
   const steps: JourneyStep[] = [
     {
       id: "track",
-      label: "חיבור מעקב",
+      label: "Connect tracking",
       done: hasTracking || hasData,
       current: !hasData,
     },
     {
       id: "data",
-      label: "איסוף נתונים",
+      label: "Collect data",
       done: hasData,
       current: hasTracking && !hasData,
     },
     {
       id: "insights",
-      label: "קבלת המלצות",
+      label: "Get recommendations",
       done: hasRecommendations,
       current: hasData && !hasRecommendations,
     },
@@ -46,13 +46,13 @@ export function ProductJourney({
     <div className="ms-journey">
       <div className="ms-journey-head">
         <div>
-          <p className="ms-journey-kicker">המסלול שלך</p>
+          <p className="ms-journey-kicker">Your progress</p>
           <h2 className="ms-journey-title">
             {completed === steps.length
-              ? "הכל מוכן — החנות שלך פעילה"
+              ? "All set — your store is active"
               : completed === 0
-                ? "בוא נתחיל — 3 צעדים פשוטים"
-                : `עוד ${steps.length - completed} צעדים ואתה בפנים`}
+                ? "Let's start — 3 simple steps"
+                : `${steps.length - completed} steps left`}
           </h2>
         </div>
         <div className="ms-journey-progress-ring" aria-hidden>
@@ -92,26 +92,26 @@ type QuickNavItem = {
 const NAV_ITEMS: QuickNavItem[] = [
   {
     to: "/app/recommendations",
-    title: "מה כדאי לעשות",
-    desc: "רשימת פעולות — מה לשפר קודם",
+    title: "Recommendations",
+    desc: "Prioritized action list",
     tone: "green",
   },
   {
     to: "/app/analytics",
-    title: "מה קורה בחנות",
-    desc: "מי נכנס, מאיפה הגיע, מה צפה",
+    title: "Analytics",
+    desc: "Who visited, from where, and what they viewed",
     tone: "blue",
   },
   {
     to: "/app/chat",
-    title: "צ'אט",
-    desc: "שאל שאלה — העוזר מנתח את הנתונים ועונה",
+    title: "Chat",
+    desc: "Ask questions — answers use your store data",
     tone: "purple",
   },
   {
     to: "/app/reports",
-    title: "סיכום שבועי",
-    desc: "מה השתנה השבוע ומה לעשות",
+    title: "Weekly report",
+    desc: "What changed this week and what to do",
     tone: "gold",
   },
 ];
@@ -127,7 +127,7 @@ export function QuickNav() {
         >
           <span className="ms-quick-title">{item.title}</span>
           <span className="ms-quick-desc">{item.desc}</span>
-          <span className="ms-quick-arrow">←</span>
+          <span className="ms-quick-arrow">→</span>
         </AppLink>
       ))}
     </div>

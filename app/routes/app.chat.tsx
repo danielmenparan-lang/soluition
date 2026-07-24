@@ -20,6 +20,11 @@ import {
   getChatMessages,
 } from "../services/ai.server";
 import { getDashboardMetrics } from "../services/analytics.server";
+import {
+  assertCanOutput,
+  recordOutput,
+  UsageLimitError,
+} from "../services/usage.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -63,22 +68,27 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const conversationId = formData.get("conversationId") as string | null;
 
   if (!message?.trim()) {
-    return { success: false, error: "הודעה ריקה" };
+    return { success: false, error: "Empty message" };
   }
 
   try {
+    await assertCanOutput(shop.id);
     const result = await chatWithAI(
       shop.id,
       conversationId || null,
       message.trim(),
     );
+    await recordOutput(shop.id);
     return {
       success: true,
       conversationId: result.conversationId,
       reply: result.reply,
     };
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "שגיאה בצ'אט";
+    if (error instanceof UsageLimitError) {
+      return { success: false, error: error.message };
+    }
+    const msg = error instanceof Error ? error.message : "Chat error";
     return { success: false, error: msg };
   }
 };
@@ -92,17 +102,17 @@ export function shouldRevalidate({
 }
 
 const SUGGESTED_WITH_DATA = [
-  "למה המכירות ירדו?",
-  "איזה מוצר לפרסם השבוע?",
-  "מאיפה מגיעים הקונים?",
-  "איפה אני מפסיד כסף?",
+  "Why did traffic drop?",
+  "Which product should I promote?",
+  "Where do buyers come from?",
+  "Where am I wasting budget?",
 ];
 
 const SUGGESTED_NO_DATA = [
-  "איך מפעילים מעקב?",
-  "למה אין נתונים?",
-  "מה לעשות קודם?",
-  "איך מתחילים?",
+  "How do I enable tracking?",
+  "Why is there no data?",
+  "What should I do first?",
+  "How do I get started?",
 ];
 
 export default function Chat() {
@@ -166,13 +176,13 @@ export default function Chat() {
   };
 
   return (
-    <s-page heading="צ'אט עם העוזר">
+    <s-page heading="Chat assistant">
       <s-section>
         <div className="ms-chat-intro">
-          <h2 className="ms-chat-intro-title">שאל כל שאלה על החנות</h2>
+          <h2 className="ms-chat-intro-title">Ask anything about your store</h2>
           <p className="ms-chat-intro-text">
-            Solution שולחת לעוזר את הנתונים האמיתיים מהחנות — הוא מנתח ועונה
-            בעברית. לא צריך לדעת שיווק או טכנולוגיה.
+            Solution sends your real tracking data to the assistant — it analyzes
+            and replies in plain English. No marketing or tech jargon required.
           </p>
         </div>
       </s-section>
@@ -182,7 +192,7 @@ export default function Chat() {
         <ChatNotice variant="not-for-customers" />
       </s-section>
 
-      <s-section heading={hasData ? "שאלות לדוגמה" : "עדיין אין נתונים? התחל כאן"}>
+      <s-section heading={hasData ? "Suggested questions" : "No data yet? Start here"}>
         <div className="ms-link-row">
           {suggestedQuestions.map((q) => (
             <Form
@@ -213,15 +223,15 @@ export default function Chat() {
         </div>
       </s-section>
 
-      <s-section heading="שיחה">
+      <s-section heading="Conversation">
         <div className="ms-chat-panel">
           {messages.length === 0 && (
             <div className="ms-empty ms-empty-chat">
-              <h3 className="ms-empty-title">התחל שיחה</h3>
+              <h3 className="ms-empty-title">Start a conversation</h3>
               <p className="ms-empty-text">
                 {hasData
-                  ? "כתוב שאלה למטה, או לחץ על אחת מהשאלות לדוגמה."
-                  : "עדיין אין נתונים מהחנות — שאל «איך מפעילים מעקב?» או חזור ל«התחלה»."}
+                  ? "Type a question below, or tap a suggested question."
+                  : "No store data yet — ask \"How do I enable tracking?\" or go to Home."}
               </p>
             </div>
           )}
@@ -231,13 +241,13 @@ export default function Chat() {
               className={`ms-chat-bubble ${msg.role === "user" ? "ms-chat-user" : "ms-chat-ai"}`}
             >
               <div className="ms-chat-label">
-                {msg.role === "user" ? "אתה" : "העוזר"}
+                {msg.role === "user" ? "You" : "Assistant"}
               </div>
               <ChatMessageBody content={msg.content} />
             </div>
           ))}
           {fetcher.state !== "idle" && (
-            <div className="ms-loading">מנתח נתונים וחושב על תשובה...</div>
+            <div className="ms-loading">Analyzing data and thinking...</div>
           )}
           <div ref={bottomRef} />
         </div>
@@ -260,7 +270,7 @@ export default function Chat() {
               name="message"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="כתוב שאלה — למשל: למה המכירות ירדו?"
+              placeholder="Ask a question — e.g. Why did traffic drop?"
               className="ms-input"
               disabled={fetcher.state !== "idle"}
             />
@@ -269,19 +279,19 @@ export default function Chat() {
               disabled={fetcher.state !== "idle" || !input.trim()}
               className="ms-btn ms-btn-primary"
             >
-              שלח
+              Send
             </button>
           </div>
         </Form>
         {conversationId ? (
           <AppLink to="/app/chat" className="ms-text-link ms-chat-new-link">
-            + שיחה חדשה
+            + New conversation
           </AppLink>
         ) : null}
       </s-section>
 
       {conversations.length > 0 && (
-        <s-section heading="שיחות קודמות">
+        <s-section heading="Previous conversations">
           <div className="ms-chat-history">
             {conversations.slice(0, 8).map((c) => (
               <AppLink
@@ -289,9 +299,9 @@ export default function Chat() {
                 to={`/app/chat?c=${c.id}`}
                 className={`ms-chat-history-item ${conversationId === c.id ? "is-active" : ""}`}
               >
-                <span className="ms-chat-history-title">{c.title ?? "שיחה"}</span>
+                <span className="ms-chat-history-title">{c.title ?? "Conversation"}</span>
                 <span className="ms-chat-history-date">
-                  {new Date(c.updated_at).toLocaleDateString("he-IL")}
+                  {new Date(c.updated_at).toLocaleDateString("en-US")}
                 </span>
               </AppLink>
             ))}

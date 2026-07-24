@@ -1,21 +1,18 @@
 export function ProductExplainer({ compact = false }: { compact?: boolean }) {
   const steps = [
     {
-      icon: "📡",
-      title: "מעקב",
-      text: "Solution סופרת מי נכנס לחנות, מאיפה הגיע, ומה צפה.",
+      title: "Track",
+      text: "Solution counts who visits your store, where they came from, and what they viewed.",
       tone: "brand",
     },
     {
-      icon: "🔍",
-      title: "ניתוח",
-      text: "המערכת מזהה מה מביא מכירות, מה חוסם, ואיפה מפסידים.",
+      title: "Analyze",
+      text: "We identify what drives sales, what blocks buyers, and where you lose revenue.",
       tone: "info",
     },
     {
-      icon: "🎯",
-      title: "פעולה",
-      text: "מקבלים המלצות, צ'אט, ודוחות — מה לעשות עכשיו.",
+      title: "Act",
+      text: "Get recommendations, chat answers, and weekly reports — what to do next.",
       tone: "ai",
     },
   ];
@@ -23,18 +20,16 @@ export function ProductExplainer({ compact = false }: { compact?: boolean }) {
   return (
     <div className={`ms-explainer ${compact ? "ms-explainer-compact" : ""}`}>
       {!compact ? (
-        <p className="ms-explainer-heading">איך Solution עובדת?</p>
+        <p className="ms-explainer-heading">How Solution works</p>
       ) : null}
       <div className="ms-explainer-steps">
         {steps.map((step, index) => (
           <div key={step.title} className={`ms-explainer-step ms-explainer-${step.tone}`}>
-            <span className="ms-explainer-icon" aria-hidden>
-              {step.icon}
+            <span className="ms-explainer-step-num" aria-hidden>
+              {index + 1}
             </span>
             <div>
-              <strong className="ms-explainer-title">
-                {index + 1}. {step.title}
-              </strong>
+              <strong className="ms-explainer-title">{step.title}</strong>
               <p className="ms-explainer-text">{step.text}</p>
             </div>
           </div>

@@ -20,7 +20,7 @@ services:
       - key: NODE_OPTIONS
         value: --max-old-space-size=384
       - key: SCOPES
-        value: read_analytics,read_content,read_products
+        value: ""
       - key: DATABASE_URL
         sync: false
       - key: SHOPIFY_API_KEY

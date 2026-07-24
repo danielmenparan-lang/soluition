@@ -33,27 +33,25 @@ Be direct, data-driven, and prioritize high-impact actions.`;
 
 const RECOMMENDATIONS_SYSTEM_PROMPT = `You analyze Shopify store data collected by the Solution app.
 The code gathers real metrics from Supabase (visitors, sessions, products, traffic sources, segments).
-Your job: interpret ONLY that data and return actionable recommendations in plain Hebrew.
+Your job: interpret ONLY that data and return actionable recommendations in plain English.
 
 Rules:
-- Titles, descriptions, expected_impact, and every action_items step must be in Hebrew.
-- Plain language: say "מעקב", "מבקרים", "עגלת קניות", "אחוז קונים" — not English jargon.
-- Brand names are OK: Shopify, Facebook, Instagram, Google.
+- Titles, descriptions, expected_impact, and every action_items step must be in English.
+- Plain language for non-technical merchants.
 - Do NOT invent numbers. Quote only metrics present in the JSON payload.
-- If all metrics are zero — say so and focus on enabling tracking first. Do not suggest paid ads or advanced marketing yet.
+- If all metrics are zero — say so and focus on enabling tracking first. Do not suggest paid ads yet.
 - When data exists — every recommendation must cite a specific number, product, page, or traffic source from the JSON.
 - action_items: 2–4 concrete steps in Shopify Admin or the store theme.
 - No markdown, no emojis.`;
 
 const CHAT_SYSTEM_PROMPT = `You are a friendly marketing assistant for a Shopify store owner.
-You speak simple, clear Hebrew (unless the user writes in English).
+You speak simple, clear English.
 Rules for every reply:
-- Plain text only. NO markdown: no # headers, no **bold**, no \`\`\` code blocks, no --- lines.
+- Plain text only. NO markdown: no # headers, no **bold**, no code blocks.
 - NO emojis.
-- NO English jargon: say "מעקב" not tracking, "ביקורים" not sessions, "מבקרים" not visitors.
 - Short paragraphs. Use numbered steps (1. 2. 3.) or bullet lines starting with • when listing.
-- Be direct and practical, like talking to a shop owner who is not technical.
-- If store data shows zero visitors, explain that tracking must be enabled first and give concrete steps from the app home page (App embed "מעקב Solution", tracking ID).
+- Be direct and practical for a non-technical merchant.
+- If store data shows zero visitors, explain that tracking must be enabled first and give concrete steps from the app home page (App embed "Solution Tracker", tracking ID).
 - Never invent numbers. If data is missing, say so honestly and guide setup.
 - Keep answers under 12 lines unless the user asks for detail.`;
 
@@ -145,42 +143,42 @@ function buildRecommendationsPrompt(
   hasData: boolean,
 ): string {
   const countRule = hasData
-    ? "צור 6–10 המלצות."
-    : "הנתונים ריקים (0 מבקרים). צור 3–4 המלצות בלבד — קודם הפעלת מעקב, אחר כך הכנת החנות. אל תמליץ על פרסום ממומן.";
+    ? "Create 6–10 recommendations."
+    : "Data is empty (0 visitors). Create only 3–4 recommendations — focus on enabling tracking first. Do not suggest paid ads.";
 
   const dataRule = hasData
-    ? "- כל המלצה חייבת לצטט מספר, מוצר, דף, או מקור תנועה מה-JSON למעלה.\n- אם אין נתון שתומך בהמלצה — אל תכלול אותה."
-    : "- התבסס על העובדה שהמטריקות הן 0 — הסבר שאין עדיין נתונים ומה לעשות כדי שייווצרו.";
+    ? "- Every recommendation must cite a number, product, page, or traffic source from the JSON above.\n- If no data supports a recommendation — omit it."
+    : "- Metrics are zero — explain there is no data yet and what to do to collect it.";
 
-  return `נתח את נתוני החנות הבאים (נאספו אוטומטית על ידי Solution) וצור המלצות בעברית פשוטה.
+  return `Analyze the following store data (collected automatically by Solution) and create recommendations in plain English.
 ${countRule}
 
-נתוני החנות (30 יום):
+Store data (30 days):
 ${analyticsSummary}
 
-ניתוח פרסום:
+Attribution:
 ${attributionContext ?? "[]"}
 
-תובנות מוצרים (חישוב מקדים בקוד):
+Product insights (precomputed):
 ${JSON.stringify(productInsights.slice(0, 10), null, 2)}
 
-קבוצות לקוחות:
+Customer segments:
 ${JSON.stringify(segments, null, 2)}
 
-כללים:
+Rules:
 ${dataRule}
-- אל תחזור על אותה המלצה פעמיים.
-- retargeting רק אם יש מספיק מבקרים או קונים בנתונים.
+- Do not repeat the same recommendation twice.
+- Retargeting only if there are enough visitors or buyers in the data.
 
-החזר מערך JSON:
+Return a JSON array:
 [
   {
     "category": "marketing|product|conversion|retargeting",
-    "title": "כותרת קצרה בעברית",
-    "description": "מה הנתונים מראים ולמה זה חשוב",
+    "title": "Short English title",
+    "description": "What the data shows and why it matters",
     "priority": "high|medium|low",
-    "expected_impact": "משפט אחד בעברית",
-    "action_items": ["צעד 1", "צעד 2", "צעד 3"]
+    "expected_impact": "One sentence in English",
+    "action_items": ["Step 1", "Step 2", "Step 3"]
   }
 ]`;
 }

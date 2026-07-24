@@ -1,10 +1,12 @@
-Solution — AI marketing manager for your Shopify store.
+Solution — AI marketing intelligence for your Shopify store.
 
-Solution tracks who visits your store, analyzes behavior, and gives clear recommendations — what to promote, fix, and prioritize. All inside Shopify Admin, in plain language.
+Solution tracks visitor behavior, analyzes patterns, and gives clear recommendations — what to promote, fix, or improve. All inside Shopify Admin, in English.
 
-• Visitor and sales tracking
+• Visitor behavior tracking
 • Data-driven AI recommendations
-• Chat — ask questions, get answers
+• Chat assistant — ask questions, get answers
 • Customer segments and weekly reports
 
-Setup: one App embed in your theme — and you're live.
+Pricing: Free — 1 scan + 1 AI output. Starter $15/mo — 10 each. Unlimited $29/mo.
+
+Setup: Enable the Solution Tracker app embed in your theme — then browse your storefront once.

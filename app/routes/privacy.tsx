@@ -8,43 +8,50 @@ export default function Privacy() {
 
   return (
     <div className="ms-static-page">
-      <h1>מדיניות פרטיות — Solution</h1>
-      <p className="ms-static-meta">עודכן: יולי 2026</p>
+      <h1>Privacy Policy — Solution</h1>
+      <p className="ms-static-meta">Last updated: July 2026</p>
 
-      <h2>מה אנחנו אוספים</h2>
+      <h2>What we collect</h2>
       <p>
-        Solution אוספת נתוני התנהגות מבקרים בחנות (צפיות בדפים, מוצרים, עגלת
-        קניות, מקור תנועה, סוג מכשיר, מדינה) כדי לספק אנליטיקה והמלצות
-        לבעלי החנות שהתקינו את האפליקציה.
+        Solution collects visitor behavior on your storefront (page views, products
+        viewed, cart activity, traffic source, device type, country) to provide
+        analytics and AI recommendations inside Shopify Admin.
       </p>
 
-      <h2>איך משתמשים בנתונים</h2>
+      <h2>Cookies and local storage</h2>
       <p>
-        הנתונים משמשים אך ורק להצגת דשבורד, קבוצות לקוחות והמלצות שיווק בתוך
-        Shopify Admin. אנחנו לא מוכרים נתוני מבקרים.
+        Our storefront tracker stores anonymous visitor and session IDs in the
+        browser localStorage and sessionStorage. These IDs are not Shopify customer
+        accounts unless explicitly linked through a purchase event.
       </p>
 
-      <h2>אחסון</h2>
+      <h2>Third-party services</h2>
       <p>
-        נתוני אנליטיקה נשמרים ב-Supabase (PostgreSQL). נתוני OAuth של Shopify
-        נשמרים בצורה מאובטחת לצורך אימות.
+        We use Supabase (database), Anthropic Claude (AI insights), and ip-api.com
+        (approximate country from IP on the server). We do not sell visitor data.
       </p>
 
-      <h2>שירות AI</h2>
+      <h2>How data is used</h2>
       <p>
-        אנחנו משתמשים ב-AI (Anthropic) ליצירת תובנות והמלצות. הנתונים שנשלחים
-        הם סיכומים מצטברים — לא מידע מזהה של קונים.
+        Data is used only to show dashboards, segments, recommendations, chat, and
+        reports to merchants who installed the app.
       </p>
 
-      <h2>מחיקת נתונים</h2>
+      <h2>Retention</h2>
       <p>
-        עם הסרת האפליקציה, נתוני החנות נמחקים בהתאם לדרישות Shopify (webhooks
-        GDPR).
+        Analytics data is kept while the app is installed. When you uninstall,
+        shop data is deleted via Shopify GDPR webhooks within 30 days.
       </p>
 
-      <h2>יצירת קשר</h2>
+      <h2>Billing</h2>
       <p>
-        לשאלות פרטיות או תמיכה:{" "}
+        Paid plans are billed through Shopify. Free includes 1 scan and 1 AI output
+        per month; Starter ($15/mo) includes 10 each; Unlimited ($29/mo) has no caps.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Privacy or support:{" "}
         <a href={`mailto:${supportEmail}`}>{supportEmail}</a>
       </p>
     </div>

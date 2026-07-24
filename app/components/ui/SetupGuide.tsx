@@ -36,11 +36,11 @@ export function SetupGuide({
       <div className={`ms-timeline-item ${hasData ? "is-done" : "is-active"}`}>
         <div className="ms-timeline-marker">1</div>
         <div className="ms-timeline-content">
-          <h3 className="ms-timeline-title">הפעל מעקב בחנות</h3>
+          <h3 className="ms-timeline-title">Enable tracking</h3>
           <p className="ms-timeline-text">
             {hasData
-              ? "מעולה — המעקב מחובר."
-              : "לחץ «פתח הגדרות עיצוב» → App embeds → הפעל «מעקב Solution» → הדבק את המזהה → שמור."}
+              ? "Tracking is connected."
+              : "Open theme editor → App embeds → enable Solution Tracker → paste your ID → Save."}
           </p>
           {!hasData ? (
             <>
@@ -50,12 +50,12 @@ export function SetupGuide({
                 rel="noopener noreferrer"
                 className="ms-btn ms-btn-primary ms-step-action"
               >
-                פתח הגדרות עיצוב
+                Open theme editor
               </a>
-              <CopyCodeBlock code={trackingId} label="המזהה שלך — העתק והדבק:" />
+              <CopyCodeBlock code={trackingId} label="Your tracking ID — copy and paste:" />
               <details className="ms-details">
-                <summary>יש בעיה? דרך ידנית עם קוד</summary>
-                <CopyCodeBlock code={script} label="הדבק את השורה הזו ב-<head> של החנות:" />
+                <summary>Manual install with code</summary>
+                <CopyCodeBlock code={script} label="Paste this line in your theme <head>:" />
               </details>
             </>
           ) : null}
@@ -67,11 +67,11 @@ export function SetupGuide({
       >
         <div className="ms-timeline-marker">2</div>
         <div className="ms-timeline-content">
-          <h3 className="ms-timeline-title">גלוש בחנות פעם אחת</h3>
+          <h3 className="ms-timeline-title">Browse your storefront once</h3>
           <p className="ms-timeline-text">
             {hasData
-              ? "יש נתונים — אפשר להמשיך."
-              : "פתח את החנות בטאב חדש, כנס ל-2–3 דפים (בית, מוצר, עגלה), וחזור לכאן."}
+              ? "Data is flowing — you're good to continue."
+              : "Open your store in a new tab, visit 2–3 pages (home, product, cart), then return here."}
           </p>
           {!hasData ? (
             <a
@@ -80,7 +80,7 @@ export function SetupGuide({
               rel="noopener noreferrer"
               className="ms-btn ms-btn-secondary ms-step-action"
             >
-              פתח את החנות שלי
+              Open my storefront
             </a>
           ) : null}
         </div>
@@ -91,20 +91,20 @@ export function SetupGuide({
       >
         <div className="ms-timeline-marker">3</div>
         <div className="ms-timeline-content">
-          <h3 className="ms-timeline-title">קבל המלצות</h3>
+          <h3 className="ms-timeline-title">Get recommendations</h3>
           <p className="ms-timeline-text">
             {hasRecommendations
-              ? "יש המלצות מוכנות — עבור ל«מה כדאי לעשות»."
+              ? "Recommendations are ready — open the Recommendations page."
               : hasData
-                ? "לחץ «קבל המלצות» בראש הדף — Solution ינתח את הנתונים ויגיד לך מה לשפר."
-                : "אחרי שיש נתונים — Solution יכין לך רשימת פעולות ברורה."}
+                ? "Click Get recommendations at the top — Solution will analyze your data and suggest improvements."
+                : "Once you have traffic data, Solution will prepare a clear action list."}
           </p>
           {hasRecommendations ? (
             <AppLink
               to="/app/recommendations"
               className="ms-btn ms-btn-primary ms-step-action"
             >
-              לך להמלצות →
+              View recommendations
             </AppLink>
           ) : null}
         </div>
@@ -116,7 +116,7 @@ export function SetupGuide({
     return (
       <div className="ms-setup-embedded">
         <h2 className="ms-setup-embedded-title">
-          {hasData ? "המשך מהנקודה שבה עצרת" : "התחל כאן — 3 צעדים"}
+          {hasData ? "Pick up where you left off" : "Start here — 3 steps"}
         </h2>
         {timeline}
       </div>
@@ -125,8 +125,8 @@ export function SetupGuide({
 
   return (
     <SectionBlock
-      title="התחלה — 3 צעדים"
-      subtitle={hasData ? "המשך מהנקודה שבה עצרת" : "עקוב אחרי הצעדים — כל אחד לוקח דקה"}
+      title="Getting started — 3 steps"
+      subtitle={hasData ? "Continue from where you stopped" : "Each step takes about a minute"}
     >
       {timeline}
     </SectionBlock>

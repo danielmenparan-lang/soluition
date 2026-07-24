@@ -4,15 +4,15 @@ export function ChatPromo() {
   return (
     <div className="ms-chat-promo">
       <div className="ms-chat-promo-copy">
-        <p className="ms-chat-promo-kicker">צ&apos;אט חי</p>
-        <h3 className="ms-chat-promo-title">דבר עם העוזר על החנות שלך</h3>
+        <p className="ms-chat-promo-kicker">Live chat</p>
+        <h3 className="ms-chat-promo-title">Talk to the assistant about your store</h3>
         <p className="ms-chat-promo-text">
-          שאל על מכירות, מוצרים, פרסום או התקנה — העוזר מקבל את הנתונים מהחנות,
-          מנתח אותם, ועונה בעברית פשוטה.
+          Ask about sales, products, ads, or setup — the assistant reads your tracking
+          data and replies in plain English.
         </p>
       </div>
       <AppLink to="/app/chat" className="ms-btn ms-btn-primary ms-chat-promo-btn">
-        פתח צ&apos;אט →
+        Open chat
       </AppLink>
     </div>
   );

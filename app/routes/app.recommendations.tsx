@@ -22,6 +22,11 @@ import {
   generateRecommendations,
   getRecommendations,
 } from "../services/ai.server";
+import {
+  assertCanOutput,
+  recordOutput,
+  UsageLimitError,
+} from "../services/usage.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -35,11 +40,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const shop = await getOrCreateShop(session.shop);
 
   try {
+    await assertCanOutput(shop.id);
     await generateRecommendations(shop.id);
-    return { success: true, message: "ההמלצות מוכנות" };
+    await recordOutput(shop.id);
+    return { success: true, message: "Recommendations are ready" };
   } catch (error) {
+    if (error instanceof UsageLimitError) {
+      return { success: false, message: error.message };
+    }
     const message =
-      error instanceof Error ? error.message : "יצירת המלצות נכשלה";
+      error instanceof Error ? error.message : "Failed to generate recommendations";
     return { success: false, message };
   }
 };
@@ -78,13 +88,13 @@ export default function Recommendations() {
         hasRecommendations={recommendations.length > 0}
       />
       <SubmitButton fetcher={fetcher} slot="primary-action">
-        {isGenerating ? "מכין..." : "המלצות חדשות"}
+        {isGenerating ? "Preparing..." : "New recommendations"}
       </SubmitButton>
 
       {isGenerating && (
         <s-section>
           <s-banner tone="info">
-            <s-paragraph>בודק את הנתונים ומכין המלצות — רגע...</s-paragraph>
+            <s-paragraph>Analyzing your data — one moment...</s-paragraph>
           </s-banner>
         </s-section>
       )}
@@ -92,11 +102,11 @@ export default function Recommendations() {
       {recommendations.length === 0 ? (
         <s-section>
           <EmptyState
-            title="עדיין אין המלצות"
-            description="ההמלצות ייווצרו לבד בכניסה לדף, או לחץ «המלצות חדשות» למעלה."
+            title="No recommendations yet"
+            description="Recommendations generate when you open this page, or click New recommendations above."
             action={
               <SubmitButton fetcher={fetcher}>
-                {isGenerating ? "מכין..." : "קבל המלצות עכשיו"}
+                {isGenerating ? "Preparing..." : "Get recommendations now"}
               </SubmitButton>
             }
           />

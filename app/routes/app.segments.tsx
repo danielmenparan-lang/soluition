@@ -1,8 +1,4 @@
-import type {
-  ActionFunctionArgs,
-  HeadersFunction,
-  LoaderFunctionArgs,
-} from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
@@ -19,6 +15,11 @@ import {
   getSegmentBreakdown,
   refreshSegments,
 } from "../services/segmentation.server";
+import {
+  assertCanScan,
+  recordScan,
+  UsageLimitError,
+} from "../services/usage.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -41,11 +42,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const shop = await getOrCreateShop(session.shop);
 
   try {
+    await assertCanScan(shop.id);
     await refreshSegments(shop.id);
-    return { success: true, message: "קבוצות הלקוחות עודכנו" };
+    await recordScan(shop.id);
+    return { success: true, message: "Customer segments updated" };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "רענון קהלים נכשל";
+    if (error instanceof UsageLimitError) {
+      return { success: false, message: error.message };
+    }
+    const message = error instanceof Error ? error.message : "Failed to refresh segments";
     return { success: false, message };
   }
 };
@@ -58,26 +63,21 @@ export default function Segments() {
 
   return (
     <s-page>
-      <PageHero
-        title={help.title}
-        subtitle={help.subtitle}
-        variant="default"
-        compact
-      />
+      <PageHero title={help.title} subtitle={help.subtitle} variant="default" compact />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
       <SubmitButton fetcher={fetcher} slot="primary-action">
-        {fetcher.state !== "idle" ? "מעדכן..." : "עדכן קבוצות"}
+        {fetcher.state !== "idle" ? "Refreshing..." : "Refresh segments"}
       </SubmitButton>
 
-      <s-section heading="הקבוצות שלך">
+      <s-section heading="Your segments">
         {segments.length === 0 ? (
           <EmptyState
-            title="עדיין אין קבוצות"
-            description="קודם ודא שיש מעקב פעיל בחנות, ואז לחץ «עדכן קבוצות»."
+            title="No segments yet"
+            description="Enable tracking first, then click Refresh segments."
             action={
               <SubmitButton fetcher={fetcher}>
-                {fetcher.state !== "idle" ? "מעדכן..." : "עדכן קבוצות"}
+                {fetcher.state !== "idle" ? "Refreshing..." : "Refresh segments"}
               </SubmitButton>
             }
           />
@@ -92,10 +92,10 @@ export default function Segments() {
                   <div className="ms-metric-value" style={{ fontSize: 24 }}>
                     {seg.member_count}
                   </div>
-                  <s-text color="subdued">אנשים בקבוצה</s-text>
+                  <s-text color="subdued">people in segment</s-text>
                   {seg.refreshed_at ? (
                     <s-text color="subdued">
-                      עודכן: {new Date(seg.refreshed_at).toLocaleDateString("he-IL")}
+                      Updated: {new Date(seg.refreshed_at).toLocaleDateString("en-US")}
                     </s-text>
                   ) : null}
                 </s-stack>
@@ -106,12 +106,12 @@ export default function Segments() {
       </s-section>
 
       {breakdown.byTrafficSource.length > 0 && (
-        <s-section heading="מאיפה הגיעו">
+        <s-section heading="Traffic sources">
           <div className="ms-metric-grid">
             {breakdown.byTrafficSource.slice(0, 8).map((s) => (
               <div key={s.source} className="ms-card">
                 <s-text type="strong">{s.source}</s-text>
-                <s-paragraph>{s.count} ביקורים</s-paragraph>
+                <s-paragraph>{s.count} sessions</s-paragraph>
               </div>
             ))}
           </div>
@@ -119,12 +119,12 @@ export default function Segments() {
       )}
 
       {breakdown.byCountry.length > 0 && (
-        <s-section heading="פילוח לפי מדינה">
+        <s-section heading="By country">
           <div className="ms-metric-grid">
             {breakdown.byCountry.slice(0, 8).map((c) => (
               <div key={c.country} className="ms-card">
                 <s-text type="strong">{c.country}</s-text>
-                <s-paragraph>{c.count} מבקרים</s-paragraph>
+                <s-paragraph>{c.count} visitors</s-paragraph>
               </div>
             ))}
           </div>
@@ -132,12 +132,12 @@ export default function Segments() {
       )}
 
       {breakdown.byDevice.length > 0 && (
-        <s-section heading="פילוח לפי מכשיר">
+        <s-section heading="By device">
           <div className="ms-metric-grid">
             {breakdown.byDevice.map((d) => (
               <div key={d.device} className="ms-card">
                 <s-text type="strong">{d.device}</s-text>
-                <s-paragraph>{d.count} מבקרים</s-paragraph>
+                <s-paragraph>{d.count} visitors</s-paragraph>
               </div>
             ))}
           </div>
@@ -147,6 +147,4 @@ export default function Segments() {
   );
 }
 
-export const headers: HeadersFunction = (headersArgs) => {
-  return boundary.headers(headersArgs);
-};
+export const headers = boundary.headers;

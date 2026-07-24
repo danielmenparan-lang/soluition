@@ -30,9 +30,9 @@ export default function Index() {
       <h1 style={{ fontSize: "1.5rem" }}>Marketing Solution</h1>
       <p>AI Marketing Intelligence for Shopify</p>
       <p style={{ color: "#555", marginTop: "24px" }}>
-        פתח את האפליקציה מ-<strong>Shopify Admin → Apps → solution</strong>.
+        Open the app from <strong>Shopify Admin → Apps → solution</strong>.
         <br />
-        אין צורך להזין כתובת חנות כאן.
+        No need to enter a shop domain here.
       </p>
     </div>
   );

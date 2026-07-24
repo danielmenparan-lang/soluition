@@ -1,24 +1,24 @@
 import type { Shop } from "../types/database.types";
 
 export function buildNoDataChatReply(shop: Shop): string {
-  return `היי! עדיין אין נתונים מהחנות — לכן אני לא יכול לענות על שאלות כמו «למה המכירות ירדו» בצורה מדויקת.
+  return `Hi! There is no store data yet, so I cannot answer questions like "why did sales drop" accurately.
 
-למה זה קורה?
-• המעקב עדיין לא הופעל בחנות, או
-• עדיין לא היו מבקרים מאז שהפעלת אותו.
+Why?
+• Tracking is not enabled in your theme yet, or
+• No visitors have been recorded since you enabled it.
 
-מה לעשות עכשיו (3 דקות):
+What to do now (about 3 minutes):
 
-1. חזור לדף «בית» באפליקציה
-2. לחץ «פתח עיצוב חנות»
-3. הפעל «מעקב Solution» והדבק את מזהה המעקב:
+1. Go to the Home page in this app
+2. Click Open theme editor
+3. Enable Solution Tracker and paste your tracking ID:
    ${shop.tracking_id}
-4. שמור, ואז פתח את החנות וגלוש בכמה דפים
+4. Save, then open your storefront and browse a few pages
 
-אחרי שיהיו נתונים — אוכל לעזור לך עם:
-• מאיפה מגיעים קונים
-• איזה מוצרים כדאי לפרסם
-• איפה מפסידים כסף
+Once data flows, I can help with:
+• Where buyers come from
+• Which products to promote
+• Where budget may be wasted
 
-רוצה עזרה בהפעלת המעקב? כתוב «איך מפעילים מעקב» ואסביר צעד-אחר-צעד.`;
+Need help enabling tracking? Ask "how do I enable tracking" and I will walk you through it.`;
 }

@@ -8,152 +8,152 @@ export type PageHelp = {
 
 export const PAGE_HELP: Record<string, PageHelp> = {
   overview: {
-    title: "Solution — עוזרת לך למכור יותר",
+    title: "Solution — sell more with clear next steps",
     subtitle:
-      "האפליקציה עוקבת אחרי מי שנכנס לחנות, מבינה מה עובד, ונותנת לך רשימה ברורה של מה לעשות.",
+      "Solution tracks store visitors, analyzes behavior, and gives you a short list of what to fix or promote.",
     tips: [
-      "קודם — הפעל מעקב בחנות (דקה אחת)",
-      "אחר כך — גלוש בחנות פעם אחת",
-      "לבסוף — קבל המלצות מוכנות לפעולה",
+      "First — turn on tracking in your theme (about one minute)",
+      "Then — browse your storefront once or twice",
+      "Finally — run a scan and get AI recommendations",
     ],
-    helpTitle: "איך זה עובד?",
+    helpTitle: "How it works",
     helpItems: [
       {
-        label: "1. מעקב",
-        text: "Solution סופרת מי נכנס לחנות, מאיפה הגיע, ומה צפה. בלי זה אין נתונים.",
+        label: "1. Track",
+        text: "Solution counts who visits, where they came from, and what they viewed. No tracking = no data.",
       },
       {
-        label: "2. ניתוח",
-        text: "המערכת בודקת מה מביא מכירות, מה גורם לעזיבה, ואיפה מפסידים כסף.",
+        label: "2. Analyze",
+        text: "We find what drives sales, what causes drop-off, and where you lose money.",
       },
       {
-        label: "3. המלצות",
-        text: "מקבלים רשימה ברורה — מה לפרסם, מה לשפר, ומה לעשות קודם.",
+        label: "3. Act",
+        text: "You get recommendations, chat answers, and weekly reports — all inside Shopify Admin.",
       },
     ],
   },
   analytics: {
-    title: "מה קורה בחנות שלך",
+    title: "Store activity",
     subtitle:
-      "כאן רואים מי נכנס, מאיפה הגיע, מה צפה, ומה קנה. הכול מ-30 הימים האחרונים.",
+      "See who visited, where traffic came from, what they viewed, and how they converted — last 30 days.",
     tips: [
-      "אם הכול ריק — קודם התקן את המעקב (בדף הבית)",
-      "מספרים גבוהים בצפיות ונמוכים ברכישות = משהו לתקן",
-      "שימו לב מאיזה פרסום מגיעים קונים אמיתיים",
+      "If everything is empty, enable tracking on the Home page first",
+      "High views with low purchases usually means something to fix",
+      "Check which channels bring real buyers, not just clicks",
     ],
-    helpTitle: "איך לקרוא את המספרים?",
+    helpTitle: "How to read the numbers",
     helpItems: [
       {
-        label: "מאיפה מגיעים",
-        text: "פייסבוק, גוגל, ישירות לחנות — תראה מה באמת מביא מכירות.",
+        label: "Traffic sources",
+        text: "Facebook, Google, direct — see what actually drives sales.",
       },
       {
-        label: "איזה מוצרים נראים",
-        text: "מוצר שרבים צופים בו אבל לא קונים — אולי המחיר, התמונה, או התיאור צריכים שיפור.",
+        label: "Product views",
+        text: "Many views but few purchases may mean price, images, or copy needs work.",
       },
       {
-        label: "איפה עוזבים",
-        text: "דפים שאנשים נכנסים אליהם ועוזבים מהר — שם כדאי לבדוק מה חסר.",
+        label: "Exit pages",
+        text: "Pages people leave quickly — worth checking what's missing.",
       },
     ],
   },
   segments: {
-    title: "קבוצות לקוחות",
+    title: "Customer groups",
     subtitle:
-      "המערכת מחלקת את המבקרים לקבוצות — לפי מאיפה הגיעו, מאיזה מכשיר, ומאיזה מדינה.",
+      "Visitors grouped by traffic source, device, and country — updated from your tracking data.",
     tips: [
-      "לחץ «עדכן קבוצות» אחרי שיש נתונים בחנות",
-      "הקבוצות מתעדכנות לפי החודש האחרון",
-      "השתמש בהן כדי לפרסם לקהל הנכון",
+      "Click Refresh groups after you have store traffic",
+      "Groups use roughly the last month of data",
+      "Use them to target ads to the right audience",
     ],
-    helpTitle: "למה זה שימושי?",
+    helpTitle: "Why this helps",
     helpItems: [
       {
-        label: "פרסום ממוקד",
-        text: "לדוגמה: מי שהגיע מפייסבוק מהנייד — קהל אחד. מי שהגיע מגוגל מהמחשב — קהל אחר.",
+        label: "Focused ads",
+        text: "Example: mobile visitors from Facebook vs desktop from Google — different audiences.",
       },
       {
-        label: "חזרה ללקוחות",
-        text: "מי שכבר ביקר בחנות — אפשר לפרסם לו שוב בקלות יותר.",
+        label: "Return visitors",
+        text: "People who already browsed your store are easier to reach again.",
       },
       {
-        label: "עדכון",
-        text: "לחץ «עדכן קבוצות» כדי לחשב מחדש לפי הנתונים העדכניים.",
+        label: "Refresh",
+        text: "Run Refresh groups to recompute from the latest data.",
       },
     ],
   },
   recommendations: {
-    title: "מה כדאי לעשות עכשיו",
+    title: "What to do next",
     subtitle:
-      "רשימת המלצות מסודרת לפי חשיבות — מה יכול להעלות מכירות, ומה לתקן קודם.",
+      "AI recommendations sorted by impact — what can grow sales and what to fix first.",
     tips: [
-      "בפעם הראשונה — ההמלצות נוצרות לבד",
-      "רוצה רענון? לחץ «המלצות חדשות»",
-      "התחל ממה שמסומן «דחוף»",
+      "First run uses your free output credit",
+      "Need a refresh? Click Generate new recommendations",
+      "Start with items marked High priority",
     ],
-    helpTitle: "איך להשתמש ברשימה?",
+    helpTitle: "How to use the list",
     helpItems: [
       {
-        label: "סדר עדיפויות",
-        text: "«דחוף» = תעשה קודם. «בינוני» = אחרי. «נמוך» = כשיש זמן.",
+        label: "Priority",
+        text: "High = do first. Medium = next. Low = when you have time.",
       },
       {
-        label: "כל המלצה מסבירה למה",
-        text: "לא סתם טיפ — יש הסבר קצר למה זה חשוב ומה זה יכול לשנות.",
+        label: "Why it matters",
+        text: "Each item explains why it matters based on your store data.",
       },
       {
-        label: "צעדים לביצוע",
-        text: "מתחת לכל המלצה יש רשימת פעולות — עשה אותן אחת-אחת.",
+        label: "Action steps",
+        text: "Under each recommendation you'll see concrete steps in Shopify Admin.",
       },
     ],
   },
   reports: {
-    title: "סיכום השבוע",
+    title: "Weekly summary",
     subtitle:
-      "דוח קצר של 7 הימים האחרונים: מה השתנה, מה לעשות, ואיפה מבזבזים כסף.",
+      "A short report for the last 7 days: what changed, what to do, and where budget may be wasted.",
     tips: [
-      "הפק דוח חדש פעם בשבוע",
-      "קרא קודם את «מה חשוב לדעת»",
-      "שתף עם מי שמנהל את הפרסום",
+      "Generate a new report once per week",
+      "Read Key takeaways first",
+      "Share with whoever runs your ads",
     ],
-    helpTitle: "מה יש בדוח?",
+    helpTitle: "What's in the report",
     helpItems: [
       {
-        label: "מה השתנה",
-        text: "עליות וירידות במכירות, בתנועה, ובמוצרים — בקצרה ובבהירות.",
+        label: "What changed",
+        text: "Ups and downs in traffic, products, and conversion — in plain language.",
       },
       {
-        label: "מה לעשות",
-        text: "רשימת פעולות מומלצות לשבוע הבא, לפי סדר חשיבות.",
+        label: "What to do",
+        text: "Suggested actions for next week, ordered by impact.",
       },
       {
-        label: "איפה מבזבזים",
-        text: "פרסום או דפים שאוכלים תקציב בלי להחזיר מכירות.",
+        label: "Waste",
+        text: "Traffic or pages that spend budget without returning sales.",
       },
     ],
   },
   chat: {
-    title: "שאל את העוזר",
+    title: "Ask the assistant",
     subtitle:
-      "כאן אתה שואל שאלות על החנות שלך — מכירות, מוצרים, פרסום. העוזר עונה לפי הנתונים האמיתיים שלך.",
+      "Ask questions about your store — sales, products, ads. Answers use your real tracking data.",
     tips: [
-      "שאל בעברית, כמו שמדברים",
-      "לחץ על שאלה מוכנה למטה כדי להתחיל",
-      "הצ'אט הזה בשבילך — לא מוצג ללקוחות בחנות",
+      "Ask in plain English",
+      "Tap a suggested question below to start",
+      "This chat is for you — customers never see it",
     ],
-    helpTitle: "שאלות שאפשר לשאול",
+    helpTitle: "Example questions",
     helpItems: [
       {
-        label: "מכירות",
-        text: "«למה המכירות ירדו השבוע?» — תקבל הסבר לפי הנתונים.",
+        label: "Sales",
+        text: "Why did traffic drop this week? — get an explanation from your data.",
       },
       {
-        label: "פרסום",
-        text: "«איזה מוצר כדאי לפרסם?» — המלצה לפי מה שעובד אצלך.",
+        label: "Marketing",
+        text: "Which product should I promote? — based on what's working in your store.",
       },
       {
-        label: "כסף",
-        text: "«איפה אני מפסיד כסף?» — זיהוי נקודות בזבוז.",
+        label: "Budget",
+        text: "Where am I wasting ad spend? — find weak channels or pages.",
       },
     ],
   },

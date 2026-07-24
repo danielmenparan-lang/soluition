@@ -8,7 +8,7 @@ export const links: LinksFunction = () => [
 
 export default function App() {
   return (
-    <html lang="he" dir="rtl">
+    <html lang="en" dir="ltr">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />

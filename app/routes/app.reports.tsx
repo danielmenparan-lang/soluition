@@ -19,6 +19,11 @@ import {
   generateWeeklyReport,
   getWeeklyReports,
 } from "../services/ai.server";
+import {
+  assertCanOutput,
+  recordOutput,
+  UsageLimitError,
+} from "../services/usage.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -32,11 +37,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const shop = await getOrCreateShop(session.shop);
 
   try {
+    await assertCanOutput(shop.id);
     await generateWeeklyReport(shop.id);
-    return { success: true, message: "סיכום השבוע מוכן" };
+    await recordOutput(shop.id);
+    return { success: true, message: "Weekly report is ready" };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "יצירת דוח נכשלה";
+    if (error instanceof UsageLimitError) {
+      return { success: false, message: error.message };
+    }
+    const message = error instanceof Error ? error.message : "Failed to generate report";
     return { success: false, message };
   }
 };
@@ -57,39 +66,34 @@ export default function Reports() {
 
   return (
     <s-page>
-      <PageHero
-        title={help.title}
-        subtitle={help.subtitle}
-        variant="reports"
-        compact
-      />
+      <PageHero title={help.title} subtitle={help.subtitle} variant="reports" compact />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
       <SubmitButton fetcher={fetcher} slot="primary-action">
-        {isGenerating ? "מכין..." : "הפק סיכום שבועי"}
+        {isGenerating ? "Preparing..." : "Generate weekly report"}
       </SubmitButton>
 
       {!latest ? (
         <s-section>
           <EmptyState
-            title="עדיין אין סיכום"
-            description="לחץ «הפק סיכום שבועי» — תקבל דוח קצר על 7 הימים האחרונים: מה השתנה ומה לעשות."
+            title="No report yet"
+            description="Click Generate weekly report for a summary of the last 7 days."
             action={
               <SubmitButton fetcher={fetcher}>
-                {isGenerating ? "מכין..." : "הפק סיכום ראשון"}
+                {isGenerating ? "Preparing..." : "Generate first report"}
               </SubmitButton>
             }
           />
         </s-section>
       ) : (
         <>
-          <s-section heading={`שבוע: ${latest.week_start} — ${latest.week_end}`}>
+          <s-section heading={`Week: ${latest.week_start} — ${latest.week_end}`}>
             <div className="ms-card ms-card-ai">
               <s-paragraph>{latest.performance_summary}</s-paragraph>
             </div>
           </s-section>
 
-          <s-section heading="מה חשוב לדעת">
+          <s-section heading="Key takeaways">
             {insights.length > 0 ? (
               <s-unordered-list>
                 {insights.map((insight, i) => (
@@ -97,26 +101,26 @@ export default function Reports() {
                 ))}
               </s-unordered-list>
             ) : (
-              <s-paragraph>אין תובנות בדוח זה.</s-paragraph>
+              <s-paragraph>No insights in this report.</s-paragraph>
             )}
           </s-section>
 
-          <s-section heading="מה לעשות השבוע">
+          <s-section heading="Actions for this week">
             {topActions.length > 0 ? (
               <s-stack direction="block" gap="base">
                 {topActions.map((item, i) => (
                   <div key={i} className="ms-card">
                     <s-text type="strong">{item.action}</s-text>
-                    <s-paragraph>למה זה חשוב: {item.impact}</s-paragraph>
+                    <s-paragraph>Why it matters: {item.impact}</s-paragraph>
                   </div>
                 ))}
               </s-stack>
             ) : (
-              <s-paragraph>אין המלצות בדוח זה.</s-paragraph>
+              <s-paragraph>No actions in this report.</s-paragraph>
             )}
           </s-section>
 
-          <s-section heading="הזדמנויות">
+          <s-section heading="Growth opportunities">
             {growthOpportunities.length > 0 ? (
               <s-unordered-list>
                 {growthOpportunities.map((opp, i) => (
@@ -124,11 +128,11 @@ export default function Reports() {
                 ))}
               </s-unordered-list>
             ) : (
-              <s-paragraph>אין הזדמנויות צמיחה בדוח זה.</s-paragraph>
+              <s-paragraph>No growth opportunities in this report.</s-paragraph>
             )}
           </s-section>
 
-          <s-section heading="איפה מבזבזים כסף">
+          <s-section heading="Where budget may be wasted">
             {wastePoints.length > 0 ? (
               <s-unordered-list>
                 {wastePoints.map((point, i) => (
@@ -136,18 +140,18 @@ export default function Reports() {
                 ))}
               </s-unordered-list>
             ) : (
-              <s-paragraph>אין נקודות בזבוז בדוח זה.</s-paragraph>
+              <s-paragraph>No waste points in this report.</s-paragraph>
             )}
           </s-section>
         </>
       )}
 
       {reports.length > 1 && (
-        <s-section heading="סיכומים קודמים">
+        <s-section heading="Previous reports">
           <s-table>
             <s-table-header-row>
-              <s-table-header>שבוע</s-table-header>
-              <s-table-header>נוצר</s-table-header>
+              <s-table-header>Week</s-table-header>
+              <s-table-header>Created</s-table-header>
             </s-table-header-row>
             <s-table-body>
               {reports.slice(1).map((r) => (
@@ -156,7 +160,7 @@ export default function Reports() {
                     {r.week_start} — {r.week_end}
                   </s-table-cell>
                   <s-table-cell>
-                    {new Date(r.generated_at).toLocaleDateString("he-IL")}
+                    {new Date(r.generated_at).toLocaleDateString("en-US")}
                   </s-table-cell>
                 </s-table-row>
               ))}

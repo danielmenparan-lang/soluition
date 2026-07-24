@@ -3,6 +3,7 @@ import "@shopify/shopify-app-react-router/adapters/node";
 import {
   ApiVersion,
   AppDistribution,
+  BillingInterval,
   shopifyApp,
 } from "@shopify/shopify-app-react-router/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
@@ -48,16 +49,39 @@ if (useSupabaseSessions) {
   });
 }
 
+export const STARTER_PLAN = "Starter";
+export const UNLIMITED_PLAN = "Unlimited";
+
 // Placeholders allow the server to boot on Render while env vars are being configured.
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY || "not-configured",
   apiSecretKey: process.env.SHOPIFY_API_SECRET || "not-configured",
   apiVersion: ApiVersion.October25,
-  scopes: process.env.SCOPES?.split(","),
+  scopes: process.env.SCOPES?.split(",").filter(Boolean),
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
   sessionStorage: sessionStorageImpl,
   distribution: AppDistribution.AppStore,
+  billing: {
+    [STARTER_PLAN]: {
+      lineItems: [
+        {
+          amount: 15,
+          currencyCode: "USD",
+          interval: BillingInterval.Every30Days,
+        },
+      ],
+    },
+    [UNLIMITED_PLAN]: {
+      lineItems: [
+        {
+          amount: 29,
+          currencyCode: "USD",
+          interval: BillingInterval.Every30Days,
+        },
+      ],
+    },
+  },
   future: {
     expiringOfflineAccessTokens: true,
   },

@@ -2,6 +2,7 @@ import type { ActionFunctionArgs } from "react-router";
 import { authenticate, sessionStorage } from "../shopify.server";
 import {
   deleteShopDataByDomain,
+  exportCustomerData,
   redactCustomerData,
 } from "../services/shop-cleanup.server";
 
@@ -28,9 +29,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   if (topic === "customers/data_request") {
-    // Visitor analytics may exist for order-linked customer ids only.
-    // Merchants receive data export via Shopify; we acknowledge the request.
-    console.log(`Data request logged for ${shop}`, payload);
+    const customer = payload as { customer?: { id?: number } };
+    const customerId = customer.customer?.id;
+    if (customerId) {
+      const exportPayload = await exportCustomerData(shop, customerId);
+      console.log(
+        `GDPR data export prepared for ${shop} customer ${customerId}`,
+        JSON.stringify(exportPayload).slice(0, 500),
+      );
+    }
     return new Response();
   }
 

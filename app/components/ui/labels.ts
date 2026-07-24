@@ -1,14 +1,14 @@
 export const CATEGORY_LABELS: Record<string, string> = {
-  marketing: "פרסום",
-  product: "מוצרים",
-  conversion: "מכירות",
-  retargeting: "חזרה ללקוחות",
+  marketing: "Marketing",
+  product: "Products",
+  conversion: "Conversion",
+  retargeting: "Retargeting",
 };
 
 export const PRIORITY_LABELS: Record<string, string> = {
-  high: "דחוף",
-  medium: "בינוני",
-  low: "אפשר לחכות",
+  high: "High",
+  medium: "Medium",
+  low: "Low",
 };
 
 export function priorityClass(priority: string): string {

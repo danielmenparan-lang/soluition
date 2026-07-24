@@ -31,8 +31,8 @@ api_version = "2026-10"
   uri = "/webhooks/compliance"
 
 [access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_analytics,read_content,read_products"
+# No Admin API data access — analytics come from the theme app embed + tracker.js
+scopes = ""
 
 [auth]
 redirect_urls = [

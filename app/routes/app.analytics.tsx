@@ -42,7 +42,7 @@ function DataTable({
   emptyMessage: string;
 }) {
   if (rows.length === 0) {
-    return <EmptyState title="אין נתונים" description={emptyMessage} />;
+    return <EmptyState title="No data" description={emptyMessage} />;
   }
 
   return (
@@ -73,15 +73,15 @@ export default function Analytics() {
 
   if (!metrics) {
     return (
-      <s-page heading="מה קורה בחנות">
+      <s-page heading="Analytics">
         <s-section>
           <EmptyState
             icon="chart"
-            title="עדיין אין נתונים כאן"
-            description="קודם צריך להפעיל מעקב בחנות ולגלוש בה פעם אחת. אחרי זה המספרים יופיעו כאן אוטומטית."
+            title="No data yet"
+            description="Enable tracking in your theme and browse the storefront once. Numbers will appear here automatically."
             action={
               <AppLink to="/app" className="ms-btn ms-btn-primary">
-                ← חזור להתחלה והפעל מעקב
+                Go to Home and enable tracking
               </AppLink>
             }
           />
@@ -92,31 +92,26 @@ export default function Analytics() {
 
   return (
     <s-page>
-      <PageHero
-        title={help.title}
-        subtitle={help.subtitle}
-        variant="analytics"
-        compact
-      />
+      <PageHero title={help.title} subtitle={help.subtitle} variant="analytics" compact />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
-      <s-section heading="המספרים בקצרה">
+      <s-section heading="At a glance">
         <div className="ms-metric-grid">
-          <MetricCard label="מבקרים" value={metrics.totalVisitors} />
-          <MetricCard label="ביקורים" value={metrics.totalSessions} accent="info" />
-          <MetricCard label="פעולות" value={metrics.totalEvents} accent="ai" />
-          <MetricCard label="אחוז קונים" value={`${metrics.conversionRate}%`} accent="brand" />
-          <MetricCard label="עזיבה" value={`${metrics.abandonmentRate}%`} accent="warning" />
+          <MetricCard label="Visitors" value={metrics.totalVisitors} />
+          <MetricCard label="Sessions" value={metrics.totalSessions} accent="info" />
+          <MetricCard label="Events" value={metrics.totalEvents} accent="ai" />
+          <MetricCard label="Conversion" value={`${metrics.conversionRate}%`} accent="brand" />
+          <MetricCard label="Abandonment" value={`${metrics.abandonmentRate}%`} accent="warning" />
           <MetricCard
-            label="זמן ממוצע בחנות"
-            value={`${Math.round(metrics.avgSessionDuration / 60)} דק'`}
+            label="Avg. time on site"
+            value={`${Math.round(metrics.avgSessionDuration / 60)} min`}
           />
         </div>
       </s-section>
 
-      <s-section heading="מאיפה מגיעים">
+      <s-section heading="Traffic sources">
         <DataTable
-          headers={["מקור", "ביקורים", "רכישות", "הכנסות", "אחוז קונים"]}
+          headers={["Source", "Sessions", "Purchases", "Revenue", "Conversion"]}
           rows={metrics.topTrafficSources.map((src) => [
             src.source,
             src.sessions,
@@ -124,13 +119,13 @@ export default function Analytics() {
             `$${src.revenue}`,
             `${src.conversionRate}%`,
           ])}
-          emptyMessage="אין נתונים עדיין — ודא שהמעקב פעיל."
+          emptyMessage="No data yet — make sure tracking is active."
         />
       </s-section>
 
-      <s-section heading="מוצרים פופולריים">
+      <s-section heading="Top products">
         <DataTable
-          headers={["מוצר", "צפיות", "רכישות", "אחוז קונים", "הכנסות"]}
+          headers={["Product", "Views", "Purchases", "Conversion", "Revenue"]}
           rows={metrics.topProducts.map((p) => [
             p.productTitle,
             p.views,
@@ -138,17 +133,17 @@ export default function Analytics() {
             `${p.conversionRate}%`,
             `$${p.revenue}`,
           ])}
-          emptyMessage="אין נתוני מוצרים — גלוש בדפי מוצר בחנות."
+          emptyMessage="No product data — visit product pages on your storefront."
         />
       </s-section>
 
       {metrics.topCountries.length > 0 && (
-        <s-section heading="מדינות">
+        <s-section heading="Countries">
           <div className="ms-metric-grid">
             {metrics.topCountries.map((c) => (
               <div key={c.country} className="ms-card">
                 <s-text type="strong">{c.country}</s-text>
-                <s-paragraph>{c.count} מבקרים</s-paragraph>
+                <s-paragraph>{c.count} visitors</s-paragraph>
               </div>
             ))}
           </div>
@@ -156,21 +151,21 @@ export default function Analytics() {
       )}
 
       {metrics.peakConversionHours.length > 0 && (
-        <s-section heading="שעות עם הכי הרבה רכישות">
+        <s-section heading="Peak conversion hours">
           <div className="ms-metric-grid">
             {metrics.peakConversionHours.map((h) => (
               <div key={h.hour} className="ms-card">
                 <s-text type="strong">{h.hour}:00</s-text>
-                <s-paragraph>{h.conversions} המרות</s-paragraph>
+                <s-paragraph>{h.conversions} conversions</s-paragraph>
               </div>
             ))}
           </div>
         </s-section>
       )}
 
-      <s-section heading="דפים שמושכים תנועה אבל לא מוכרים">
+      <s-section heading="High traffic, low conversion pages">
         <DataTable
-          headers={["כתובת", "שם", "צפיות", "עזיבות", "אחוז עזיבה"]}
+          headers={["URL", "Title", "Views", "Exits", "Exit rate"]}
           rows={lowConversionPages.map((p) => [
             p.url,
             p.pageTitle ?? "—",
@@ -178,32 +173,28 @@ export default function Analytics() {
             p.exits,
             `${p.exitRate}%`,
           ])}
-          emptyMessage="אין מספיק נתונים לזיהוי דפים בעייתיים."
+          emptyMessage="Not enough data to flag problem pages."
         />
       </s-section>
 
-      <s-section heading="מוצרים שגורמים לעזוב">
+      <s-section heading="Products linked to exits">
         <DataTable
-          headers={["מוצר", "צפיות", "עזיבות", "אחוז עזיבה"]}
+          headers={["Product", "Views", "Exits", "Exit rate"]}
           rows={productExitDrivers.map((p) => [
             p.productTitle,
             p.viewCount,
             p.exitCount,
             `${p.exitRate}%`,
           ])}
-          emptyMessage="אין נתוני נטישת מוצרים עדיין."
+          emptyMessage="No product exit data yet."
         />
       </s-section>
 
-      <s-section heading="דפים שאנשים עוזבים מהר">
+      <s-section heading="Quick-exit pages">
         <DataTable
-          headers={["כתובת", "שם", "עזיבות"]}
-          rows={bouncePages.map((p) => [
-            p.url,
-            p.pageTitle ?? "—",
-            p.exitCount,
-          ])}
-          emptyMessage="אין נתוני bounce עדיין."
+          headers={["URL", "Title", "Exits"]}
+          rows={bouncePages.map((p) => [p.url, p.pageTitle ?? "—", p.exitCount])}
+          emptyMessage="No bounce data yet."
         />
       </s-section>
     </s-page>

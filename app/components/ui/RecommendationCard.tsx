@@ -19,11 +19,11 @@ export function RecommendationCard({ rec }: { rec: AIRecommendation }) {
         </s-stack>
         <s-paragraph>{rec.description}</s-paragraph>
         {rec.expected_impact ? (
-          <s-text color="subdued">למה זה שווה: {rec.expected_impact}</s-text>
+          <s-text color="subdued">Why it matters: {rec.expected_impact}</s-text>
         ) : null}
         {actions.length > 0 ? (
           <div className="ms-rec-actions">
-            <p className="ms-rec-actions-title">מה לעשות:</p>
+            <p className="ms-rec-actions-title">What to do:</p>
             <s-unordered-list>
               {actions.map((item, i) => (
                 <s-list-item key={i}>{item}</s-list-item>

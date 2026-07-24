@@ -27,6 +27,13 @@ import {
   generateWeeklyReport,
 } from "../services/ai.server";
 import { refreshSegments } from "../services/segmentation.server";
+import {
+  assertCanOutput,
+  assertCanScan,
+  recordOutput,
+  recordScan,
+  UsageLimitError,
+} from "../services/usage.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -58,24 +65,35 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   try {
     if (intent === "generate_recommendations") {
+      await assertCanOutput(shop.id);
       await generateRecommendations(shop.id);
-      return { success: true, message: "ההמלצות מוכנות — גלול למטה או עבור ל«מה כדאי לעשות»" };
+      await recordOutput(shop.id);
+      return {
+        success: true,
+        message: "Recommendations are ready — scroll down or open Recommendations",
+      };
     }
     if (intent === "refresh_segments") {
+      await assertCanScan(shop.id);
       await refreshSegments(shop.id);
-      return { success: true, message: "קבוצות הלקוחות עודכנו" };
+      await recordScan(shop.id);
+      return { success: true, message: "Customer segments updated" };
     }
     if (intent === "generate_report") {
+      await assertCanOutput(shop.id);
       await generateWeeklyReport(shop.id);
-      return { success: true, message: "סיכום השבוע מוכן" };
+      await recordOutput(shop.id);
+      return { success: true, message: "Weekly report is ready" };
     }
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "הפעולה נכשלה";
+    if (error instanceof UsageLimitError) {
+      return { success: false, message: error.message };
+    }
+    const message = error instanceof Error ? error.message : "Action failed";
     return { success: false, message };
   }
 
-  return { success: false, message: "פעולה לא מוכרת" };
+  return { success: false, message: "Unknown action" };
 };
 
 export default function Overview() {
@@ -97,7 +115,7 @@ export default function Overview() {
 
   if (!hasData) {
     return (
-      <s-page heading="התחלה">
+      <s-page heading="Home">
         <s-section>
           <WelcomeScreen
             shopDomain={shop.shop_domain}
@@ -112,21 +130,21 @@ export default function Overview() {
   }
 
   return (
-    <s-page heading="סיכום החנות">
+    <s-page heading="Store overview">
       {hasData ? (
         <SubmitButton
           fetcher={fetcher}
           slot="primary-action"
           intent="generate_recommendations"
         >
-          {isGenerating ? "מכין המלצות..." : "קבל המלצות"}
+          {isGenerating ? "Preparing..." : "Get recommendations"}
         </SubmitButton>
       ) : null}
 
       {isGenerating ? (
         <s-section>
           <div className="ms-status-banner">
-            <span className="ms-loading">בודק נתונים ומכין המלצות — רגע...</span>
+            <span className="ms-loading">Analyzing your data — one moment...</span>
           </div>
         </s-section>
       ) : null}
@@ -152,16 +170,16 @@ export default function Overview() {
       )}
 
       <s-section>
-        <SectionBlock title="המספרים שלך" subtitle="30 הימים האחרונים">
+        <SectionBlock title="Your numbers" subtitle="Last 30 days">
           <div className="ms-metric-grid">
-            <MetricCard label="מבקרים" value={metrics!.totalVisitors} accent="brand" hint="אנשים שונים שנכנסו" />
-            <MetricCard label="ביקורים" value={metrics!.totalSessions} accent="info" hint="כמה פעמים נכנסו לחנות" />
-            <MetricCard label="אחוז קונים" value={`${metrics!.conversionRate}%`} accent="ai" hint="מבקרים שהפכו לקונים" />
+            <MetricCard label="Visitors" value={metrics!.totalVisitors} accent="brand" hint="Unique people who visited" />
+            <MetricCard label="Sessions" value={metrics!.totalSessions} accent="info" hint="Total store visits" />
+            <MetricCard label="Conversion" value={`${metrics!.conversionRate}%`} accent="ai" hint="Visitors who purchased" />
             <MetricCard
-              label="זמן ממוצע"
-              value={`${Math.round(metrics!.avgSessionDuration / 60)} דק'`}
+              label="Avg. time"
+              value={`${Math.round(metrics!.avgSessionDuration / 60)} min`}
               accent="warning"
-              hint="כמה זמן נשארו בחנות"
+              hint="Time spent in your store"
             />
           </div>
         </SectionBlock>
@@ -169,11 +187,11 @@ export default function Overview() {
 
       <s-section>
         <SectionBlock
-          title={recommendationCount > 0 ? "מה כדאי לעשות עכשיו" : "המלצות לפעולה"}
+          title={recommendationCount > 0 ? "What to do next" : "Action recommendations"}
           subtitle={
             recommendationCount > 0
-              ? "הדברים הכי חשובים לשיפור המכירות"
-              : "לחץ «קבל המלצות» למעלה — Solution ינתח את הנתונים ויגיד לך מה לשפר"
+              ? "Highest-impact improvements for your store"
+              : "Click Get recommendations above — Solution will analyze your data"
           }
         >
           {recommendations.length > 0 ? (
@@ -183,18 +201,18 @@ export default function Overview() {
               ))}
               {recommendationCount > 3 ? (
                 <AppLink to="/app/recommendations" className="ms-text-link">
-                  צפה בכל {recommendationCount} ההמלצות →
+                  View all {recommendationCount} recommendations
                 </AppLink>
               ) : null}
             </div>
           ) : (
             <EmptyState
               icon="spark"
-              title="עדיין אין המלצות"
-              description="לחץ «קבל המלצות» בראש הדף. Solution יבדוק את הנתונים ויכין רשימה ברורה של מה לשפר."
+              title="No recommendations yet"
+              description="Click Get recommendations at the top. Solution will review your data and suggest improvements."
               action={
                 <SubmitButton fetcher={fetcher} intent="generate_recommendations">
-                  {isGenerating ? "מכין..." : "קבל המלצות עכשיו"}
+                  {isGenerating ? "Preparing..." : "Get recommendations now"}
                 </SubmitButton>
               }
             />
@@ -203,7 +221,7 @@ export default function Overview() {
       </s-section>
 
       <s-section>
-        <SectionBlock title="לאן ממשיכים?" subtitle="כל מה ש-Solution מציעה">
+        <SectionBlock title="Where to next?" subtitle="Everything Solution offers">
           <QuickNav />
         </SectionBlock>
       </s-section>
@@ -214,18 +232,18 @@ export default function Overview() {
 
       {segments.length > 0 ? (
         <s-section>
-          <SectionBlock title="קבוצות לקוחות" subtitle="מי מגיע לחנות — לפי מקור ומכשיר">
+          <SectionBlock title="Customer segments" subtitle="Visitors grouped by source and device">
             <div className="ms-metric-grid">
               {segments.map((seg) => (
                 <div key={seg.id} className="ms-card ms-card-soft">
                   <s-text type="strong">{seg.name}</s-text>
                   <div className="ms-metric-value">{seg.member_count}</div>
-                  <s-text color="subdued">אנשים בקבוצה</s-text>
+                  <s-text color="subdued">people in segment</s-text>
                 </div>
               ))}
             </div>
             <AppLink to="/app/segments" className="ms-text-link">
-              → כל הקבוצות
+              View all segments
             </AppLink>
           </SectionBlock>
         </s-section>

@@ -7,15 +7,15 @@ export function SupportFooter({ email }: SupportFooterProps) {
     <footer className="ms-support-footer">
       <div className="ms-support-inner">
         <div className="ms-support-block">
-          <span className="ms-support-label">יש שאלה? כתוב לנו:</span>
-          <a className="ms-support-email" href={`mailto:${email}?subject=Solution%20AI%20Support`}>
+          <span className="ms-support-label">Questions? Email us:</span>
+          <a className="ms-support-email" href={`mailto:${email}?subject=Solution%20Support`}>
             {email}
           </a>
         </div>
         <p className="ms-support-note">
-          זמן תגובה ממוצע: עד 24 שעות ·{" "}
+          Typical response time: within 24 hours ·{" "}
           <a href="/privacy" target="_blank" rel="noopener noreferrer">
-            מדיניות פרטיות
+            Privacy policy
           </a>
         </p>
       </div>

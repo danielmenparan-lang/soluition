@@ -8,11 +8,18 @@ import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { NavMenu } from "@shopify/app-bridge-react";
-import { authenticate } from "../shopify.server";
+import { authenticate, STARTER_PLAN, UNLIMITED_PLAN } from "../shopify.server";
 import { AppLink } from "../components/AppLink";
 import { BrandHeader } from "../components/ui/BrandHeader";
 import { SupportFooter } from "../components/ui/SupportFooter";
 import { getSupportEmail } from "../config/support.server";
+import { getOrCreateShop } from "../services/shop.server";
+import {
+  getUsage,
+  planFromSubscriptionName,
+  syncPlanFromBilling,
+  usageSummary,
+} from "../services/usage.server";
 import appStyles from "../styles/app.css?url";
 
 export const links: LinksFunction = () => [
@@ -20,14 +27,28 @@ export const links: LinksFunction = () => [
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
+  const { session, billing } = await authenticate.admin(request);
+  const shop = await getOrCreateShop(session.shop);
+
+  const check = await billing.check({
+    plans: [STARTER_PLAN, UNLIMITED_PLAN],
+    isTest: process.env.NODE_ENV !== "production",
+  });
+
+  if (check.hasActivePayment && check.appSubscriptions.length > 0) {
+    const plan = planFromSubscriptionName(check.appSubscriptions[0].name);
+    await syncPlanFromBilling(shop.id, plan);
+  } else {
+    await syncPlanFromBilling(shop.id, "free");
+  }
+
   return {
     apiKey: process.env.SHOPIFY_API_KEY || "",
     supportEmail: getSupportEmail(),
+    usage: usageSummary(await getUsage(shop.id)),
   };
 };
 
-/** Safety net: POST to /app without ?index hits the layout and would 405 otherwise. */
 export const action = async ({ request }: ActionFunctionArgs) => {
   if (request.method !== "POST") {
     return new Response(null, { status: 405 });
@@ -35,29 +56,30 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   return {
     success: false,
-    message: "שגיאת ניווט — רענן את הדף ונסה שוב",
+    message: "Navigation error — refresh the page and try again",
   };
 };
 
 export default function App() {
-  const { apiKey, supportEmail } = useLoaderData<typeof loader>();
+  const { apiKey, supportEmail, usage } = useLoaderData<typeof loader>();
 
   return (
     <AppProvider embedded apiKey={apiKey}>
       <NavMenu>
         <AppLink to="/app" rel="home">
-          התחלה
+          Home
         </AppLink>
-        <AppLink to="/app/recommendations">מה כדאי לעשות</AppLink>
-        <AppLink to="/app/analytics">מה קורה בחנות</AppLink>
-        <AppLink to="/app/chat">צ&apos;אט</AppLink>
-        <AppLink to="/app/segments">קבוצות לקוחות</AppLink>
-        <AppLink to="/app/reports">סיכום שבועי</AppLink>
+        <AppLink to="/app/recommendations">Recommendations</AppLink>
+        <AppLink to="/app/analytics">Analytics</AppLink>
+        <AppLink to="/app/chat">Chat</AppLink>
+        <AppLink to="/app/segments">Segments</AppLink>
+        <AppLink to="/app/reports">Reports</AppLink>
+        <AppLink to="/app/billing">Billing</AppLink>
       </NavMenu>
       <div className="ms-app-shell">
-        <BrandHeader />
+        <BrandHeader usage={usage} />
         <div className="ms-app-content ms-app-container">
-          <Outlet context={{ supportEmail }} />
+          <Outlet context={{ supportEmail, usage }} />
         </div>
         <SupportFooter email={supportEmail} />
       </div>

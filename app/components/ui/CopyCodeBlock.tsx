@@ -6,32 +6,30 @@ type CopyCodeBlockProps = {
   label?: string;
 };
 
-export function CopyCodeBlock({ code, label = "העתק:" }: CopyCodeBlockProps) {
+export function CopyCodeBlock({ code, label = "Copy:" }: CopyCodeBlockProps) {
   const shopify = useAppBridge();
   const [copied, setCopied] = useState(false);
 
-  const copy = async () => {
+  async function handleCopy() {
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
-      shopify.toast.show("הועתק — עכשיו הדבק במקום הנכון");
+      shopify.toast.show("Copied — paste it in the theme editor");
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      shopify.toast.show("לא הצלחנו להעתיק — סמן והעתק ידנית");
+      shopify.toast.show("Could not copy — select and copy manually");
     }
-  };
+  }
 
   return (
-    <div className="ms-code-wrap">
-      <div className="ms-code-toolbar">
-        <span className="ms-code-label">{label}</span>
-        <button type="button" className="ms-copy-btn" onClick={copy}>
-          {copied ? "הועתק ✓" : "העתק"}
+    <div className="ms-copy-block">
+      {label ? <p className="ms-copy-label">{label}</p> : null}
+      <div className="ms-copy-row">
+        <code className="ms-copy-code">{code}</code>
+        <button type="button" className="ms-btn ms-btn-secondary" onClick={handleCopy}>
+          {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      <pre className="ms-code-pre">
-        <code>{code}</code>
-      </pre>
     </div>
   );
 }
