@@ -9,11 +9,11 @@ Why?
 
 What to do now (about 3 minutes):
 
-1. Go to the Home page in this app
-2. Click Open theme editor
-3. Enable Solution Tracker and paste your tracking ID:
+1. Open Solution → Home
+2. Click "Enable Solution Tracker" (or go manually: Online Store → Themes → Customize → App embeds)
+3. Turn on Solution Tracker and paste your tracking ID:
    ${shop.tracking_id}
-4. Save, then open your storefront and browse a few pages
+4. Click Save in the theme editor, then browse your storefront (2–3 pages)
 
 Once data flows, I can help with:
 • Where buyers come from

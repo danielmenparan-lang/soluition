@@ -21,7 +21,8 @@ Partners → Apps → solution → Listing:
 
 Testing instructions for Shopify reviewer (paste into Partners):
 1. Install the app on the development store.
-2. Open Solution → Home. Click "Open theme editor" and enable the "Solution Tracker" app embed. Paste the tracking ID shown on Home. Save.
+2. Open Solution → Home. Click "Enable Solution Tracker" (opens Theme editor). Turn on the "Solution Tracker" app embed, paste the tracking ID from Home, click Save.
+   Manual path: Online Store → Themes → Customize (live theme) → App embeds (puzzle icon) → Solution Tracker → Save.
 3. Open the storefront in a new tab. Visit Home, a product page, and the cart.
 4. Return to Solution → Home. Click "Get recommendations" (uses 1 free AI output).
 5. Open Chat and ask: "Where does my traffic come from?"

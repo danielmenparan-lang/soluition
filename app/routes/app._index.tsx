@@ -34,6 +34,10 @@ import {
   recordScan,
   UsageLimitError,
 } from "../services/usage.server";
+import {
+  buildThemeEmbedActivateUrl,
+  buildThemesAdminUrl,
+} from "../config/theme-embed";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -54,6 +58,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     trackingScriptUrl: process.env.SHOPIFY_APP_URL
       ? `${process.env.SHOPIFY_APP_URL}/tracker.js`
       : "/tracker.js",
+    themeEmbedUrl: buildThemeEmbedActivateUrl(
+      session.shop,
+      process.env.SHOPIFY_API_KEY ?? "00eb38f774ffba914d98a6800f4c5df5",
+    ),
+    themesAdminUrl: buildThemesAdminUrl(session.shop),
   };
 };
 
@@ -104,6 +113,8 @@ export default function Overview() {
     recommendationCount,
     segments,
     trackingScriptUrl,
+    themeEmbedUrl,
+    themesAdminUrl,
   } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
   const isGenerating = fetcher.state !== "idle";
@@ -121,6 +132,8 @@ export default function Overview() {
             shopDomain={shop.shop_domain}
             trackingId={shop.tracking_id}
             trackingScriptUrl={trackingScriptUrl}
+            themeEmbedUrl={themeEmbedUrl}
+            themesAdminUrl={themesAdminUrl}
             hasData={hasData}
             hasRecommendations={recommendationCount > 0}
           />
@@ -155,6 +168,8 @@ export default function Overview() {
             shopDomain={shop.shop_domain}
             trackingId={shop.tracking_id}
             trackingScriptUrl={trackingScriptUrl}
+            themeEmbedUrl={themeEmbedUrl}
+            themesAdminUrl={themesAdminUrl}
             hasData={hasData}
             hasRecommendations={recommendationCount > 0}
           />

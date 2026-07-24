@@ -1,30 +1,34 @@
 import { CopyCodeBlock } from "./CopyCodeBlock";
 import { SectionBlock } from "./SectionBlock";
 import { AppLink } from "../AppLink";
+import {
+  THEME_EMBED_NAME,
+  buildThemeEmbedActivateUrl,
+  buildThemesAdminUrl,
+} from "../../config/theme-embed";
 
 type SetupGuideProps = {
   shopDomain: string;
   trackingId: string;
   trackingScriptUrl: string;
+  themeEmbedUrl: string;
+  themesAdminUrl: string;
   hasData: boolean;
   hasRecommendations: boolean;
   embedded?: boolean;
 };
 
-function storeHandle(shopDomain: string): string {
-  return shopDomain.replace(".myshopify.com", "");
-}
-
 export function SetupGuide({
   shopDomain,
   trackingId,
   trackingScriptUrl,
+  themeEmbedUrl,
+  themesAdminUrl,
   hasData,
   hasRecommendations,
   embedded = false,
 }: SetupGuideProps) {
   const script = `<script src="${trackingScriptUrl}" data-tracking-id="${trackingId}" async></script>`;
-  const themeEditorUrl = `https://admin.shopify.com/store/${storeHandle(shopDomain)}/themes/current/editor?context=apps`;
   const storefrontUrl = `https://${shopDomain}`;
 
   if (hasData && hasRecommendations) {
@@ -40,19 +44,40 @@ export function SetupGuide({
           <p className="ms-timeline-text">
             {hasData
               ? "Tracking is connected."
-              : "Open theme editor → App embeds → enable Solution Tracker → paste your ID → Save."}
+              : `Enable "${THEME_EMBED_NAME}" in your live theme, paste your tracking ID, then click Save.`}
           </p>
           {!hasData ? (
             <>
               <a
-                href={themeEditorUrl}
+                href={themeEmbedUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="ms-btn ms-btn-primary ms-step-action"
               >
-                Open theme editor
+                Enable {THEME_EMBED_NAME}
               </a>
-              <CopyCodeBlock code={trackingId} label="Your tracking ID — copy and paste:" />
+              <CopyCodeBlock code={trackingId} label="Your tracking ID — copy and paste in the embed settings:" />
+              <ol className="ms-step-list">
+                <li>
+                  Click <strong>Enable {THEME_EMBED_NAME}</strong> above (opens Theme editor in a new tab).
+                </li>
+                <li>
+                  Or manually: Shopify Admin → <strong>Online Store</strong> → <strong>Themes</strong> →{" "}
+                  <strong>Customize</strong> on your live theme.
+                </li>
+                <li>
+                  In the left sidebar, open <strong>App embeds</strong> (puzzle icon), turn on{" "}
+                  <strong>{THEME_EMBED_NAME}</strong>, paste your tracking ID, then <strong>Save</strong>.
+                </li>
+              </ol>
+              <a
+                href={themesAdminUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ms-text-link ms-step-action"
+              >
+                Open Online Store → Themes
+              </a>
               <details className="ms-details">
                 <summary>Manual install with code</summary>
                 <CopyCodeBlock code={script} label="Paste this line in your theme <head>:" />

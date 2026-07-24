@@ -1124,6 +1124,12 @@
   max-width: 680px;
 }
 
+.ms-welcome-cta {
+  display: inline-block;
+  margin-top: 16px;
+  text-decoration: none;
+}
+
 .ms-welcome-values-title {
   margin: 0 0 12px;
   font-size: 16px;
