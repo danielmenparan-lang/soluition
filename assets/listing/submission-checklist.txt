@@ -17,7 +17,7 @@ Partners → Apps → solution → Listing:
 - Category: Marketing / Analytics
 - Privacy: https://shopify-marketing-solution.onrender.com/privacy
 - Support: vonx.support@gmail.com
-- Pricing: Free plan + $15 Starter + $29 Unlimited (configured in app)
+- Pricing: Free plan + $9 Starter + $19 Unlimited (configured in app)
 
 Testing instructions for Shopify reviewer (paste into Partners):
 1. Install the app on the development store.
@@ -26,7 +26,7 @@ Testing instructions for Shopify reviewer (paste into Partners):
 3. Open the storefront in a new tab. Visit Home, a product page, and the cart.
 4. Return to Solution → Home. Click "Get recommendations" (uses 1 free AI output).
 5. Open Chat and ask: "Where does my traffic come from?"
-6. Optional: Billing page shows Free (1 scan + 1 output), Starter $15/mo, Unlimited $29/mo.
+6. Optional: Billing page shows Free (1 scan + 2 outputs), Starter $9/mo, Unlimited $19/mo.
 
 Install link (dev store):
 https://admin.shopify.com/store/solution-vyndgruj/oauth/install?client_id=00eb38f774ffba914d98a6800f4c5df5

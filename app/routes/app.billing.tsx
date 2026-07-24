@@ -3,7 +3,7 @@ import { redirect, useLoaderData } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate, STARTER_PLAN, UNLIMITED_PLAN } from "../shopify.server";
 import { getOrCreateShop } from "../services/shop.server";
-import { PLAN_LIMITS } from "../config/plans";
+import { PLAN_LIMITS, formatOutputLimit, formatScanLimit } from "../config/plans";
 import {
   getUsage,
   planFromSubscriptionName,
@@ -73,32 +73,17 @@ export default function BillingPage() {
   const { usage } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
 
-  const tiers = [
-    {
-      id: "free",
-      name: "Free",
-      price: "$0",
-      scans: "1 scan",
-      outputs: "1 AI output",
-      current: usage.plan === "free",
-    },
-    {
-      id: "starter",
-      name: "Starter",
-      price: "$15 / month",
-      scans: "10 scans",
-      outputs: "10 AI outputs",
-      current: usage.plan === "starter",
-    },
-    {
-      id: "unlimited",
-      name: "Unlimited",
-      price: "$29 / month",
-      scans: "Unlimited scans",
-      outputs: "Unlimited AI outputs",
-      current: usage.plan === "unlimited",
-    },
-  ] as const;
+  const tiers = (["free", "starter", "unlimited"] as const).map((id) => {
+    const plan = PLAN_LIMITS[id];
+    return {
+      id,
+      name: plan.label,
+      price: id === "free" ? "$0" : plan.price.replace("/mo", " / month"),
+      scans: formatScanLimit(plan.scans),
+      outputs: formatOutputLimit(plan.outputs),
+      current: usage.plan === id,
+    };
+  });
 
   return (
     <s-page heading="Plans & usage">
@@ -131,7 +116,7 @@ export default function BillingPage() {
       <s-section>
         <SectionBlock
           title="Choose a plan"
-          subtitle="Free includes 1 scan and 1 AI output. Upgrade when you need more."
+          subtitle={`Free includes ${PLAN_LIMITS.free.scans} scan and ${PLAN_LIMITS.free.outputs} AI outputs. Upgrade when you need more.`}
         >
           <div className="ms-plan-grid">
             {tiers.map((tier) => (

@@ -15,6 +15,30 @@ export function formatChatReply(text: string): string {
   return out.trim();
 }
 
+const DEFER_PATTERNS = [
+  /come back/i,
+  /check again/i,
+  /wait \d/i,
+  /24.?48 hour/i,
+  /20.?30 visitors/i,
+  /once you have (more|enough)/i,
+  /when you have (more|enough|at least)/i,
+  /after (a|one) week/i,
+  /then we can analyze/i,
+  /נתונים (אמיתיים )?בעוד/i,
+  /חזור (ל|אל)/i,
+  /אחרי שיהיו/i,
+];
+
+/** Remove lines that tell the merchant to wait or return later. */
+export function stripDeferredAdvice(text: string): string {
+  const lines = text.split("\n");
+  const filtered = lines.filter(
+    (line) => !DEFER_PATTERNS.some((pattern) => pattern.test(line)),
+  );
+  return (filtered.length > 0 ? filtered : lines).join("\n").trim();
+}
+
 export function hasAnalyticsData(summaryJson: string): boolean {
   try {
     const data = JSON.parse(summaryJson) as {

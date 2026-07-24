@@ -16,6 +16,7 @@ import {
   formatChatReply,
   hasAnalyticsData,
   isSparseAnalyticsData,
+  stripDeferredAdvice,
 } from "../utils/format-chat-reply";
 import { buildNoDataChatReply } from "../utils/chat-no-data-reply";
 import type {
@@ -48,7 +49,7 @@ Rules:
 const CHAT_SYSTEM_PROMPT = `You are a friendly marketing assistant for a Shopify store owner.
 You speak simple, clear English.
 
-Every reply MUST include a section titled "Action items:" with 3–5 numbered steps the merchant can take this week in Shopify Admin or their storefront.
+Every reply MUST include a section titled "Action items:" with 3–5 numbered steps the merchant can take today or this week in Shopify Admin or their storefront.
 
 Rules for every reply:
 - Plain text only. NO markdown: no # headers, no **bold**, no code blocks.
@@ -56,10 +57,11 @@ Rules for every reply:
 - Short paragraphs. Use numbered steps (1. 2. 3.) or bullet lines starting with • when listing.
 - Be direct and practical for a non-technical merchant.
 - Lead with insight, then end with Action items — never reply with setup instructions only.
-- If data is sparse (very few visitors/sessions): say data is early. Do NOT claim tracking is broken when visitors > 0. Give concrete marketing and store-improvement actions using the numbers you have.
-- If all metrics are zero: give 2 setup steps for Solution Tracker AND 2–3 store-prep actions they can do immediately.
-- Never invent numbers. Quote metrics from the JSON when available.
-- Never tell the merchant to wait 24–48 hours as the main advice.
+- ALWAYS answer the question now. Use current data when available; fill gaps with proven Shopify best practices (homepage clarity, product photos, trust badges, checkout friction, social proof, email capture).
+- If data is sparse (very few visitors): explain what the numbers mean AND give growth actions. Do NOT claim tracking is broken when visitors > 0.
+- If all metrics are zero: give 2 setup steps for Solution Tracker AND 3 store-prep actions they can do immediately.
+- Never invent metrics. Quote numbers from the JSON when available.
+- FORBIDDEN — never write any of these ideas: come back later, check again in a week, wait 24–48 hours, once you have 20–30 visitors, when you have more data, we will analyze later, I cannot help until.
 - Keep the main answer under 10 lines, then Action items.`;
 
 function isSetupQuestion(message: string): boolean {
@@ -382,10 +384,10 @@ export async function chatWithAI(
 
     const sparse = hasData && isSparseAnalyticsData(analyticsSummary);
     const dataNote = !hasData
-      ? "Store has NO analytics data yet (all zeros). Give setup steps plus immediate store-prep actions. Still include Action items."
+      ? "Store has NO analytics data yet (all zeros). Give setup steps plus immediate store-prep actions. Still include Action items. Never defer."
       : sparse
-        ? "Store has EARLY data (very few visitors). Tracking appears active. Do NOT say tracking is broken. Analyze the numbers you have and give growth-focused Action items for a new store."
-        : "Store has analytics data — cite specific numbers from the JSON.";
+        ? "Store has EARLY data (very few visitors). Tracking appears active. Analyze what you have NOW and give growth-focused Action items. Never tell the merchant to return later or wait for more visitors."
+        : "Store has analytics data — cite specific numbers and give Action items now.";
 
     const trackingNote = shop
       ? `Shop domain: ${shop.shop_domain}. Tracking ID (optional override): ${shop.tracking_id}`
@@ -405,10 +407,10 @@ ${(history ?? [])
 
 User question: ${userMessage}
 
-Answer in plain English. Always end with "Action items:" and 3–5 numbered steps.`;
+Answer in plain English. Always end with "Action items:" and 3–5 numbered steps. Never defer analysis to a future date or visitor count.`;
 
     const rawReply = await callClaude(CHAT_SYSTEM_PROMPT, contextPrompt, 1200);
-    reply = formatChatReply(rawReply);
+    reply = stripDeferredAdvice(formatChatReply(rawReply));
   }
 
   await supabase.from("chat_messages").insert({

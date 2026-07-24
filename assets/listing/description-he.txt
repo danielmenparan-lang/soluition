@@ -7,6 +7,6 @@ Solution tracks visitor behavior, analyzes patterns, and delivers clear recommen
 • Chat assistant — ask questions, get answers
 • Customer segments and weekly reports
 
-Pricing: Free — 1 scan + 1 AI output. Starter $15/mo — 10 each. Unlimited $29/mo.
+Pricing: Free — 1 scan + 2 AI outputs. Starter $9/mo — 5 each. Unlimited $19/mo.
 
 Setup: Enable the Solution Tracker app embed in your theme, then browse your storefront once.
