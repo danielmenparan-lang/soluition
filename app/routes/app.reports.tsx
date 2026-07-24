@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
+import { SubmitButton } from "../components/SubmitButton";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   generateWeeklyReport,
@@ -44,12 +45,9 @@ export default function Reports() {
 
   return (
     <s-page heading="דוחות שבועיים">
-      <s-button
-        slot="primary-action"
-        onClick={() => fetcher.submit({}, { method: "POST" })}
-      >
+      <SubmitButton fetcher={fetcher} slot="primary-action">
         {fetcher.state !== "idle" ? "מייצר..." : "יצירת דוח שבועי"}
-      </s-button>
+      </SubmitButton>
 
       {!latest ? (
         <s-section>

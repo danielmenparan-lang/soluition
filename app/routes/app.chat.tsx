@@ -52,6 +52,7 @@ const SUGGESTED_QUESTIONS = [
 export default function Chat() {
   const { conversations } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
+  const { Form, actionUrl } = fetcher;
   const [messages, setMessages] = useState<
     Array<{ role: "user" | "assistant"; content: string }>
   >([]);
@@ -75,14 +76,10 @@ export default function Chat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = (text: string) => {
+  const handleSubmit = (text: string) => {
     if (!text.trim() || fetcher.state !== "idle") return;
-    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    setMessages((prev) => [...prev, { role: "user", content: text.trim() }]);
     setInput("");
-    fetcher.submit(
-      { message: text, conversationId: conversationId ?? "" },
-      { method: "POST" },
-    );
   };
 
   return (
@@ -90,9 +87,22 @@ export default function Chat() {
       <s-section heading="שאלות מומלצות">
         <s-stack direction="inline" gap="small">
           {SUGGESTED_QUESTIONS.map((q) => (
-            <s-button key={q} onClick={() => sendMessage(q)}>
-              {q}
-            </s-button>
+            <Form
+              key={q}
+              method="post"
+              action={actionUrl}
+              onSubmit={() => handleSubmit(q)}
+            >
+              <input type="hidden" name="message" value={q} />
+              <input
+                type="hidden"
+                name="conversationId"
+                value={conversationId ?? ""}
+              />
+              <s-button type="submit" disabled={fetcher.state !== "idle"}>
+                {q}
+              </s-button>
+            </Form>
           ))}
         </s-stack>
       </s-section>
@@ -142,15 +152,16 @@ export default function Chat() {
       </s-section>
 
       <s-section>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            sendMessage(input);
-          }}
+        <Form
+          method="post"
+          action={actionUrl}
+          onSubmit={() => handleSubmit(input)}
         >
+          <input type="hidden" name="conversationId" value={conversationId ?? ""} />
           <s-stack direction="inline" gap="base">
             <input
               type="text"
+              name="message"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="שאל שאלה על החנות שלך..."
@@ -166,7 +177,7 @@ export default function Chat() {
               שלח
             </s-button>
           </s-stack>
-        </form>
+        </Form>
       </s-section>
 
       {conversations.length > 0 && (

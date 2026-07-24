@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
+import { SubmitButton } from "../components/SubmitButton";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   getSegments,
@@ -48,12 +49,9 @@ export default function Segments() {
 
   return (
     <s-page heading="קהלים (Segments)">
-      <s-button
-        slot="primary-action"
-        onClick={() => fetcher.submit({}, { method: "POST" })}
-      >
+      <SubmitButton fetcher={fetcher} slot="primary-action">
         {fetcher.state !== "idle" ? "מעדכן..." : "רענון קהלים"}
-      </s-button>
+      </SubmitButton>
 
       <s-section heading="קהלים אוטומטיים">
         <s-grid gridTemplateColumns="repeat(3, 1fr)" gap="base">

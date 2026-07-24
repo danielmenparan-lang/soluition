@@ -1,35 +1,35 @@
-import { Link, type LinkProps, useSearchParams } from "react-router";
+import { type AnchorHTMLAttributes } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 
 function appendSearchParams(path: string, search: string): string {
   if (!search) return path;
   return path.includes("?") ? `${path}&${search}` : `${path}?${search}`;
 }
 
-export function AppLink({ to, ...props }: LinkProps) {
+function resolvePath(to: string, query: string): string {
+  return appendSearchParams(to, query);
+}
+
+type AppLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
+  to: string;
+};
+
+export function AppLink({ to, onClick, ...props }: AppLinkProps) {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const query = searchParams.toString();
+  const href = resolvePath(to, query);
 
-  if (typeof to === "string") {
-    return <Link to={appendSearchParams(to, query)} {...props} />;
-  }
-
-  if (typeof to === "object" && to !== null) {
-    const pathname = typeof to.pathname === "string" ? to.pathname : "";
-    const existingSearch =
-      typeof to.search === "string" ? to.search.replace(/^\?/, "") : "";
-    const mergedSearch = [existingSearch, query].filter(Boolean).join("&");
-
-    return (
-      <Link
-        to={{
-          ...to,
-          pathname,
-          search: mergedSearch ? `?${mergedSearch}` : undefined,
-        }}
-        {...props}
-      />
-    );
-  }
-
-  return <Link to={to} {...props} />;
+  return (
+    <a
+      href={href}
+      {...props}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
+        event.preventDefault();
+        navigate(href);
+      }}
+    />
+  );
 }

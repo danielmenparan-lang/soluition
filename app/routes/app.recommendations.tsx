@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
+import { SubmitButton } from "../components/SubmitButton";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   generateRecommendations,
@@ -59,12 +60,9 @@ export default function Recommendations() {
 
   return (
     <s-page heading="המלצות AI">
-      <s-button
-        slot="primary-action"
-        onClick={() => fetcher.submit({}, { method: "POST" })}
-      >
+      <SubmitButton fetcher={fetcher} slot="primary-action">
         {fetcher.state !== "idle" ? "מייצר..." : "יצירת המלצות חדשות"}
-      </s-button>
+      </SubmitButton>
 
       {recommendations.length === 0 ? (
         <s-section>

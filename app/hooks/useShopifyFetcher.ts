@@ -5,6 +5,7 @@ import {
   useSearchParams,
   type FetcherSubmitOptions,
 } from "react-router";
+import { useMemo } from "react";
 
 type SubmitTarget = Parameters<ReturnType<typeof useFetcher>["submit"]>[0];
 
@@ -15,11 +16,32 @@ function isIndexRoute(matches: ReturnType<typeof useMatches>): boolean {
   return leaf.pathname === parent.pathname;
 }
 
+function buildActionUrl(
+  pathname: string,
+  searchParams: URLSearchParams,
+  matches: ReturnType<typeof useMatches>,
+  targetPath: string,
+): string {
+  const params = new URLSearchParams(searchParams.toString());
+
+  if (isIndexRoute(matches) && targetPath === pathname) {
+    params.set("index", "");
+  }
+
+  const query = params.toString();
+  return query ? `${targetPath}?${query}` : targetPath;
+}
+
 export function useShopifyFetcher<T>() {
   const fetcher = useFetcher<T>();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const matches = useMatches();
+
+  const actionUrl = useMemo(
+    () => buildActionUrl(location.pathname, searchParams, matches, location.pathname),
+    [location.pathname, searchParams, matches],
+  );
 
   const submit = (target: SubmitTarget, options?: FetcherSubmitOptions) => {
     const actionPath =
@@ -27,17 +49,15 @@ export function useShopifyFetcher<T>() {
         ? options.action.split("?")[0]
         : location.pathname;
 
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (isIndexRoute(matches) && actionPath === location.pathname) {
-      params.set("index", "");
-    }
-
-    const query = params.toString();
-    const action = query ? `${actionPath}?${query}` : actionPath;
+    const action = buildActionUrl(
+      location.pathname,
+      searchParams,
+      matches,
+      actionPath,
+    );
 
     fetcher.submit(target, { ...options, action });
   };
 
-  return { ...fetcher, submit };
+  return { ...fetcher, submit, actionUrl, Form: fetcher.Form };
 }

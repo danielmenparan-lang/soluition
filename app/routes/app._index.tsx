@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
+import { SubmitButton } from "../components/SubmitButton";
 import { getOrCreateShop } from "../services/shop.server";
 import { getDashboardMetrics } from "../services/analytics.server";
 import { getRecommendations } from "../services/ai.server";
@@ -78,15 +79,15 @@ export default function Overview() {
     }
   }, [fetcher.data, shopify]);
 
-  const submitAction = (intent: string) => {
-    fetcher.submit({ intent }, { method: "POST" });
-  };
-
   return (
     <s-page heading="Marketing Solution — סקירה כללית">
-      <s-button slot="primary-action" onClick={() => submitAction("generate_recommendations")}>
+      <SubmitButton
+        fetcher={fetcher}
+        slot="primary-action"
+        intent="generate_recommendations"
+      >
         {fetcher.state !== "idle" ? "מעבד..." : "יצירת המלצות AI"}
-      </s-button>
+      </SubmitButton>
 
       <s-section heading="פתיחה נכונה של האפליקציה">
         <s-banner tone="warning">
@@ -132,15 +133,15 @@ export default function Overview() {
 
       <s-section heading="פעולות מהירות">
         <s-stack direction="inline" gap="base">
-          <s-button onClick={() => submitAction("generate_recommendations")}>
+          <SubmitButton fetcher={fetcher} intent="generate_recommendations">
             Generate Recommendations
-          </s-button>
-          <s-button onClick={() => submitAction("refresh_segments")}>
+          </SubmitButton>
+          <SubmitButton fetcher={fetcher} intent="refresh_segments">
             Refresh Segments
-          </s-button>
-          <s-button onClick={() => submitAction("generate_report")}>
+          </SubmitButton>
+          <SubmitButton fetcher={fetcher} intent="generate_report">
             Generate Report
-          </s-button>
+          </SubmitButton>
         </s-stack>
       </s-section>
 
