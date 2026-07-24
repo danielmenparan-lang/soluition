@@ -12,6 +12,11 @@ import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { SubmitButton } from "../components/SubmitButton";
 import { AutoGenerateRecommendations } from "../components/AutoGenerateRecommendations";
+import { AppLink } from "../components/AppLink";
+import { MetricCard } from "../components/ui/MetricCard";
+import { SetupGuide } from "../components/ui/SetupGuide";
+import { RecommendationCard } from "../components/ui/RecommendationCard";
+import { EmptyState } from "../components/ui/EmptyState";
 import { getOrCreateShop } from "../services/shop.server";
 import { getDashboardMetrics } from "../services/analytics.server";
 import { getRecommendations } from "../services/ai.server";
@@ -36,6 +41,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     shop,
     metrics,
     recommendations: recommendations.slice(0, 3),
+    recommendationCount: recommendations.length,
     segments: segments.slice(0, 3),
     trackingScriptUrl: `${process.env.SHOPIFY_APP_URL}/tracker.js`,
   };
@@ -50,7 +56,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     if (intent === "generate_recommendations") {
       await generateRecommendations(shop.id);
-      return { success: true, message: "המלצות נוצרו בהצלחה" };
+      return { success: true, message: "המלצות AI נוצרו בהצלחה" };
     }
     if (intent === "refresh_segments") {
       await refreshSegments(shop.id);
@@ -70,10 +76,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Overview() {
-  const { shop, metrics, recommendations, segments, trackingScriptUrl } =
-    useLoaderData<typeof loader>();
+  const {
+    shop,
+    metrics,
+    recommendations,
+    recommendationCount,
+    segments,
+    trackingScriptUrl,
+  } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
   const shopify = useAppBridge();
+  const hasData = Boolean(metrics && metrics.totalVisitors > 0);
+  const isGenerating = fetcher.state !== "idle";
 
   useEffect(() => {
     if (fetcher.data?.message) {
@@ -82,10 +96,10 @@ export default function Overview() {
   }, [fetcher.data, shopify]);
 
   return (
-    <s-page heading="Marketing Solution — סקירה כללית">
+    <s-page heading="Solution — מנהל השיווק החכם">
       <AutoGenerateRecommendations
         fetcher={fetcher}
-        hasRecommendations={recommendations.length > 0}
+        hasRecommendations={recommendationCount > 0}
         intent="generate_recommendations"
       />
       <SubmitButton
@@ -93,111 +107,117 @@ export default function Overview() {
         slot="primary-action"
         intent="generate_recommendations"
       >
-        {fetcher.state !== "idle" ? "מעבד..." : "יצירת המלצות AI"}
+        {isGenerating ? "מייצר המלצות..." : "יצירת המלצות AI"}
       </SubmitButton>
 
-      <s-section heading="פתיחה נכונה של האפליקציה">
-        <s-banner tone="warning">
-          <s-paragraph>
-            אל תפתח כתובות <s-text type="strong">trycloudflare.com</s-text> — הן זמניות
-            ונמחקות. פתח תמיד דרך Shopify Admin → Apps → solution.
-          </s-paragraph>
-        </s-banner>
-        <s-paragraph>
-          כתובת production:{" "}
-          <s-text type="strong">https://shopify-marketing-solution.onrender.com</s-text>
-        </s-paragraph>
+      <s-section>
+        <p className="ms-page-intro">
+          האפליקציה אוספת נתונים מהחנות, מנתחת אותם עם Claude AI, ומציגה המלצות
+          שיווק, קהלים ודוחות — הכול מתוך Shopify Admin.
+        </p>
       </s-section>
 
-      <s-section heading="מזהה מעקב">
-        <s-paragraph>
-          הוסף את סקריפט המעקב לחנות שלך. Tracking ID:{" "}
-          <s-text type="strong">{shop.tracking_id}</s-text>
-        </s-paragraph>
-        <s-box padding="base" background="subdued" borderRadius="base">
-          <pre style={{ margin: 0, fontSize: "12px", direction: "ltr", textAlign: "left" }}>
-            {`<script src="${trackingScriptUrl}" data-tracking-id="${shop.tracking_id}" async></script>`}
-          </pre>
-        </s-box>
-      </s-section>
-
-      {metrics && (
-        <s-section heading="מדדים מרכזיים (30 יום)">
-          <s-grid gridTemplateColumns="repeat(4, 1fr)" gap="base">
-            <MetricCard label="מבקרים" value={metrics.totalVisitors} />
-            <MetricCard label="Sessions" value={metrics.totalSessions} />
-            <MetricCard
-              label="Conversion Rate"
-              value={`${metrics.conversionRate}%`}
-            />
-            <MetricCard
-              label="זמן Session ממוצע"
-              value={`${Math.round(metrics.avgSessionDuration / 60)}m`}
-            />
-          </s-grid>
+      {isGenerating && (
+        <s-section>
+          <s-banner tone="info">
+            <s-paragraph>
+              <span className="ms-loading">⏳ מושך נתונים → שולח ל-Claude → שומר המלצות...</span>
+            </s-paragraph>
+          </s-banner>
         </s-section>
       )}
+
+      <SetupGuide
+        trackingId={shop.tracking_id}
+        trackingScriptUrl={trackingScriptUrl}
+        hasData={hasData}
+        hasRecommendations={recommendationCount > 0}
+      />
+
+      <s-section heading="מדדים מרכזיים — 30 יום אחרונים">
+        {metrics ? (
+          <div className="ms-metric-grid">
+            <MetricCard label="מבקרים" value={metrics.totalVisitors} accent="brand" hint="גולשים ייחודיים" />
+            <MetricCard label="Sessions" value={metrics.totalSessions} accent="info" hint="ביקורים" />
+            <MetricCard label="שיעור המרה" value={`${metrics.conversionRate}%`} accent="ai" hint="רכישות / sessions" />
+            <MetricCard
+              label="זמן ממוצע"
+              value={`${Math.round(metrics.avgSessionDuration / 60)} דק'`}
+              accent="warning"
+              hint="משך session"
+            />
+          </div>
+        ) : (
+          <EmptyState
+            title="אין נתונים עדיין"
+            description="התקן את סקריפט המעקב ובקר בחנות — הנתונים יופיעו כאן תוך דקות."
+          />
+        )}
+      </s-section>
 
       <s-section heading="פעולות מהירות">
         <s-stack direction="inline" gap="base">
-          <SubmitButton fetcher={fetcher} intent="generate_recommendations">
-            Generate Recommendations
+          <SubmitButton fetcher={fetcher} intent="generate_recommendations" variant="primary">
+            {isGenerating ? "מעבד..." : "המלצות AI"}
           </SubmitButton>
-          <SubmitButton fetcher={fetcher} intent="refresh_segments">
-            Refresh Segments
+          <SubmitButton fetcher={fetcher} intent="refresh_segments" variant="secondary">
+            רענון קהלים
           </SubmitButton>
-          <SubmitButton fetcher={fetcher} intent="generate_report">
-            Generate Report
+          <SubmitButton fetcher={fetcher} intent="generate_report" variant="secondary">
+            דוח שבועי
           </SubmitButton>
         </s-stack>
+        <div className="ms-link-row">
+          <AppLink to="/app/analytics">→ אנליטיקה מלאה</AppLink>
+          <AppLink to="/app/recommendations">→ כל ההמלצות</AppLink>
+          <AppLink to="/app/chat">→ צ'אט AI</AppLink>
+        </div>
       </s-section>
 
-      {recommendations.length === 0 && fetcher.state !== "idle" && (
-        <s-section heading="יוצר המלצות AI">
-          <s-paragraph>
-            מושך נתונים מ-Supabase, שולח ל-Claude, ויוצר המלצות שיווק...
-          </s-paragraph>
-        </s-section>
-      )}
-
-      {recommendations.length > 0 && (
-        <s-section heading="המלצות AI אחרונות">
-          {recommendations.map((rec) => (
-            <s-box key={rec.id} padding="base" borderWidth="base" borderRadius="base">
-              <s-stack direction="block" gap="small">
-                <s-text type="strong">{rec.title}</s-text>
-                <s-badge tone={rec.priority === "high" ? "critical" : rec.priority === "medium" ? "warning" : "info"}>
-                  {rec.priority}
-                </s-badge>
-                <s-paragraph>{rec.description}</s-paragraph>
-              </s-stack>
-            </s-box>
-          ))}
-        </s-section>
-      )}
+      <s-section heading="המלצות AI אחרונות">
+        {recommendations.length > 0 ? (
+          <s-stack direction="block" gap="base">
+            {recommendations.map((rec) => (
+              <RecommendationCard key={rec.id} rec={rec} />
+            ))}
+            {recommendationCount > 3 ? (
+              <AppLink to="/app/recommendations">
+                צפה בכל {recommendationCount} ההמלצות →
+              </AppLink>
+            ) : null}
+          </s-stack>
+        ) : (
+          <EmptyState
+            title="אין המלצות עדיין"
+            description="המערכת תיצור המלצות אוטומטית, או לחץ 'יצירת המלצות AI' למעלה."
+            action={
+              <SubmitButton fetcher={fetcher} intent="generate_recommendations">
+                {isGenerating ? "מייצר..." : "יצירת המלצות עכשיו"}
+              </SubmitButton>
+            }
+          />
+        )}
+      </s-section>
 
       {segments.length > 0 && (
-        <s-section heading="קהלים">
-          <s-grid gridTemplateColumns="repeat(3, 1fr)" gap="base">
+        <s-section heading="קהלים מובילים">
+          <div className="ms-metric-grid">
             {segments.map((seg) => (
-              <s-box key={seg.id} padding="base" background="subdued" borderRadius="base">
+              <div key={seg.id} className="ms-card">
                 <s-text type="strong">{seg.name}</s-text>
-                <s-paragraph>{seg.member_count} חברים</s-paragraph>
-              </s-box>
+                <div className="ms-metric-value" style={{ fontSize: 22 }}>
+                  {seg.member_count}
+                </div>
+                <s-text color="subdued">חברים בקהל</s-text>
+              </div>
             ))}
-          </s-grid>
+          </div>
+          <div className="ms-link-row">
+            <AppLink to="/app/segments">→ כל הקהלים</AppLink>
+          </div>
         </s-section>
       )}
     </s-page>
-  );
-}
-
-function MetricCard({ label, value }: { label: string; value: string | number }) {
-  return (
-    <s-box padding="base" background="subdued" borderRadius="base">
-      <s-text color="subdued">{label}</s-text>
-      <s-heading>{String(value)}</s-heading>
-    </s-box>
   );
 }
 

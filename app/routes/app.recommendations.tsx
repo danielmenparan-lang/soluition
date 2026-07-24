@@ -12,6 +12,9 @@ import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { SubmitButton } from "../components/SubmitButton";
 import { AutoGenerateRecommendations } from "../components/AutoGenerateRecommendations";
+import { RecommendationCard } from "../components/ui/RecommendationCard";
+import { EmptyState } from "../components/ui/EmptyState";
+import { CATEGORY_LABELS } from "../components/ui/labels";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   generateRecommendations,
@@ -31,7 +34,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   try {
     await generateRecommendations(shop.id);
-    return { success: true };
+    return { success: true, message: "המלצות חדשות נוצרו בהצלחה" };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "יצירת המלצות נכשלה";
@@ -39,23 +42,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
-const CATEGORY_LABELS: Record<string, string> = {
-  marketing: "שיווק",
-  product: "מוצר",
-  conversion: "Conversion",
-  retargeting: "Retargeting",
-};
-
 export default function Recommendations() {
   const { recommendations } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
   const shopify = useAppBridge();
+  const isGenerating = fetcher.state !== "idle";
 
   useEffect(() => {
-    if (fetcher.data?.success) {
-      shopify.toast.show("המלצות חדשות נוצרו");
-    } else if (fetcher.data?.message) {
+    if (fetcher.data?.message) {
       shopify.toast.show(fetcher.data.message);
+    } else if (fetcher.data?.success) {
+      shopify.toast.show("המלצות חדשות נוצרו");
     }
   }, [fetcher.data, shopify]);
 
@@ -76,58 +73,49 @@ export default function Recommendations() {
         hasRecommendations={recommendations.length > 0}
       />
       <SubmitButton fetcher={fetcher} slot="primary-action">
-        {fetcher.state !== "idle" ? "מייצר..." : "יצירת המלצות חדשות"}
+        {isGenerating ? "מייצר..." : "יצירת המלצות חדשות"}
       </SubmitButton>
+
+      <s-section>
+        <p className="ms-page-intro">
+          Claude מנתח את נתוני החנות שלך — תנועה, מוצרים, קהלים — ומציע פעולות
+          שיווק ממוקדות עם עדיפות והשפעה צפויה.
+        </p>
+      </s-section>
+
+      {isGenerating && (
+        <s-section>
+          <s-banner tone="info">
+            <s-paragraph>
+              מושך נתונים מ-Supabase, שולח ל-Claude, ושומר המלצות...
+            </s-paragraph>
+          </s-banner>
+        </s-section>
+      )}
 
       {recommendations.length === 0 ? (
         <s-section>
-          <s-paragraph>
-            {fetcher.state !== "idle"
-              ? "מושך נתונים, שולח ל-Claude, ויוצר המלצות..."
-              : 'אין המלצות עדיין. לחץ על "יצירת המלצות חדשות" או המתן — ההמלצות ייווצרו אוטומטית.'}
-          </s-paragraph>
+          <EmptyState
+            title="אין המלצות עדיין"
+            description="ההמלצות ייווצרו אוטומטית בכניסה לדף, או לחץ על הכפתור למעלה."
+            action={
+              <SubmitButton fetcher={fetcher}>
+                {isGenerating ? "מייצר..." : "יצירת המלצות עכשיו"}
+              </SubmitButton>
+            }
+          />
         </s-section>
       ) : (
         Object.entries(grouped).map(([category, recs]) => (
-          <s-section key={category} heading={CATEGORY_LABELS[category] ?? category}>
-            {recs.map((rec) => (
-              <s-box
-                key={rec.id}
-                padding="base"
-                borderWidth="base"
-                borderRadius="base"
-              >
-                <s-stack direction="block" gap="small">
-                  <s-stack direction="inline" gap="small">
-                    <s-text type="strong">{rec.title}</s-text>
-                    <s-badge
-                      tone={
-                        rec.priority === "high"
-                          ? "critical"
-                          : rec.priority === "medium"
-                            ? "warning"
-                            : "info"
-                      }
-                    >
-                      {rec.priority}
-                    </s-badge>
-                  </s-stack>
-                  <s-paragraph>{rec.description}</s-paragraph>
-                  {rec.expected_impact && (
-                    <s-text color="subdued">
-                      Impact צפוי: {rec.expected_impact}
-                    </s-text>
-                  )}
-                  {Array.isArray(rec.action_items) && rec.action_items.length > 0 && (
-                    <s-unordered-list>
-                      {(rec.action_items as string[]).map((item, i) => (
-                        <s-list-item key={i}>{item}</s-list-item>
-                      ))}
-                    </s-unordered-list>
-                  )}
-                </s-stack>
-              </s-box>
-            ))}
+          <s-section
+            key={category}
+            heading={`${CATEGORY_LABELS[category] ?? category} (${recs.length})`}
+          >
+            <s-stack direction="block" gap="base">
+              {recs.map((rec) => (
+                <RecommendationCard key={rec.id} rec={rec} />
+              ))}
+            </s-stack>
           </s-section>
         ))
       )}

@@ -10,6 +10,7 @@ import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { SubmitButton } from "../components/SubmitButton";
+import { EmptyState } from "../components/ui/EmptyState";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   generateWeeklyReport,
@@ -26,43 +27,66 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
-  await generateWeeklyReport(shop.id);
-  return { success: true };
+
+  try {
+    await generateWeeklyReport(shop.id);
+    return { success: true, message: "דוח שבועי נוצר בהצלחה" };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "יצירת דוח נכשלה";
+    return { success: false, message };
+  }
 };
 
 export default function Reports() {
   const { reports } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
   const shopify = useAppBridge();
+  const latest = reports[0];
+  const isGenerating = fetcher.state !== "idle";
 
   useEffect(() => {
-    if (fetcher.data?.success) {
+    if (fetcher.data?.message) {
+      shopify.toast.show(fetcher.data.message);
+    } else if (fetcher.data?.success) {
       shopify.toast.show("דוח שבועי נוצר בהצלחה");
     }
   }, [fetcher.data, shopify]);
 
-  const latest = reports[0];
-
   return (
     <s-page heading="דוחות שבועיים">
       <SubmitButton fetcher={fetcher} slot="primary-action">
-        {fetcher.state !== "idle" ? "מייצר..." : "יצירת דוח שבועי"}
+        {isGenerating ? "מייצר..." : "יצירת דוח שבועי"}
       </SubmitButton>
+
+      <s-section>
+        <p className="ms-page-intro">
+          דוח AI שבועי עם תובנות, פעולות מומלצות, הזדמנויות צמיחה ונקודות בזבוז
+          — מבוסס על נתוני 7 הימים האחרונים.
+        </p>
+      </s-section>
 
       {!latest ? (
         <s-section>
-          <s-paragraph>
-            אין דוחות עדיין. לחץ על &quot;יצירת דוח שבועי&quot; כדי ליצור את
-            הדוח הראשון.
-          </s-paragraph>
+          <EmptyState
+            title="אין דוחות עדיין"
+            description="לחץ 'יצירת דוח שבועי' — Claude ינתח את השבוע האחרון ויצור דוח מפורט."
+            action={
+              <SubmitButton fetcher={fetcher}>
+                {isGenerating ? "מייצר..." : "יצירת דוח ראשון"}
+              </SubmitButton>
+            }
+          />
         </s-section>
       ) : (
         <>
           <s-section heading={`דוח: ${latest.week_start} — ${latest.week_end}`}>
-            <s-paragraph>{latest.performance_summary}</s-paragraph>
+            <div className="ms-card ms-card-ai">
+              <s-paragraph>{latest.performance_summary}</s-paragraph>
+            </div>
           </s-section>
 
-          <s-section heading="10 תובנות מרכזיות">
+          <s-section heading="תובנות מרכזיות">
             <s-unordered-list>
               {(latest.insights as string[]).map((insight, i) => (
                 <s-list-item key={i}>{insight}</s-list-item>
@@ -70,15 +94,17 @@ export default function Reports() {
             </s-unordered-list>
           </s-section>
 
-          <s-section heading="5 פעולות עם Impact גבוה">
-            {(latest.top_actions as Array<{ action: string; impact: string }>).map(
-              (item, i) => (
-                <s-box key={i} padding="base" background="subdued" borderRadius="base">
-                  <s-text type="strong">{item.action}</s-text>
-                  <s-paragraph>Impact: {item.impact}</s-paragraph>
-                </s-box>
-              ),
-            )}
+          <s-section heading="פעולות עם Impact גבוה">
+            <s-stack direction="block" gap="base">
+              {(latest.top_actions as Array<{ action: string; impact: string }>).map(
+                (item, i) => (
+                  <div key={i} className="ms-card">
+                    <s-text type="strong">{item.action}</s-text>
+                    <s-paragraph>השפעה: {item.impact}</s-paragraph>
+                  </div>
+                ),
+              )}
+            </s-stack>
           </s-section>
 
           <s-section heading="הזדמנויות צמיחה">

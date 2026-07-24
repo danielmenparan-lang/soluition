@@ -23,7 +23,7 @@ export default function App() {
         <AppLink to="/app/analytics">אנליטיקה</AppLink>
         <AppLink to="/app/segments">קהלים</AppLink>
         <AppLink to="/app/recommendations">המלצות AI</AppLink>
-        <AppLink to="/app/reports">דוחות שבועיים</AppLink>
+        <AppLink to="/app/reports">דוחות</AppLink>
         <AppLink to="/app/chat">צ'אט AI</AppLink>
       </NavMenu>
       <Outlet />

@@ -1,4 +1,4 @@
-import { useId, type CSSProperties, type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import type { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 
 type ShopifyFetcher = ReturnType<typeof useShopifyFetcher>;
@@ -9,30 +9,7 @@ type SubmitButtonProps = {
   slot?: string;
   intent?: string;
   fields?: Record<string, string>;
-  variant?: "primary" | "secondary";
-};
-
-const buttonStyle: Record<NonNullable<SubmitButtonProps["variant"]>, CSSProperties> = {
-  primary: {
-    padding: "8px 16px",
-    borderRadius: "8px",
-    border: "none",
-    background: "#303030",
-    color: "#fff",
-    fontWeight: 600,
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-  secondary: {
-    padding: "8px 16px",
-    borderRadius: "8px",
-    border: "1px solid #ccc",
-    background: "#fff",
-    color: "#303030",
-    fontWeight: 500,
-    cursor: "pointer",
-    fontSize: "14px",
-  },
+  variant?: "primary" | "secondary" | "chip";
 };
 
 export function SubmitButton({
@@ -46,6 +23,12 @@ export function SubmitButton({
   const { Form, actionUrl, state } = fetcher;
   const formId = useId().replace(/:/g, "");
   const disabled = state !== "idle";
+  const className =
+    variant === "secondary"
+      ? "ms-btn ms-btn-secondary"
+      : variant === "chip"
+        ? "ms-btn ms-btn-chip"
+        : "ms-btn ms-btn-primary";
 
   return (
     <>
@@ -62,10 +45,7 @@ export function SubmitButton({
         form={formId}
         slot={slot}
         disabled={disabled}
-        style={{
-          ...buttonStyle[variant],
-          opacity: disabled ? 0.6 : 1,
-        }}
+        className={className}
       >
         {children}
       </button>

@@ -1,185 +1,199 @@
+import type { ReactNode } from "react";
 import type { HeadersFunction, LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { getOrCreateShop } from "../services/shop.server";
-import { getDashboardMetrics, getHighBouncePages, getHighTrafficLowConversionPages } from "../services/analytics.server";
+import {
+  getDashboardMetrics,
+  getHighBouncePages,
+  getHighTrafficLowConversionPages,
+} from "../services/analytics.server";
 import { getProductExitDrivers } from "../services/product-intelligence.server";
+import { MetricCard } from "../components/ui/MetricCard";
+import { EmptyState } from "../components/ui/EmptyState";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
 
-  const [metrics, bouncePages, lowConversionPages, productExitDrivers] = await Promise.all([
-    getDashboardMetrics(shop.id),
-    getHighBouncePages(shop.id),
-    getHighTrafficLowConversionPages(shop.id),
-    getProductExitDrivers(shop.id),
-  ]);
+  const [metrics, bouncePages, lowConversionPages, productExitDrivers] =
+    await Promise.all([
+      getDashboardMetrics(shop.id).catch(() => null),
+      getHighBouncePages(shop.id).catch(() => []),
+      getHighTrafficLowConversionPages(shop.id).catch(() => []),
+      getProductExitDrivers(shop.id).catch(() => []),
+    ]);
 
   return { metrics, bouncePages, lowConversionPages, productExitDrivers };
 };
+
+function DataTable({
+  headers,
+  rows,
+  emptyMessage,
+}: {
+  headers: string[];
+  rows: ReactNode[][];
+  emptyMessage: string;
+}) {
+  if (rows.length === 0) {
+    return <EmptyState title="אין נתונים" description={emptyMessage} />;
+  }
+
+  return (
+    <s-table>
+      <s-table-header-row>
+        {headers.map((h) => (
+          <s-table-header key={h}>{h}</s-table-header>
+        ))}
+      </s-table-header-row>
+      <s-table-body>
+        {rows.map((cells, i) => (
+          <s-table-row key={i}>
+            {cells.map((cell, j) => (
+              <s-table-cell key={j}>{cell}</s-table-cell>
+            ))}
+          </s-table-row>
+        ))}
+      </s-table-body>
+    </s-table>
+  );
+}
 
 export default function Analytics() {
   const { metrics, bouncePages, lowConversionPages, productExitDrivers } =
     useLoaderData<typeof loader>();
 
+  if (!metrics) {
+    return (
+      <s-page heading="אנליטיקה">
+        <s-section>
+          <EmptyState
+            title="אין נתוני אנליטיקה"
+            description="התקן את סקריפט המעקב בחנות ובקר בה פעם אחת. הנתונים יופיעו כאן אוטומטית."
+          />
+        </s-section>
+      </s-page>
+    );
+  }
+
   return (
     <s-page heading="אנליטיקה">
+      <s-section>
+        <p className="ms-page-intro">
+          תמונת מצב מלאה של הביצועים — מקורות תנועה, מוצרים, דפים בעייתיים
+          ונקודות יציאה.
+        </p>
+      </s-section>
+
       <s-section heading="מדדים">
-        <s-grid gridTemplateColumns="repeat(3, 1fr)" gap="base">
-          <Stat label="מבקרים" value={metrics.totalVisitors} />
-          <Stat label="Sessions" value={metrics.totalSessions} />
-          <Stat label="Events" value={metrics.totalEvents} />
-          <Stat label="Conversion Rate" value={`${metrics.conversionRate}%`} />
-          <Stat label="Abandonment Rate" value={`${metrics.abandonmentRate}%`} />
-          <Stat
-            label="Session Duration"
-            value={`${Math.round(metrics.avgSessionDuration / 60)} min`}
+        <div className="ms-metric-grid">
+          <MetricCard label="מבקרים" value={metrics.totalVisitors} />
+          <MetricCard label="Sessions" value={metrics.totalSessions} accent="info" />
+          <MetricCard label="Events" value={metrics.totalEvents} accent="ai" />
+          <MetricCard label="שיעור המרה" value={`${metrics.conversionRate}%`} accent="brand" />
+          <MetricCard label="נטישה" value={`${metrics.abandonmentRate}%`} accent="warning" />
+          <MetricCard
+            label="משך Session"
+            value={`${Math.round(metrics.avgSessionDuration / 60)} דק'`}
           />
-        </s-grid>
+        </div>
       </s-section>
 
       <s-section heading="מקורות תנועה מובילים">
-        <s-table>
-          <s-table-header-row>
-            <s-table-header>מקור</s-table-header>
-            <s-table-header>Sessions</s-table-header>
-            <s-table-header>Conversions</s-table-header>
-            <s-table-header>Revenue</s-table-header>
-            <s-table-header>Conversion Rate</s-table-header>
-          </s-table-header-row>
-          <s-table-body>
-            {metrics.topTrafficSources.map((src) => (
-              <s-table-row key={src.source}>
-                <s-table-cell>{src.source}</s-table-cell>
-                <s-table-cell>{src.sessions}</s-table-cell>
-                <s-table-cell>{src.conversions}</s-table-cell>
-                <s-table-cell>${src.revenue}</s-table-cell>
-                <s-table-cell>{src.conversionRate}%</s-table-cell>
-              </s-table-row>
-            ))}
-          </s-table-body>
-        </s-table>
+        <DataTable
+          headers={["מקור", "Sessions", "המרות", "הכנסות", "שיעור המרה"]}
+          rows={metrics.topTrafficSources.map((src) => [
+            src.source,
+            src.sessions,
+            src.conversions,
+            `$${src.revenue}`,
+            `${src.conversionRate}%`,
+          ])}
+          emptyMessage="אין נתוני מקורות תנועה — ודא שהמעקב פעיל."
+        />
       </s-section>
 
       <s-section heading="מוצרים מובילים">
-        <s-table>
-          <s-table-header-row>
-            <s-table-header>מוצר</s-table-header>
-            <s-table-header>צפיות</s-table-header>
-            <s-table-header>רכישות</s-table-header>
-            <s-table-header>Conversion</s-table-header>
-            <s-table-header>Revenue</s-table-header>
-          </s-table-header-row>
-          <s-table-body>
-            {metrics.topProducts.map((p) => (
-              <s-table-row key={p.productId}>
-                <s-table-cell>{p.productTitle}</s-table-cell>
-                <s-table-cell>{p.views}</s-table-cell>
-                <s-table-cell>{p.purchases}</s-table-cell>
-                <s-table-cell>{p.conversionRate}%</s-table-cell>
-                <s-table-cell>${p.revenue}</s-table-cell>
-              </s-table-row>
+        <DataTable
+          headers={["מוצר", "צפיות", "רכישות", "המרה", "הכנסות"]}
+          rows={metrics.topProducts.map((p) => [
+            p.productTitle,
+            p.views,
+            p.purchases,
+            `${p.conversionRate}%`,
+            `$${p.revenue}`,
+          ])}
+          emptyMessage="אין נתוני מוצרים — בקר בדפי מוצר בחנות."
+        />
+      </s-section>
+
+      {metrics.topCountries.length > 0 && (
+        <s-section heading="מדינות מובילות">
+          <div className="ms-metric-grid">
+            {metrics.topCountries.map((c) => (
+              <div key={c.country} className="ms-card">
+                <s-text type="strong">{c.country}</s-text>
+                <s-paragraph>{c.count} מבקרים</s-paragraph>
+              </div>
             ))}
-          </s-table-body>
-        </s-table>
-      </s-section>
+          </div>
+        </s-section>
+      )}
 
-      <s-section heading="מדינות מובילות">
-        <s-grid gridTemplateColumns="repeat(5, 1fr)" gap="base">
-          {metrics.topCountries.map((c) => (
-            <s-box key={c.country} padding="base" background="subdued" borderRadius="base">
-              <s-text type="strong">{c.country}</s-text>
-              <s-paragraph>{c.count} מבקרים</s-paragraph>
-            </s-box>
-          ))}
-        </s-grid>
-      </s-section>
-
-      <s-section heading="שעות Peak Conversion">
-        <s-grid gridTemplateColumns="repeat(5, 1fr)" gap="base">
-          {metrics.peakConversionHours.map((h) => (
-            <s-box key={h.hour} padding="base" background="subdued" borderRadius="base">
-              <s-text type="strong">{h.hour}:00</s-text>
-              <s-paragraph>{h.conversions} conversions</s-paragraph>
-            </s-box>
-          ))}
-        </s-grid>
-      </s-section>
-
-      <s-section heading="דפים עם traffic גבוה ו-conversion נמוך">
-        <s-table>
-          <s-table-header-row>
-            <s-table-header>URL</s-table-header>
-            <s-table-header>כותרת</s-table-header>
-            <s-table-header>צפיות</s-table-header>
-            <s-table-header>יציאות</s-table-header>
-            <s-table-header>Exit Rate</s-table-header>
-          </s-table-header-row>
-          <s-table-body>
-            {lowConversionPages.map((p) => (
-              <s-table-row key={p.url}>
-                <s-table-cell>{p.url}</s-table-cell>
-                <s-table-cell>{p.pageTitle ?? "—"}</s-table-cell>
-                <s-table-cell>{p.views}</s-table-cell>
-                <s-table-cell>{p.exits}</s-table-cell>
-                <s-table-cell>{p.exitRate}%</s-table-cell>
-              </s-table-row>
+      {metrics.peakConversionHours.length > 0 && (
+        <s-section heading="שעות שיא המרה">
+          <div className="ms-metric-grid">
+            {metrics.peakConversionHours.map((h) => (
+              <div key={h.hour} className="ms-card">
+                <s-text type="strong">{h.hour}:00</s-text>
+                <s-paragraph>{h.conversions} המרות</s-paragraph>
+              </div>
             ))}
-          </s-table-body>
-        </s-table>
+          </div>
+        </s-section>
+      )}
+
+      <s-section heading="דפים עם תנועה גבוהה והמרה נמוכה">
+        <DataTable
+          headers={["URL", "כותרת", "צפיות", "יציאות", "Exit Rate"]}
+          rows={lowConversionPages.map((p) => [
+            p.url,
+            p.pageTitle ?? "—",
+            p.views,
+            p.exits,
+            `${p.exitRate}%`,
+          ])}
+          emptyMessage="אין מספיק נתונים לזיהוי דפים בעייתיים."
+        />
       </s-section>
 
       <s-section heading="מוצרים שגורמים לנטישה">
-        <s-table>
-          <s-table-header-row>
-            <s-table-header>מוצר</s-table-header>
-            <s-table-header>צפיות</s-table-header>
-            <s-table-header>נטישות</s-table-header>
-            <s-table-header>Exit Rate</s-table-header>
-          </s-table-header-row>
-          <s-table-body>
-            {productExitDrivers.map((p) => (
-              <s-table-row key={p.productId}>
-                <s-table-cell>{p.productTitle}</s-table-cell>
-                <s-table-cell>{p.viewCount}</s-table-cell>
-                <s-table-cell>{p.exitCount}</s-table-cell>
-                <s-table-cell>{p.exitRate}%</s-table-cell>
-              </s-table-row>
-            ))}
-          </s-table-body>
-        </s-table>
+        <DataTable
+          headers={["מוצר", "צפיות", "נטישות", "Exit Rate"]}
+          rows={productExitDrivers.map((p) => [
+            p.productTitle,
+            p.viewCount,
+            p.exitCount,
+            `${p.exitRate}%`,
+          ])}
+          emptyMessage="אין נתוני נטישת מוצרים עדיין."
+        />
       </s-section>
 
       <s-section heading="דפים עם נטישה גבוהה">
-        <s-table>
-          <s-table-header-row>
-            <s-table-header>URL</s-table-header>
-            <s-table-header>כותרת</s-table-header>
-            <s-table-header>יציאות</s-table-header>
-          </s-table-header-row>
-          <s-table-body>
-            {bouncePages.map((p) => (
-              <s-table-row key={p.url}>
-                <s-table-cell>{p.url}</s-table-cell>
-                <s-table-cell>{p.pageTitle ?? "—"}</s-table-cell>
-                <s-table-cell>{p.exitCount}</s-table-cell>
-              </s-table-row>
-            ))}
-          </s-table-body>
-        </s-table>
+        <DataTable
+          headers={["URL", "כותרת", "יציאות"]}
+          rows={bouncePages.map((p) => [
+            p.url,
+            p.pageTitle ?? "—",
+            p.exitCount,
+          ])}
+          emptyMessage="אין נתוני bounce עדיין."
+        />
       </s-section>
     </s-page>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <s-box padding="base" background="subdued" borderRadius="base">
-      <s-text color="subdued">{label}</s-text>
-      <s-heading>{String(value)}</s-heading>
-    </s-box>
   );
 }
 

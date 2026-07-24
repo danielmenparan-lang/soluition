@@ -5,6 +5,7 @@ import type {
 } from "react-router";
 import { useLoaderData } from "react-router";
 import { useEffect, useRef, useState } from "react";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
@@ -29,16 +30,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return { error: "הודעה ריקה" };
   }
 
-  const result = await chatWithAI(
-    shop.id,
-    conversationId || null,
-    message.trim(),
-  );
-
-  return {
-    conversationId: result.conversationId,
-    reply: result.reply,
-  };
+  try {
+    const result = await chatWithAI(
+      shop.id,
+      conversationId || null,
+      message.trim(),
+    );
+    return {
+      conversationId: result.conversationId,
+      reply: result.reply,
+    };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "שגיאה בצ'אט";
+    return { error: msg };
+  }
 };
 
 const SUGGESTED_QUESTIONS = [
@@ -46,12 +51,13 @@ const SUGGESTED_QUESTIONS = [
   "איזה מוצר לפרסם השבוע?",
   "איזה קהל הכי רווחי?",
   "איפה אני מפסיד כסף?",
-  "איך להגדיל Conversion?",
+  "איך להגדיל המרות?",
 ];
 
 export default function Chat() {
   const { conversations } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
+  const shopify = useAppBridge();
   const { Form, actionUrl } = fetcher;
   const [messages, setMessages] = useState<
     Array<{ role: "user" | "assistant"; content: string }>
@@ -70,7 +76,10 @@ export default function Chat() {
         setConversationId(fetcher.data.conversationId);
       }
     }
-  }, [fetcher.data]);
+    if (fetcher.data && "error" in fetcher.data && fetcher.data.error) {
+      shopify.toast.show(fetcher.data.error);
+    }
+  }, [fetcher.data, shopify]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -83,9 +92,16 @@ export default function Chat() {
   };
 
   return (
-    <s-page heading="צ'אט AI — מנהל השיווק שלך">
+    <s-page heading="צ'אט AI — מנהל השיווק">
+      <s-section>
+        <p className="ms-page-intro">
+          שאל שאלות על הביצועים, המוצרים והקהלים — Claude עונה על בסיס נתוני
+          החנות האמיתיים שלך.
+        </p>
+      </s-section>
+
       <s-section heading="שאלות מומלצות">
-        <s-stack direction="inline" gap="small">
+        <div className="ms-link-row">
           {SUGGESTED_QUESTIONS.map((q) => (
             <Form
               key={q}
@@ -102,60 +118,39 @@ export default function Chat() {
               <button
                 type="submit"
                 disabled={fetcher.state !== "idle"}
-                style={{
-                  padding: "6px 12px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  background: "#fff",
-                  cursor: "pointer",
-                }}
+                className="ms-btn ms-btn-chip"
               >
                 {q}
               </button>
             </Form>
           ))}
-        </s-stack>
+        </div>
       </s-section>
 
       <s-section>
-        <div
-          style={{
-            minHeight: "400px",
-            maxHeight: "600px",
-            overflowY: "auto",
-            padding: "16px",
-            background: "#f6f6f7",
-            borderRadius: "8px",
-          }}
-        >
+        <div className="ms-chat-panel">
           {messages.length === 0 && (
-            <s-paragraph>
-              שלום! אני מנהל השיווק AI של החנות שלך. שאל אותי כל שאלה על
-              הביצועים, המוצרים, הקהלים או ההמלצות.
-            </s-paragraph>
+            <div className="ms-empty" style={{ border: "none", background: "transparent" }}>
+              <h3 className="ms-empty-title">שלום! 👋</h3>
+              <p className="ms-empty-text">
+                אני מנהל השיווק AI של החנות. שאל אותי על ביצועים, מוצרים,
+                קהלים או המלצות — אני מבוסס על הנתונים שלך.
+              </p>
+            </div>
           )}
           {messages.map((msg, i) => (
             <div
               key={i}
-              style={{
-                marginBottom: "12px",
-                textAlign: msg.role === "user" ? "left" : "right",
-              }}
+              className={`ms-chat-bubble ${msg.role === "user" ? "ms-chat-user" : "ms-chat-ai"}`}
             >
-              <s-box
-                padding="base"
-                background={msg.role === "user" ? "base" : "subdued"}
-                borderRadius="base"
-              >
-                <s-text type={msg.role === "user" ? "strong" : undefined}>
-                  {msg.role === "user" ? "אתה" : "AI Marketing Manager"}
-                </s-text>
-                <s-paragraph>{msg.content}</s-paragraph>
-              </s-box>
+              <div className="ms-chat-label">
+                {msg.role === "user" ? "אתה" : "AI Marketing Manager"}
+              </div>
+              {msg.content}
             </div>
           ))}
           {fetcher.state !== "idle" && (
-            <s-paragraph>מנתח נתונים...</s-paragraph>
+            <div className="ms-loading">⏳ מנתח נתונים ומכין תשובה...</div>
           )}
           <div ref={bottomRef} />
         </div>
@@ -168,37 +163,24 @@ export default function Chat() {
           onSubmit={() => handleSubmit(input)}
         >
           <input type="hidden" name="conversationId" value={conversationId ?? ""} />
-          <s-stack direction="inline" gap="base">
+          <div className="ms-input-row">
             <input
               type="text"
               name="message"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="שאל שאלה על החנות שלך..."
-              style={{
-                flex: 1,
-                padding: "8px 12px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-              }}
+              className="ms-input"
               disabled={fetcher.state !== "idle"}
             />
             <button
               type="submit"
-              disabled={fetcher.state !== "idle"}
-              style={{
-                padding: "8px 16px",
-                borderRadius: "8px",
-                border: "none",
-                background: "#303030",
-                color: "#fff",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
+              disabled={fetcher.state !== "idle" || !input.trim()}
+              className="ms-btn ms-btn-primary"
             >
               שלח
             </button>
-          </s-stack>
+          </div>
         </Form>
       </s-section>
 
