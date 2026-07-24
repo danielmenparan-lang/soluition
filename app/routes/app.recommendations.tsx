@@ -36,7 +36,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   try {
     await generateRecommendations(shop.id);
-    return { success: true, message: "המלצות חדשות נוצרו בהצלחה" };
+    return { success: true, message: "ההמלצות מוכנות" };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "יצירת המלצות נכשלה";
@@ -78,15 +78,13 @@ export default function Recommendations() {
         hasRecommendations={recommendations.length > 0}
       />
       <SubmitButton fetcher={fetcher} slot="primary-action">
-        {isGenerating ? "מייצר..." : "יצירת המלצות חדשות"}
+        {isGenerating ? "מכין..." : "המלצות חדשות"}
       </SubmitButton>
 
       {isGenerating && (
         <s-section>
           <s-banner tone="info">
-            <s-paragraph>
-              מושך נתונים מ-Supabase, שולח ל-Claude, ושומר המלצות...
-            </s-paragraph>
+            <s-paragraph>בודק את הנתונים ומכין המלצות — רגע...</s-paragraph>
           </s-banner>
         </s-section>
       )}
@@ -94,11 +92,11 @@ export default function Recommendations() {
       {recommendations.length === 0 ? (
         <s-section>
           <EmptyState
-            title="אין המלצות עדיין"
-            description="ההמלצות ייווצרו אוטומטית בכניסה לדף, או לחץ על הכפתור למעלה."
+            title="עדיין אין המלצות"
+            description="ההמלצות ייווצרו לבד בכניסה לדף, או לחץ «המלצות חדשות» למעלה."
             action={
               <SubmitButton fetcher={fetcher}>
-                {isGenerating ? "מייצר..." : "יצירת המלצות עכשיו"}
+                {isGenerating ? "מכין..." : "קבל המלצות עכשיו"}
               </SubmitButton>
             }
           />

@@ -460,6 +460,27 @@
   color: var(--ms-text-subdued);
 }
 
+/* Notice banners */
+.ms-notice {
+  border-radius: var(--ms-radius);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.ms-notice-success {
+  background: #e3f1df;
+  border: 1px solid #b7d4b0;
+  color: var(--ms-brand-dark);
+}
+
+.ms-notice-info {
+  background: #eef4fc;
+  border: 1px solid #b4cce8;
+  color: #1a3a5c;
+}
+
 /* Privacy / static pages */
 .ms-static-page {
   max-width: 720px;

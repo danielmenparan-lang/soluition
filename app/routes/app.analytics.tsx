@@ -82,8 +82,8 @@ export default function Analytics() {
         <HelpPanel title={help.helpTitle} items={help.helpItems} />
         <s-section>
           <EmptyState
-            title="אין נתוני אנליטיקה"
-            description="התקן את סקריפט המעקב בחנות ובקר בה פעם אחת. הנתונים יופיעו כאן אוטומטית."
+            title="עדיין אין נתונים"
+            description="קודם הדבק את שורת המעקב (בדף הבית) והיכנס לחנות פעם אחת. הנתונים יופיעו כאן."
           />
         </s-section>
       </s-page>
@@ -100,23 +100,23 @@ export default function Analytics() {
       />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
-      <s-section heading="מדדים">
+      <s-section heading="המספרים בקצרה">
         <div className="ms-metric-grid">
           <MetricCard label="מבקרים" value={metrics.totalVisitors} />
-          <MetricCard label="Sessions" value={metrics.totalSessions} accent="info" />
-          <MetricCard label="Events" value={metrics.totalEvents} accent="ai" />
-          <MetricCard label="שיעור המרה" value={`${metrics.conversionRate}%`} accent="brand" />
-          <MetricCard label="נטישה" value={`${metrics.abandonmentRate}%`} accent="warning" />
+          <MetricCard label="ביקורים" value={metrics.totalSessions} accent="info" />
+          <MetricCard label="פעולות" value={metrics.totalEvents} accent="ai" />
+          <MetricCard label="אחוז קונים" value={`${metrics.conversionRate}%`} accent="brand" />
+          <MetricCard label="עזיבה" value={`${metrics.abandonmentRate}%`} accent="warning" />
           <MetricCard
-            label="משך Session"
+            label="זמן ממוצע בחנות"
             value={`${Math.round(metrics.avgSessionDuration / 60)} דק'`}
           />
         </div>
       </s-section>
 
-      <s-section heading="מקורות תנועה מובילים">
+      <s-section heading="מאיפה מגיעים">
         <DataTable
-          headers={["מקור", "Sessions", "המרות", "הכנסות", "שיעור המרה"]}
+          headers={["מקור", "ביקורים", "רכישות", "הכנסות", "אחוז קונים"]}
           rows={metrics.topTrafficSources.map((src) => [
             src.source,
             src.sessions,
@@ -124,13 +124,13 @@ export default function Analytics() {
             `$${src.revenue}`,
             `${src.conversionRate}%`,
           ])}
-          emptyMessage="אין נתוני מקורות תנועה — ודא שהמעקב פעיל."
+          emptyMessage="אין נתונים עדיין — ודא שהמעקב פעיל."
         />
       </s-section>
 
-      <s-section heading="מוצרים מובילים">
+      <s-section heading="מוצרים פופולריים">
         <DataTable
-          headers={["מוצר", "צפיות", "רכישות", "המרה", "הכנסות"]}
+          headers={["מוצר", "צפיות", "רכישות", "אחוז קונים", "הכנסות"]}
           rows={metrics.topProducts.map((p) => [
             p.productTitle,
             p.views,
@@ -138,12 +138,12 @@ export default function Analytics() {
             `${p.conversionRate}%`,
             `$${p.revenue}`,
           ])}
-          emptyMessage="אין נתוני מוצרים — בקר בדפי מוצר בחנות."
+          emptyMessage="אין נתוני מוצרים — גלוש בדפי מוצר בחנות."
         />
       </s-section>
 
       {metrics.topCountries.length > 0 && (
-        <s-section heading="מדינות מובילות">
+        <s-section heading="מדינות">
           <div className="ms-metric-grid">
             {metrics.topCountries.map((c) => (
               <div key={c.country} className="ms-card">
@@ -156,7 +156,7 @@ export default function Analytics() {
       )}
 
       {metrics.peakConversionHours.length > 0 && (
-        <s-section heading="שעות שיא המרה">
+        <s-section heading="שעות עם הכי הרבה רכישות">
           <div className="ms-metric-grid">
             {metrics.peakConversionHours.map((h) => (
               <div key={h.hour} className="ms-card">
@@ -168,9 +168,9 @@ export default function Analytics() {
         </s-section>
       )}
 
-      <s-section heading="דפים עם תנועה גבוהה והמרה נמוכה">
+      <s-section heading="דפים שמושכים תנועה אבל לא מוכרים">
         <DataTable
-          headers={["URL", "כותרת", "צפיות", "יציאות", "Exit Rate"]}
+          headers={["כתובת", "שם", "צפיות", "עזיבות", "אחוז עזיבה"]}
           rows={lowConversionPages.map((p) => [
             p.url,
             p.pageTitle ?? "—",
@@ -182,9 +182,9 @@ export default function Analytics() {
         />
       </s-section>
 
-      <s-section heading="מוצרים שגורמים לנטישה">
+      <s-section heading="מוצרים שגורמים לעזוב">
         <DataTable
-          headers={["מוצר", "צפיות", "נטישות", "Exit Rate"]}
+          headers={["מוצר", "צפיות", "עזיבות", "אחוז עזיבה"]}
           rows={productExitDrivers.map((p) => [
             p.productTitle,
             p.viewCount,
@@ -195,9 +195,9 @@ export default function Analytics() {
         />
       </s-section>
 
-      <s-section heading="דפים עם נטישה גבוהה">
+      <s-section heading="דפים שאנשים עוזבים מהר">
         <DataTable
-          headers={["URL", "כותרת", "יציאות"]}
+          headers={["כתובת", "שם", "עזיבות"]}
           rows={bouncePages.map((p) => [
             p.url,
             p.pageTitle ?? "—",

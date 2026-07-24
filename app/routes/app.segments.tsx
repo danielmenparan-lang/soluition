@@ -42,7 +42,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   try {
     await refreshSegments(shop.id);
-    return { success: true, message: "קהלים עודכנו בהצלחה" };
+    return { success: true, message: "קבוצות הלקוחות עודכנו" };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "רענון קהלים נכשל";
@@ -67,17 +67,17 @@ export default function Segments() {
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
       <SubmitButton fetcher={fetcher} slot="primary-action">
-        {fetcher.state !== "idle" ? "מעדכן..." : "רענון קהלים"}
+        {fetcher.state !== "idle" ? "מעדכן..." : "עדכן קבוצות"}
       </SubmitButton>
 
-      <s-section heading="קהלים אוטומטיים">
+      <s-section heading="הקבוצות שלך">
         {segments.length === 0 ? (
           <EmptyState
-            title="אין קהלים עדיין"
-            description="לחץ 'רענון קהלים' כדי ליצור קהלים מהנתונים הקיימים."
+            title="עדיין אין קבוצות"
+            description="קודם ודא שיש מעקב פעיל בחנות, ואז לחץ «עדכן קבוצות»."
             action={
               <SubmitButton fetcher={fetcher}>
-                {fetcher.state !== "idle" ? "מעדכן..." : "רענון קהלים"}
+                {fetcher.state !== "idle" ? "מעדכן..." : "עדכן קבוצות"}
               </SubmitButton>
             }
           />
@@ -92,7 +92,7 @@ export default function Segments() {
                   <div className="ms-metric-value" style={{ fontSize: 24 }}>
                     {seg.member_count}
                   </div>
-                  <s-text color="subdued">חברים בקהל</s-text>
+                  <s-text color="subdued">אנשים בקבוצה</s-text>
                   {seg.refreshed_at ? (
                     <s-text color="subdued">
                       עודכן: {new Date(seg.refreshed_at).toLocaleDateString("he-IL")}
@@ -106,12 +106,12 @@ export default function Segments() {
       </s-section>
 
       {breakdown.byTrafficSource.length > 0 && (
-        <s-section heading="פילוח לפי מקור תנועה">
+        <s-section heading="מאיפה הגיעו">
           <div className="ms-metric-grid">
             {breakdown.byTrafficSource.slice(0, 8).map((s) => (
               <div key={s.source} className="ms-card">
                 <s-text type="strong">{s.source}</s-text>
-                <s-paragraph>{s.count} sessions</s-paragraph>
+                <s-paragraph>{s.count} ביקורים</s-paragraph>
               </div>
             ))}
           </div>

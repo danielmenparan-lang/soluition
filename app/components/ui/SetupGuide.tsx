@@ -16,15 +16,16 @@ export function SetupGuide({
   const script = `<script src="${trackingScriptUrl}" data-tracking-id="${trackingId}" async></script>`;
 
   return (
-    <s-section heading="התחלה מהירה — 3 שלבים">
+    <s-section heading="איך מתחילים? — 3 צעדים">
       <div className="ms-steps">
         <div className={`ms-step ${hasData ? "ms-step-done" : ""}`}>
           <div className="ms-step-num">1</div>
           <div>
-            <s-text type="strong">התקן את סקריפט המעקב</s-text>
+            <s-text type="strong">הדבק שורת מעקב בחנות</s-text>
             <s-paragraph>
-              הוסף את הקוד הבא ל-Theme → theme.liquid לפני {"</head>"}, או הפעל את
-              App Embed דרך Online Store → Themes → Customize.
+              לך לעיצוב החנות (Online Store → עיצוב → ערוך קוד) והדבק את השורה
+              הבאה לפני סגירת תג ה-head. אפשר גם דרך «התאמה אישית» אם יש App Embed
+              של האפליקציה.
             </s-paragraph>
             <CopyCodeBlock code={script} />
           </div>
@@ -33,12 +34,11 @@ export function SetupGuide({
         <div className={`ms-step ${hasData ? "ms-step-done" : ""}`}>
           <div className="ms-step-num">2</div>
           <div>
-            <s-text type="strong">אסוף נתונים מהחנות</s-text>
+            <s-text type="strong">היכנס לחנות פעם אחת</s-text>
             <s-paragraph>
               {hasData
-                ? "מעולה — נתונים מתחילים להגיע. ככל שיותר מבקרים, ההמלצות יהיו מדויקות יותר."
-                : "אחרי התקנת הסקריפט, בקר בחנות פעם אחת כדי ליצור session ראשון. מזהה מעקב: "}
-              {!hasData ? <s-text type="strong">{trackingId}</s-text> : null}
+                ? "מעולה — הנתונים מתחילים להגיע. ככל שיותר אנשים יבקרו, ההמלצות יהיו מדויקות יותר."
+                : "פתח את החנות שלך בדפדפן (כמו לקוח רגיל) וגלוש בכמה דפים. זה מפעיל את המעקב."}
             </s-paragraph>
           </div>
         </div>
@@ -46,11 +46,11 @@ export function SetupGuide({
         <div className={`ms-step ${hasRecommendations ? "ms-step-done" : ""}`}>
           <div className="ms-step-num">3</div>
           <div>
-            <s-text type="strong">קבל המלצות AI</s-text>
+            <s-text type="strong">קבל המלצות</s-text>
             <s-paragraph>
               {hasRecommendations
-                ? "המלצות AI פעילות — עבור לעמוד 'המלצות AI' לראות את כולן."
-                : "לחץ 'יצירת המלצות AI' למעלה. המערכת תמשוך נתונים מ-Supabase, תשלח ל-Claude, ותשמור המלצות."}
+                ? "יש לך המלצות — עבור ל«מה כדאי לעשות» לראות את כולן."
+                : "לחץ «קבל המלצות» למעלה. המערכת תבדוק את הנתונים ותציע מה לשפר."}
             </s-paragraph>
           </div>
         </div>

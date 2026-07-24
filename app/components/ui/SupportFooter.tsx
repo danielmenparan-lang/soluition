@@ -7,7 +7,7 @@ export function SupportFooter({ email }: SupportFooterProps) {
     <footer className="ms-support-footer">
       <div className="ms-support-inner">
         <div className="ms-support-block">
-          <span className="ms-support-label">צריך עזרה?</span>
+          <span className="ms-support-label">יש שאלה? כתוב לנו:</span>
           <a className="ms-support-email" href={`mailto:${email}?subject=Solution%20AI%20Support`}>
             {email}
           </a>

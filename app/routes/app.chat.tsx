@@ -12,6 +12,7 @@ import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { useFetcherToast } from "../hooks/useFetcherToast";
 import { PageHero } from "../components/ui/PageHero";
 import { HelpPanel } from "../components/ui/HelpPanel";
+import { ChatNotice } from "../components/ui/ChatNotice";
 import { PAGE_HELP } from "../config/page-help";
 import { getOrCreateShop } from "../services/shop.server";
 import { chatWithAI, getChatConversations } from "../services/ai.server";
@@ -130,7 +131,10 @@ export default function Chat() {
       />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
-      <s-section heading="שאלות מומלצות">
+      <ChatNotice variant="owner" />
+      <ChatNotice variant="not-for-customers" />
+
+      <s-section heading="רוצה להתחיל? לחץ על שאלה">
         <div className="ms-link-row">
           {SUGGESTED_QUESTIONS.map((q) => (
             <Form
@@ -167,8 +171,8 @@ export default function Chat() {
             <div className="ms-empty" style={{ border: "none", background: "transparent" }}>
               <h3 className="ms-empty-title">שלום!</h3>
               <p className="ms-empty-text">
-                אני מנהל השיווק AI של החנות. שאל אותי על ביצועים, מוצרים,
-                קהלים או המלצות — אני מבוסס על הנתונים שלך.
+                שאל אותי כל דבר על החנות — למה מכירות ירדו, מה לפרסם, איפה
+                מפסידים כסף. אני עונה לפי הנתונים האמיתיים שלך.
               </p>
             </div>
           )}
@@ -178,13 +182,13 @@ export default function Chat() {
               className={`ms-chat-bubble ${msg.role === "user" ? "ms-chat-user" : "ms-chat-ai"}`}
             >
               <div className="ms-chat-label">
-                {msg.role === "user" ? "אתה" : "AI Marketing Manager"}
+                {msg.role === "user" ? "אתה" : "העוזר"}
               </div>
               {msg.content}
             </div>
           ))}
           {fetcher.state !== "idle" && (
-            <div className="ms-loading">מנתח נתונים ומכין תשובה...</div>
+            <div className="ms-loading">חושב על תשובה...</div>
           )}
           <div ref={bottomRef} />
         </div>
@@ -207,7 +211,7 @@ export default function Chat() {
               name="message"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="שאל שאלה על החנות שלך..."
+              placeholder="כתוב שאלה — למשל: למה המכירות ירדו?"
               className="ms-input"
               disabled={fetcher.state !== "idle"}
             />

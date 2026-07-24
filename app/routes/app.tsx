@@ -39,13 +39,13 @@ export default function App() {
     <AppProvider embedded apiKey={apiKey}>
       <NavMenu>
         <AppLink to="/app" rel="home">
-          סקירה
+          בית
         </AppLink>
-        <AppLink to="/app/analytics">אנליטיקה</AppLink>
-        <AppLink to="/app/segments">קהלים</AppLink>
-        <AppLink to="/app/recommendations">המלצות AI</AppLink>
-        <AppLink to="/app/reports">דוחות</AppLink>
-        <AppLink to="/app/chat">צ'אט AI</AppLink>
+        <AppLink to="/app/analytics">מה קורה בחנות</AppLink>
+        <AppLink to="/app/segments">קבוצות לקוחות</AppLink>
+        <AppLink to="/app/recommendations">מה כדאי לעשות</AppLink>
+        <AppLink to="/app/reports">סיכום שבועי</AppLink>
+        <AppLink to="/app/chat">שאל את העוזר</AppLink>
       </NavMenu>
       <div className="ms-app-shell">
         <div className="ms-app-content">

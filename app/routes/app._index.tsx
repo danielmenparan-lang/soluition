@@ -59,15 +59,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     if (intent === "generate_recommendations") {
       await generateRecommendations(shop.id);
-      return { success: true, message: "המלצות AI נוצרו בהצלחה" };
+      return { success: true, message: "ההמלצות מוכנות — תראה אותן למטה" };
     }
     if (intent === "refresh_segments") {
       await refreshSegments(shop.id);
-      return { success: true, message: "קהלים עודכנו בהצלחה" };
+      return { success: true, message: "קבוצות הלקוחות עודכנו" };
     }
     if (intent === "generate_report") {
       await generateWeeklyReport(shop.id);
-      return { success: true, message: "דוח שבועי נוצר בהצלחה" };
+      return { success: true, message: "סיכום השבוע מוכן" };
     }
   } catch (error) {
     const message =
@@ -110,14 +110,14 @@ export default function Overview() {
         slot="primary-action"
         intent="generate_recommendations"
       >
-        {isGenerating ? "מייצר המלצות..." : "יצירת המלצות AI"}
+        {isGenerating ? "מכין המלצות..." : "קבל המלצות"}
       </SubmitButton>
 
       {isGenerating && (
         <s-section>
           <s-banner tone="info">
             <s-paragraph>
-              <span className="ms-loading">⏳ מושך נתונים → שולח ל-Claude → שומר המלצות...</span>
+              <span className="ms-loading">בודק את הנתונים ומכין המלצות — זה לוקח כדקה...</span>
             </s-paragraph>
           </s-banner>
         </s-section>
@@ -130,47 +130,47 @@ export default function Overview() {
         hasRecommendations={recommendationCount > 0}
       />
 
-      <s-section heading="מדדים מרכזיים — 30 יום אחרונים">
+      <s-section heading="המספרים שלך — 30 יום אחרונים">
         {metrics ? (
           <div className="ms-metric-grid">
-            <MetricCard label="מבקרים" value={metrics.totalVisitors} accent="brand" hint="גולשים ייחודיים" />
-            <MetricCard label="Sessions" value={metrics.totalSessions} accent="info" hint="ביקורים" />
-            <MetricCard label="שיעור המרה" value={`${metrics.conversionRate}%`} accent="ai" hint="רכישות / sessions" />
+            <MetricCard label="מבקרים" value={metrics.totalVisitors} accent="brand" hint="אנשים שונים שנכנסו" />
+            <MetricCard label="ביקורים" value={metrics.totalSessions} accent="info" hint="כמה פעמים נכנסו לחנות" />
+            <MetricCard label="אחוז קונים" value={`${metrics.conversionRate}%`} accent="ai" hint="מבקרים שהפכו לקונים" />
             <MetricCard
               label="זמן ממוצע"
               value={`${Math.round(metrics.avgSessionDuration / 60)} דק'`}
               accent="warning"
-              hint="משך session"
+              hint="כמה זמן נשארו בחנות"
             />
           </div>
         ) : (
           <EmptyState
-            title="אין נתונים עדיין"
-            description="התקן את סקריפט המעקב ובקר בחנות — הנתונים יופיעו כאן תוך דקות."
+            title="עדיין אין נתונים"
+            description="קודם הדבק את שורת המעקב (למעלה) והיכנס לחנות פעם אחת. תוך דקות המספרים יופיעו כאן."
           />
         )}
       </s-section>
 
-      <s-section heading="פעולות מהירות">
+      <s-section heading="מה אפשר לעשות מכאן">
         <s-stack direction="inline" gap="base">
           <SubmitButton fetcher={fetcher} intent="generate_recommendations" variant="primary">
-            {isGenerating ? "מעבד..." : "המלצות AI"}
+            {isGenerating ? "מכין..." : "קבל המלצות"}
           </SubmitButton>
           <SubmitButton fetcher={fetcher} intent="refresh_segments" variant="secondary">
-            רענון קהלים
+            עדכן קבוצות
           </SubmitButton>
           <SubmitButton fetcher={fetcher} intent="generate_report" variant="secondary">
-            דוח שבועי
+            סיכום שבועי
           </SubmitButton>
         </s-stack>
         <div className="ms-link-row">
-          <AppLink to="/app/analytics">→ אנליטיקה מלאה</AppLink>
-          <AppLink to="/app/recommendations">→ כל ההמלצות</AppLink>
-          <AppLink to="/app/chat">→ צ'אט AI</AppLink>
+          <AppLink to="/app/analytics">→ מה קורה בחנות</AppLink>
+          <AppLink to="/app/recommendations">→ מה כדאי לעשות</AppLink>
+          <AppLink to="/app/chat">→ שאל את העוזר</AppLink>
         </div>
       </s-section>
 
-      <s-section heading="המלצות AI אחרונות">
+      <s-section heading="המלצות אחרונות">
         {recommendations.length > 0 ? (
           <s-stack direction="block" gap="base">
             {recommendations.map((rec) => (
@@ -184,11 +184,11 @@ export default function Overview() {
           </s-stack>
         ) : (
           <EmptyState
-            title="אין המלצות עדיין"
-            description="המערכת תיצור המלצות אוטומטית, או לחץ 'יצירת המלצות AI' למעלה."
+            title="עדיין אין המלצות"
+            description="לחץ «קבל המלצות» למעלה — המערכת תבדוק את הנתונים ותגיד לך מה כדאי לעשות."
             action={
               <SubmitButton fetcher={fetcher} intent="generate_recommendations">
-                {isGenerating ? "מייצר..." : "יצירת המלצות עכשיו"}
+                {isGenerating ? "מכין..." : "קבל המלצות עכשיו"}
               </SubmitButton>
             }
           />
@@ -196,7 +196,7 @@ export default function Overview() {
       </s-section>
 
       {segments.length > 0 && (
-        <s-section heading="קהלים מובילים">
+        <s-section heading="קבוצות גדולות">
           <div className="ms-metric-grid">
             {segments.map((seg) => (
               <div key={seg.id} className="ms-card">
@@ -204,12 +204,12 @@ export default function Overview() {
                 <div className="ms-metric-value" style={{ fontSize: 22 }}>
                   {seg.member_count}
                 </div>
-                <s-text color="subdued">חברים בקהל</s-text>
+                <s-text color="subdued">אנשים בקבוצה</s-text>
               </div>
             ))}
           </div>
           <div className="ms-link-row">
-            <AppLink to="/app/segments">→ כל הקהלים</AppLink>
+            <AppLink to="/app/segments">→ כל הקבוצות</AppLink>
           </div>
         </s-section>
       )}

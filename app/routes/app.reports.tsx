@@ -33,7 +33,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   try {
     await generateWeeklyReport(shop.id);
-    return { success: true, message: "דוח שבועי נוצר בהצלחה" };
+    return { success: true, message: "סיכום השבוע מוכן" };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "יצירת דוח נכשלה";
@@ -66,30 +66,30 @@ export default function Reports() {
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
       <SubmitButton fetcher={fetcher} slot="primary-action">
-        {isGenerating ? "מייצר..." : "יצירת דוח שבועי"}
+        {isGenerating ? "מכין..." : "הפק סיכום שבועי"}
       </SubmitButton>
 
       {!latest ? (
         <s-section>
           <EmptyState
-            title="אין דוחות עדיין"
-            description="לחץ 'יצירת דוח שבועי' — Claude ינתח את השבוע האחרון ויצור דוח מפורט."
+            title="עדיין אין סיכום"
+            description="לחץ «הפק סיכום שבועי» — תקבל דוח קצר על 7 הימים האחרונים: מה השתנה ומה לעשות."
             action={
               <SubmitButton fetcher={fetcher}>
-                {isGenerating ? "מייצר..." : "יצירת דוח ראשון"}
+                {isGenerating ? "מכין..." : "הפק סיכום ראשון"}
               </SubmitButton>
             }
           />
         </s-section>
       ) : (
         <>
-          <s-section heading={`דוח: ${latest.week_start} — ${latest.week_end}`}>
+          <s-section heading={`שבוע: ${latest.week_start} — ${latest.week_end}`}>
             <div className="ms-card ms-card-ai">
               <s-paragraph>{latest.performance_summary}</s-paragraph>
             </div>
           </s-section>
 
-          <s-section heading="תובנות מרכזיות">
+          <s-section heading="מה חשוב לדעת">
             {insights.length > 0 ? (
               <s-unordered-list>
                 {insights.map((insight, i) => (
@@ -101,22 +101,22 @@ export default function Reports() {
             )}
           </s-section>
 
-          <s-section heading="פעולות עם Impact גבוה">
+          <s-section heading="מה לעשות השבוע">
             {topActions.length > 0 ? (
               <s-stack direction="block" gap="base">
                 {topActions.map((item, i) => (
                   <div key={i} className="ms-card">
                     <s-text type="strong">{item.action}</s-text>
-                    <s-paragraph>השפעה: {item.impact}</s-paragraph>
+                    <s-paragraph>למה זה חשוב: {item.impact}</s-paragraph>
                   </div>
                 ))}
               </s-stack>
             ) : (
-              <s-paragraph>אין פעולות מומלצות בדוח זה.</s-paragraph>
+              <s-paragraph>אין המלצות בדוח זה.</s-paragraph>
             )}
           </s-section>
 
-          <s-section heading="הזדמנויות צמיחה">
+          <s-section heading="הזדמנויות">
             {growthOpportunities.length > 0 ? (
               <s-unordered-list>
                 {growthOpportunities.map((opp, i) => (
@@ -128,7 +128,7 @@ export default function Reports() {
             )}
           </s-section>
 
-          <s-section heading="נקודות בזבוז כסף">
+          <s-section heading="איפה מבזבזים כסף">
             {wastePoints.length > 0 ? (
               <s-unordered-list>
                 {wastePoints.map((point, i) => (
@@ -143,7 +143,7 @@ export default function Reports() {
       )}
 
       {reports.length > 1 && (
-        <s-section heading="דוחות קודמים">
+        <s-section heading="סיכומים קודמים">
           <s-table>
             <s-table-header-row>
               <s-table-header>שבוע</s-table-header>
