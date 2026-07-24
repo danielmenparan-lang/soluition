@@ -1,38 +1,39 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { redirect, Form, useLoaderData } from "react-router";
-import { login } from "../shopify.server";
+import { redirect } from "react-router";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
-  if (url.searchParams.get("shop")) {
+  const shop = url.searchParams.get("shop");
+  const embedded = url.searchParams.get("embedded");
+  const host = url.searchParams.get("host");
+
+  // Shopify Admin / install — go straight to the embedded app (normal flow).
+  if (shop || embedded || host) {
     throw redirect(`/app?${url.searchParams.toString()}`);
   }
-  return { showForm: Boolean(login) };
+
+  return null;
 };
 
 export default function Index() {
-  const { showForm } = useLoaderData<typeof loader>();
-
   return (
-    <div style={{ fontFamily: "system-ui", maxWidth: "600px", margin: "80px auto", padding: "0 24px" }}>
-      <h1>Marketing Solution</h1>
-      <p>AI Marketing Intelligence Platform for Shopify</p>
-      {showForm && (
-        <Form method="post" action="/auth/login" style={{ marginTop: "32px" }}>
-          <label style={{ display: "block", marginBottom: "8px" }}>
-            Shop domain
-            <input
-              type="text"
-              name="shop"
-              placeholder="my-shop.myshopify.com"
-              style={{ display: "block", width: "100%", padding: "8px", marginTop: "4px" }}
-            />
-          </label>
-          <button type="submit" style={{ marginTop: "12px", padding: "8px 16px" }}>
-            Log in
-          </button>
-        </Form>
-      )}
+    <div
+      style={{
+        fontFamily: "system-ui, sans-serif",
+        maxWidth: "520px",
+        margin: "80px auto",
+        padding: "0 24px",
+        textAlign: "center",
+        lineHeight: 1.6,
+      }}
+    >
+      <h1 style={{ fontSize: "1.5rem" }}>Marketing Solution</h1>
+      <p>AI Marketing Intelligence for Shopify</p>
+      <p style={{ color: "#555", marginTop: "24px" }}>
+        פתח את האפליקציה מ-<strong>Shopify Admin → Apps → solution</strong>.
+        <br />
+        אין צורך להזין כתובת חנות כאן.
+      </p>
     </div>
   );
 }

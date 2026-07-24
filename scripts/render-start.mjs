@@ -3,9 +3,15 @@
  * Render production entrypoint — must bind PORT in THIS process (no spawn wrapper).
  */
 import { execSync } from "node:child_process";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { validateDatabaseUrl } from "./validate-database-url.mjs";
+
+const nodeRequire = createRequire(import.meta.url);
+if (typeof globalThis.WebSocket === "undefined") {
+  globalThis.WebSocket = nodeRequire("ws");
+}
 
 const EXPECTED_CLIENT_ID = "00eb38f774ffba914d98a6800f4c5df5";
 const EXPECTED_APP_URL = "https://shopify-marketing-solution.onrender.com";
@@ -39,8 +45,22 @@ if (appUrl && appUrl.includes("fly.dev")) {
 
 const databaseUrl = process.env.DATABASE_URL?.trim() ?? "";
 const dbCheck = validateDatabaseUrl(databaseUrl);
+const useSupabaseSessions = Boolean(
+  process.env.SUPABASE_URL?.trim() && process.env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
+);
 
-if (!dbCheck.valid) {
+if (useSupabaseSessions) {
+  console.log("[render-start] OAuth sessions via Supabase REST — skipping prisma migrate");
+  try {
+    execSync("node scripts/ensure-session-table.mjs", {
+      cwd: appRoot,
+      stdio: "inherit",
+      env: process.env,
+    });
+  } catch {
+    console.error("[render-start] Session table missing — app login will fail until SQL is run");
+  }
+} else if (!dbCheck.valid) {
   console.error("[render-start] DATABASE_URL problems:");
   for (const issue of dbCheck.issues) {
     console.error(`  - ${issue}`);

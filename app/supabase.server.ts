@@ -1,5 +1,5 @@
+import "./node-polyfills.server";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import ws from "ws";
 import type { Database } from "./types/database.types";
 
 declare global {
@@ -27,9 +27,6 @@ function createSupabaseClient(): SupabaseClient<Database> {
 
   return createClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
-    realtime: {
-      transport: ws as unknown as typeof WebSocket,
-    },
   });
 }
 
