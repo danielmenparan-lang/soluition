@@ -1,10 +1,12 @@
-Solution — מנהל השיווק החכם לחנות Shopify שלך.
+Solution — AI marketing intelligence for your Shopify store.
 
-Solution עוקבת אחרי מי שנכנס לחנות, מנתחת את ההתנהגות, ונותנת לך המלצות ברורות — מה לפרסם, מה לשפר, ומה לתקן. הכול בתוך Shopify Admin, בעברית, בלי כלים חיצוניים.
+Solution tracks visitor behavior, analyzes patterns, and delivers clear recommendations — what to promote, fix, or improve. All inside Shopify Admin.
 
-• מעקב מבקרים ומכירות
-• המלצות AI מבוססות נתונים
-• צ'אט — שאל שאלה, קבל תשובה
-• קבוצות לקוחות וסיכום שבועי
+• Visitor behavior tracking
+• Data-driven AI recommendations
+• Chat assistant — ask questions, get answers
+• Customer segments and weekly reports
 
-התקנה: App embed אחד בערכת העיצוב — והמערכת מתחילה לעבוד.
+Pricing: Free — 1 scan + 1 AI output. Starter $15/mo — 10 each. Unlimited $29/mo.
+
+Setup: Enable the Solution Tracker app embed in your theme, then browse your storefront once.

@@ -4,6 +4,7 @@ import {
   deleteShopDataByDomain,
   exportCustomerData,
   redactCustomerData,
+  storeCustomerDataExport,
 } from "../services/shop-cleanup.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -33,10 +34,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const customerId = customer.customer?.id;
     if (customerId) {
       const exportPayload = await exportCustomerData(shop, customerId);
-      console.log(
-        `GDPR data export prepared for ${shop} customer ${customerId}`,
-        JSON.stringify(exportPayload).slice(0, 500),
-      );
+      await storeCustomerDataExport(shop, customerId, exportPayload);
+      console.log(`GDPR data export stored for ${shop} customer ${customerId}`);
     }
     return new Response();
   }

@@ -49,6 +49,13 @@ export default function Privacy() {
         per month; Starter ($15/mo) includes 10 each; Unlimited ($29/mo) has no caps.
       </p>
 
+      <h2>GDPR data requests</h2>
+      <p>
+        When a customer requests their data, we export linked visitor analytics and
+        store it securely for the merchant to retrieve from app settings. Data is
+        deleted on customer/shop redact webhooks.
+      </p>
+
       <h2>Contact</h2>
       <p>
         Privacy or support:{" "}

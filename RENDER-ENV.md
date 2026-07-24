@@ -23,7 +23,7 @@
 | `SUPABASE_SERVICE_ROLE_KEY` | מ-Supabase → Settings → API |
 | `ANTHROPIC_API_KEY` | מ-Anthropic |
 | `HOST` | `0.0.0.0` |
-| `SCOPES` | `read_products,read_orders,read_customers,read_analytics,write_script_tags,read_content` |
+| `SCOPES` | *(leave empty — app uses theme embed only, no Admin API scopes)* |
 
 > **אל תגדיר `PORT` ידנית** — Render מזריק PORT אוטומטית.
 

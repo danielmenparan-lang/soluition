@@ -85,3 +85,43 @@ export async function exportCustomerData(
     events: events.data ?? [],
   };
 }
+
+/** Persist GDPR export in shop settings so the merchant can retrieve it. */
+export async function storeCustomerDataExport(
+  shopDomain: string,
+  customerId: number,
+  exportPayload: Record<string, unknown>,
+): Promise<void> {
+  const supabase = getSupabase();
+  const { data: shop } = await supabase
+    .from("shops")
+    .select("id, settings")
+    .eq("shop_domain", shopDomain)
+    .maybeSingle();
+
+  if (!shop) return;
+
+  const settings =
+    shop.settings && typeof shop.settings === "object"
+      ? (shop.settings as Record<string, unknown>)
+      : {};
+
+  const existing = Array.isArray(settings.gdprExports)
+    ? (settings.gdprExports as Record<string, unknown>[])
+    : [];
+
+  const nextExports = [
+    ...existing.filter(
+      (entry) =>
+        typeof entry === "object" &&
+        entry !== null &&
+        (entry as { customerId?: number }).customerId !== customerId,
+    ),
+    { customerId, storedAt: new Date().toISOString(), data: exportPayload },
+  ].slice(-20);
+
+  await supabase
+    .from("shops")
+    .update({ settings: { ...settings, gdprExports: nextExports } })
+    .eq("id", shop.id);
+}

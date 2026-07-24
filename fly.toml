@@ -8,7 +8,7 @@ primary_region = "fra"
 [env]
   NODE_ENV = "production"
   HOST = "0.0.0.0"
-  SCOPES = "read_analytics,read_content,read_customers,read_orders,read_products,write_script_tags"
+  SCOPES = ""
 
 [http_service]
   internal_port = 8080

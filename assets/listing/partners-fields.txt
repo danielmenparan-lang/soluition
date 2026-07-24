@@ -3,36 +3,35 @@
 App name (display):
 Solution — AI Marketing
 
-Subtitle / tagline (HE):
-מנהל שיווק AI שמבין את החנות שלך
-
 Subtitle / tagline (EN):
 AI marketing intelligence built into Shopify Admin
 
-Short description — paste into listing (HE):
-(see description-he.txt — full text)
-
-Checklist before submit:
-assets/listing/submission-checklist.txt
-
 Short description — paste into listing (EN):
-Solution tracks visitors and sales on your Shopify store, analyzes data with Claude AI, and shows marketing recommendations, audience segments, and weekly reports — all inside Admin. Add one tracking line and your dashboard goes live.
+(see description-en.txt — full text)
+
+Short description summary (EN):
+Solution tracks visitor behavior on your Shopify store, analyzes data with Claude AI, and shows recommendations, segments, and weekly reports — all inside Admin. Free: 1 scan + 1 AI output. Starter $15/mo. Unlimited $29/mo.
 
 Search keywords:
-marketing, analytics, AI, recommendations, conversion, tracking, segments, Claude, dashboard, Hebrew
+marketing, analytics, AI, recommendations, conversion, tracking, segments, Claude, dashboard, behavior
 
 Icon:
 Upload assets/app-icon.png (1200×1200)
 
-Screenshots:
-Capture from Shopify Admin → Apps → solution:
-1. התחלה — ProductExplainer + setup guide
-2. מה כדאי לעשות — recommendations
-3. מה קורה בחנות — analytics
-4. צ'אט — chat assistant
+Screenshots (capture from Shopify Admin → Apps → solution):
+1. Home — setup guide + ProductExplainer
+2. Recommendations — AI action list
+3. Analytics — traffic and product metrics
+4. Chat — assistant conversation
 
-Support email (Partners listing + app footer):
+Support email:
 vonx.support@gmail.com
 
 Privacy policy URL:
 https://shopify-marketing-solution.onrender.com/privacy
+
+Testing instructions:
+assets/listing/submission-checklist.txt (English block — paste into Partners)
+
+Checklist:
+assets/listing/submission-checklist.txt

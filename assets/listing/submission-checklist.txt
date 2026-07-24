@@ -1,25 +1,31 @@
-=== צ'ק-ליסט שליחה ל-Shopify App Store ===
+=== Shopify App Store submission checklist ===
 
-לפני Submit for review:
+Before Submit for review:
 
-[ ] git push + Render deploy הושלם (https://shopify-marketing-solution.onrender.com/health → ok: true)
-[ ] npm run deploy:shopify — webhooks + theme extension עלו ל-Partners
-[ ] Privacy policy חיה: https://shopify-marketing-solution.onrender.com/privacy
-[ ] Support email: vonx.support@gmail.com (ב-Partners + באפליקציה)
+[x] git push + Render deploy (https://shopify-marketing-solution.onrender.com/health → ok: true)
+[x] npm run deploy:shopify — webhooks + theme extension on Partners
+[ ] Render Environment → SCOPES = empty (or delete the variable)
+[ ] Privacy policy live: https://shopify-marketing-solution.onrender.com/privacy
+[ ] Support email in Partners: vonx.support@gmail.com
 [ ] App icon 1200×1200: assets/app-icon.png
-[ ] 4 screenshots מ-Shopify Admin (התחלה, המלצות, אנליטיקס, צ'אט)
-[ ] תיאור HE/EN מ-assets/listing/description-*.txt
-[ ] חנות בדיקה עם מעקב פעיל + נתונים אמיתיים להדגמה
-[ ] (אופציונלי) orders/create webhook — דורש Protected customer data ב-Partners לפני הפעלה
+[ ] 4 screenshots from Shopify Admin (Home, Recommendations, Analytics, Chat)
+[ ] Paste EN description from assets/listing/description-en.txt
+[ ] Demo store with tracking enabled + real visitor data
 
-ב-Partners → Apps → solution → Listing:
+Partners → Apps → solution → Listing:
 - App name: Solution — AI Marketing
 - Category: Marketing / Analytics
 - Privacy: https://shopify-marketing-solution.onrender.com/privacy
 - Support: vonx.support@gmail.com
+- Pricing: Free plan + $15 Starter + $29 Unlimited (configured in app)
 
-Testing instructions for reviewer:
-1. Apps → Solution → «התחלה»
-2. Themes → Customize → App embeds → «מעקב Solution» → Save
-3. Visit storefront, return to app
-4. «קבל המלצות» or «צ'אט»
+Testing instructions for Shopify reviewer (paste into Partners):
+1. Install the app on the development store.
+2. Open Solution → Home. Click "Open theme editor" and enable the "Solution Tracker" app embed. Paste the tracking ID shown on Home. Save.
+3. Open the storefront in a new tab. Visit Home, a product page, and the cart.
+4. Return to Solution → Home. Click "Get recommendations" (uses 1 free AI output).
+5. Open Chat and ask: "Where does my traffic come from?"
+6. Optional: Billing page shows Free (1 scan + 1 output), Starter $15/mo, Unlimited $29/mo.
+
+Install link (dev store):
+https://admin.shopify.com/store/solution-vyndgruj/oauth/install?client_id=00eb38f774ffba914d98a6800f4c5df5
