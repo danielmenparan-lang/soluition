@@ -133,27 +133,26 @@ export const PAGE_HELP: Record<string, PageHelp> = {
     ],
   },
   chat: {
-    title: "Growth consultant",
-    subtitle:
-      "CMO-level strategy from your data — even with early traffic, get moves worth paying for.",
+    title: "Marketing advisor",
+    subtitle: "Plain-language advice — what to fix and what to do next. English or Hebrew.",
     tips: [
-      "Strategic diagnosis, not generic social tips",
-      "Works with sparse data — 1 visitor is enough to start",
-      "Private to you — not visible to customers",
+      "Simple words, no marketing jargon",
+      "Ask in Hebrew or English",
+      "Private to you — customers never see this",
     ],
     helpTitle: "Example prompts",
     helpItems: [
       {
-        label: "Constraint",
-        text: "What is the real constraint on revenue right now?",
+        label: "Sales",
+        text: "למה אין מכירות? / Why are there no sales?",
       },
       {
-        label: "Plan",
-        text: "Build a 30-day acquisition plan for this data",
+        label: "Traffic",
+        text: "איך להביא יותר אנשים לחנות?",
       },
       {
-        label: "Positioning",
-        text: "How should I position my hero product?",
+        label: "Fix first",
+        text: "What should I fix first on my store?",
       },
     ],
   },

@@ -102,17 +102,17 @@ export function shouldRevalidate({
 }
 
 const SUGGESTED_WITH_DATA = [
-  "What is the real constraint on revenue right now?",
-  "Build a 30-day acquisition plan for this data",
-  "How should I position my hero product?",
-  "Where should my first marketing dollar go?",
+  "למה אין מכירות?",
+  "What should I fix first?",
+  "איך להביא יותר אנשים לחנות?",
+  "Where am I losing buyers?",
 ];
 
 const SUGGESTED_NO_DATA = [
-  "Pre-launch: what should I fix before driving traffic?",
-  "Define my ICP and first channel",
-  "Why is there no session data?",
-  "Audit my store for conversion readiness",
+  "מה לעשות קודם?",
+  "How do I enable tracking?",
+  "איך להתכונן לפני שמפרסמים?",
+  "Why is there no data?",
 ];
 
 export default function Chat() {
@@ -176,13 +176,13 @@ export default function Chat() {
   };
 
   return (
-    <s-page heading="Growth consultant">
+    <s-page heading="Marketing advisor">
       <s-section>
         <div className="ms-chat-intro">
-          <h2 className="ms-chat-intro-title">Growth consultant</h2>
+          <h2 className="ms-chat-intro-title">Marketing advisor</h2>
           <p className="ms-chat-intro-text">
-            Senior-level strategy from your store data — positioning, acquisition,
-            and conversion moves worth paying for. Not generic social tips.
+            Clear advice in plain language — what to fix and what to do next.
+            Ask in English or Hebrew.
           </p>
         </div>
       </s-section>

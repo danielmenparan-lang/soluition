@@ -18,9 +18,10 @@ import {
 } from "../utils/format-chat-reply";
 import { buildNoDataChatReply } from "../utils/chat-no-data-reply";
 import {
-  CHAT_REPLY_FORMAT_HINT,
   CHAT_SYSTEM_PROMPT,
+  chatReplyFormatHint,
   chatStageHint,
+  userWritesHebrew,
 } from "../config/chat-voice";
 import { prepareChatContext } from "./chat-context.server";
 import { rejectLowValueReply } from "../utils/chat-quality";
@@ -356,7 +357,7 @@ export async function chatWithAI(
   let reply: string;
 
   if (!hasData && shop && isSetupQuestion(userMessage)) {
-    reply = buildNoDataChatReply(shop);
+    reply = buildNoDataChatReply(shop, userWritesHebrew(userMessage));
   } else {
     const { data: history } = await supabase
       .from("chat_messages")
@@ -365,7 +366,9 @@ export async function chatWithAI(
       .order("created_at", { ascending: true })
       .limit(20);
 
-    const contextPrompt = `${chatStageHint(stage)}
+    const hebrew = userWritesHebrew(userMessage);
+
+    const contextPrompt = `${chatStageHint(stage, hebrew)}
 
 Shop: ${shop?.shop_domain ?? "unknown"}
 
@@ -389,14 +392,14 @@ ${(history ?? [])
 
 User question: ${userMessage}
 
-${CHAT_REPLY_FORMAT_HINT}`;
+${chatReplyFormatHint(userMessage)}`;
 
     let rawReply = await callClaude(CHAT_SYSTEM_PROMPT, contextPrompt, 1800);
     reply = formatChatReply(rawReply);
 
     if (rejectLowValueReply(reply)) {
       rawReply = await callClaude(
-        `${CHAT_SYSTEM_PROMPT}\n\nYour last draft included generic low-value tactics. Rewrite with senior consultant-level strategy only.`,
+        `${CHAT_SYSTEM_PROMPT}\n\nRewrite in simpler language. No jargon. No generic social tips.`,
         contextPrompt,
         1800,
       );
