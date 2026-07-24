@@ -3,11 +3,12 @@ import type {
   HeadersFunction,
   LoaderFunctionArgs,
 } from "react-router";
-import { useFetcher, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
+import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { getOrCreateShop } from "../services/shop.server";
 import { getDashboardMetrics } from "../services/analytics.server";
 import { getRecommendations } from "../services/ai.server";
@@ -43,17 +44,23 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const intent = formData.get("intent");
 
-  if (intent === "generate_recommendations") {
-    await generateRecommendations(shop.id);
-    return { success: true, message: "המלצות נוצרו בהצלחה" };
-  }
-  if (intent === "refresh_segments") {
-    await refreshSegments(shop.id);
-    return { success: true, message: "קהלים עודכנו בהצלחה" };
-  }
-  if (intent === "generate_report") {
-    await generateWeeklyReport(shop.id);
-    return { success: true, message: "דוח שבועי נוצר בהצלחה" };
+  try {
+    if (intent === "generate_recommendations") {
+      await generateRecommendations(shop.id);
+      return { success: true, message: "המלצות נוצרו בהצלחה" };
+    }
+    if (intent === "refresh_segments") {
+      await refreshSegments(shop.id);
+      return { success: true, message: "קהלים עודכנו בהצלחה" };
+    }
+    if (intent === "generate_report") {
+      await generateWeeklyReport(shop.id);
+      return { success: true, message: "דוח שבועי נוצר בהצלחה" };
+    }
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "הפעולה נכשלה";
+    return { success: false, message };
   }
 
   return { success: false, message: "פעולה לא מוכרת" };
@@ -62,11 +69,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function Overview() {
   const { shop, metrics, recommendations, segments, trackingScriptUrl } =
     useLoaderData<typeof loader>();
-  const fetcher = useFetcher<typeof action>();
+  const fetcher = useShopifyFetcher<typeof action>();
   const shopify = useAppBridge();
 
   useEffect(() => {
-    if (fetcher.data?.success) {
+    if (fetcher.data?.message) {
       shopify.toast.show(fetcher.data.message);
     }
   }, [fetcher.data, shopify]);

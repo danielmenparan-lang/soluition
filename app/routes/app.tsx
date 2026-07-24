@@ -1,9 +1,10 @@
 import type { HeadersFunction, LoaderFunctionArgs } from "react-router";
-import { Link, Outlet, useLoaderData, useRouteError } from "react-router";
+import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { NavMenu } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
+import { AppLink } from "../components/AppLink";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
@@ -16,14 +17,14 @@ export default function App() {
   return (
     <AppProvider embedded apiKey={apiKey}>
       <NavMenu>
-        <Link to="/app" rel="home">
+        <AppLink to="/app" rel="home">
           סקירה
-        </Link>
-        <Link to="/app/analytics">אנליטיקה</Link>
-        <Link to="/app/segments">קהלים</Link>
-        <Link to="/app/recommendations">המלצות AI</Link>
-        <Link to="/app/reports">דוחות שבועיים</Link>
-        <Link to="/app/chat">צ'אט AI</Link>
+        </AppLink>
+        <AppLink to="/app/analytics">אנליטיקה</AppLink>
+        <AppLink to="/app/segments">קהלים</AppLink>
+        <AppLink to="/app/recommendations">המלצות AI</AppLink>
+        <AppLink to="/app/reports">דוחות שבועיים</AppLink>
+        <AppLink to="/app/chat">צ'אט AI</AppLink>
       </NavMenu>
       <Outlet />
     </AppProvider>

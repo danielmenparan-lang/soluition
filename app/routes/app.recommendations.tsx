@@ -3,11 +3,12 @@ import type {
   HeadersFunction,
   LoaderFunctionArgs,
 } from "react-router";
-import { useFetcher, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
+import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   generateRecommendations,
@@ -37,7 +38,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function Recommendations() {
   const { recommendations } = useLoaderData<typeof loader>();
-  const fetcher = useFetcher<typeof action>();
+  const fetcher = useShopifyFetcher<typeof action>();
   const shopify = useAppBridge();
 
   useEffect(() => {

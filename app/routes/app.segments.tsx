@@ -3,11 +3,12 @@ import type {
   HeadersFunction,
   LoaderFunctionArgs,
 } from "react-router";
-import { useFetcher, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
+import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   getSegments,
@@ -36,7 +37,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function Segments() {
   const { segments, breakdown } = useLoaderData<typeof loader>();
-  const fetcher = useFetcher<typeof action>();
+  const fetcher = useShopifyFetcher<typeof action>();
   const shopify = useAppBridge();
 
   useEffect(() => {

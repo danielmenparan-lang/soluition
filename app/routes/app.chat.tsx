@@ -3,10 +3,11 @@ import type {
   HeadersFunction,
   LoaderFunctionArgs,
 } from "react-router";
-import { useFetcher, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 import { useEffect, useRef, useState } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
+import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { getOrCreateShop } from "../services/shop.server";
 import { chatWithAI, getChatConversations } from "../services/ai.server";
 
@@ -50,7 +51,7 @@ const SUGGESTED_QUESTIONS = [
 
 export default function Chat() {
   const { conversations } = useLoaderData<typeof loader>();
-  const fetcher = useFetcher<typeof action>();
+  const fetcher = useShopifyFetcher<typeof action>();
   const [messages, setMessages] = useState<
     Array<{ role: "user" | "assistant"; content: string }>
   >([]);
