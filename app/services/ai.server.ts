@@ -52,6 +52,10 @@ export interface WeeklyReportData {
   performance_summary: string;
 }
 
+function getAnthropicModel(): string {
+  return process.env.ANTHROPIC_MODEL?.trim() || "claude-sonnet-4-6";
+}
+
 async function callClaude(
   systemPrompt: string,
   userMessage: string,
@@ -59,7 +63,7 @@ async function callClaude(
 ): Promise<string> {
   const client = getAnthropicClient();
   const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: getAnthropicModel(),
     max_tokens: maxTokens,
     system: systemPrompt,
     messages: [{ role: "user", content: userMessage }],

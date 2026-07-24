@@ -54,6 +54,7 @@ export const loader = async () => {
       anthropic: {
         apiKeySet: Boolean(process.env.ANTHROPIC_API_KEY?.trim()),
         apiKeyPrefix: process.env.ANTHROPIC_API_KEY?.trim().slice(0, 8) ?? null,
+        model: process.env.ANTHROPIC_MODEL?.trim() || "claude-sonnet-4-6",
       },
       hints: [
         !shopifyConfig.apiKeyMatchesApp
