@@ -1452,6 +1452,13 @@
   color: var(--ms-brand-dark);
 }
 
+.ms-plan-description {
+  margin: 10px 0 12px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ms-text);
+}
+
 .ms-plan-list {
   margin: 0;
   padding-left: 18px;

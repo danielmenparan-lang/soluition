@@ -3,7 +3,7 @@ import { redirect, useLoaderData } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate, STARTER_PLAN, UNLIMITED_PLAN } from "../shopify.server";
 import { getOrCreateShop } from "../services/shop.server";
-import { PLAN_LIMITS, formatOutputLimit, formatScanLimit } from "../config/plans";
+import { PLAN_LIMITS } from "../config/plans";
 import {
   getUsage,
   planFromSubscriptionName,
@@ -78,9 +78,10 @@ export default function BillingPage() {
     return {
       id,
       name: plan.label,
-      price: id === "free" ? "$0" : plan.price.replace("/mo", " / month"),
-      scans: formatScanLimit(plan.scans),
-      outputs: formatOutputLimit(plan.outputs),
+      price: plan.price,
+      priceDetail: plan.priceDetail,
+      description: plan.description,
+      highlights: plan.highlights,
       current: usage.plan === id,
     };
   });
@@ -126,11 +127,12 @@ export default function BillingPage() {
               >
                 <s-text type="strong">{tier.name}</s-text>
                 <div className="ms-plan-price">{tier.price}</div>
+                <s-text color="subdued">{tier.priceDetail}</s-text>
+                <p className="ms-plan-description">{tier.description}</p>
                 <ul className="ms-plan-list">
-                  <li>{tier.scans}</li>
-                  <li>{tier.outputs}</li>
-                  <li>Visitor behavior tracking</li>
-                  <li>Analytics dashboard</li>
+                  {tier.highlights.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
                 </ul>
                 {tier.current ? (
                   <s-text color="subdued">Current plan</s-text>
