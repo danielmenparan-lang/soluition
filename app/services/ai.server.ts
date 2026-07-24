@@ -12,6 +12,11 @@ import {
   findWastefulSources,
 } from "./attribution.server";
 import { getSegments } from "./segmentation.server";
+import {
+  formatChatReply,
+  hasAnalyticsData,
+} from "../utils/format-chat-reply";
+import { buildNoDataChatReply } from "../utils/chat-no-data-reply";
 import type {
   AIRecommendation,
   RecommendationCategory,
@@ -26,6 +31,30 @@ You provide specific, actionable marketing recommendations — not generic advic
 Always respond in valid JSON when asked for structured output.
 Be direct, data-driven, and prioritize high-impact actions.
 Respond in the same language as the user's question (Hebrew or English).`;
+
+const CHAT_SYSTEM_PROMPT = `You are a friendly marketing assistant for a Shopify store owner.
+You speak simple, clear Hebrew (unless the user writes in English).
+Rules for every reply:
+- Plain text only. NO markdown: no # headers, no **bold**, no \`\`\` code blocks, no --- lines.
+- NO emojis.
+- NO English jargon: say "מעקב" not tracking, "ביקורים" not sessions, "מבקרים" not visitors.
+- Short paragraphs. Use numbered steps (1. 2. 3.) or bullet lines starting with • when listing.
+- Be direct and practical, like talking to a shop owner who is not technical.
+- If store data shows zero visitors, explain that tracking must be enabled first and give concrete steps from the app home page (App embed "מעקב Solution", tracking ID).
+- Never invent numbers. If data is missing, say so honestly and guide setup.
+- Keep answers under 12 lines unless the user asks for detail.`;
+
+function isSetupQuestion(message: string): boolean {
+  return /מעקב|הפעל|התק|מתחיל|setup|install|איך|עוזר|הורא|embed|עיצוב/i.test(
+    message,
+  );
+}
+
+function needsStoreData(message: string): boolean {
+  return /מכיר|ירד|על|תנוע|מוצר|קהל|המר|כסף|ביצוע|פרסום|analytics|traffic|conversion|revenue|sales/i.test(
+    message,
+  );
+}
 
 function getAnthropicClient(): Anthropic {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -220,6 +249,13 @@ export async function chatWithAI(
 ): Promise<{ conversationId: string; reply: string }> {
   const supabase = getSupabase();
   const analyticsSummary = await prepareAnalyticsSummary(shopId);
+  const hasData = hasAnalyticsData(analyticsSummary);
+
+  const { data: shop } = await supabase
+    .from("shops")
+    .select("*")
+    .eq("id", shopId)
+    .single();
 
   let convId = conversationId;
   if (!convId) {
@@ -240,21 +276,45 @@ export async function chatWithAI(
     content: userMessage,
   });
 
-  const { data: history } = await supabase
-    .from("chat_messages")
-    .select("role, content")
-    .eq("conversation_id", convId)
-    .order("created_at", { ascending: true })
-    .limit(20);
+  let reply: string;
 
-  const contextPrompt = `Store data context:
+  if (!hasData && shop && needsStoreData(userMessage) && !isSetupQuestion(userMessage)) {
+    reply = buildNoDataChatReply(shop);
+  } else {
+    const { data: history } = await supabase
+      .from("chat_messages")
+      .select("role, content")
+      .eq("conversation_id", convId)
+      .order("created_at", { ascending: true })
+      .limit(20);
+
+    const dataNote = hasData
+      ? "Store has analytics data — use the numbers below."
+      : "Store has NO analytics data yet (all zeros). Do not analyze sales or traffic. Guide setup or answer setup questions only.";
+
+    const trackingNote = shop
+      ? `Tracking ID for this shop: ${shop.tracking_id}`
+      : "";
+
+    const contextPrompt = `${dataNote}
+${trackingNote}
+
+Store data:
 ${analyticsSummary}
+
+Recent chat:
+${(history ?? [])
+  .slice(-6)
+  .map((m) => `${m.role}: ${m.content}`)
+  .join("\n")}
 
 User question: ${userMessage}
 
-Answer based on the actual store data above. Be specific with numbers and actionable advice.`;
+Answer in plain Hebrew. No markdown. No emojis.`;
 
-  const reply = await callClaude(MARKETING_MANAGER_SYSTEM_PROMPT, contextPrompt);
+    const rawReply = await callClaude(CHAT_SYSTEM_PROMPT, contextPrompt, 1200);
+    reply = formatChatReply(rawReply);
+  }
 
   await supabase.from("chat_messages").insert({
     conversation_id: convId,

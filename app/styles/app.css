@@ -316,6 +316,18 @@
   margin-bottom: 4px;
 }
 
+.ms-chat-body {
+  line-height: 1.55;
+}
+
+.ms-chat-paragraph {
+  margin: 0 0 10px;
+}
+
+.ms-chat-paragraph:last-child {
+  margin-bottom: 0;
+}
+
 .ms-input-row {
   display: flex;
   gap: 8px;

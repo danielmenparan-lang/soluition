@@ -13,15 +13,21 @@ import { useFetcherToast } from "../hooks/useFetcherToast";
 import { PageHero } from "../components/ui/PageHero";
 import { HelpPanel } from "../components/ui/HelpPanel";
 import { ChatNotice } from "../components/ui/ChatNotice";
+import { ChatMessageBody } from "../components/ui/ChatMessageBody";
 import { PAGE_HELP } from "../config/page-help";
 import { getOrCreateShop } from "../services/shop.server";
 import { chatWithAI, getChatConversations } from "../services/ai.server";
+import { getDashboardMetrics } from "../services/analytics.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
-  const conversations = await getChatConversations(shop.id).catch(() => []);
-  return { conversations };
+  const [conversations, metrics] = await Promise.all([
+    getChatConversations(shop.id).catch(() => []),
+    getDashboardMetrics(shop.id).catch(() => null),
+  ]);
+  const hasData = Boolean(metrics && metrics.totalVisitors > 0);
+  return { conversations, hasData };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -60,16 +66,22 @@ export function shouldRevalidate({
   return defaultShouldRevalidate;
 }
 
-const SUGGESTED_QUESTIONS = [
+const SUGGESTED_WITH_DATA = [
   "למה המכירות ירדו?",
   "איזה מוצר לפרסם השבוע?",
-  "איזה קהל הכי רווחי?",
+  "מאיפה מגיעים הקונים?",
   "איפה אני מפסיד כסף?",
-  "איך להגדיל המרות?",
+];
+
+const SUGGESTED_NO_DATA = [
+  "איך מפעילים מעקב?",
+  "למה אין נתונים?",
+  "מה לעשות קודם?",
+  "איך מתחילים?",
 ];
 
 export default function Chat() {
-  const { conversations } = useLoaderData<typeof loader>();
+  const { conversations, hasData } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
   const { Form, actionUrl } = fetcher;
   const [messages, setMessages] = useState<
@@ -83,6 +95,7 @@ export default function Chat() {
 
   useFetcherToast(fetcher);
   const help = PAGE_HELP.chat;
+  const suggestedQuestions = hasData ? SUGGESTED_WITH_DATA : SUGGESTED_NO_DATA;
 
   useEffect(() => {
     if (fetcher.state !== "idle") return;
@@ -134,9 +147,9 @@ export default function Chat() {
       <ChatNotice variant="owner" />
       <ChatNotice variant="not-for-customers" />
 
-      <s-section heading="רוצה להתחיל? לחץ על שאלה">
+      <s-section heading={hasData ? "שאלות לדוגמה" : "עדיין אין נתונים? התחל כאן"}>
         <div className="ms-link-row">
-          {SUGGESTED_QUESTIONS.map((q) => (
+          {suggestedQuestions.map((q) => (
             <Form
               key={q}
               method="post"
@@ -171,8 +184,9 @@ export default function Chat() {
             <div className="ms-empty" style={{ border: "none", background: "transparent" }}>
               <h3 className="ms-empty-title">שלום!</h3>
               <p className="ms-empty-text">
-                שאל אותי כל דבר על החנות — למה מכירות ירדו, מה לפרסם, איפה
-                מפסידים כסף. אני עונה לפי הנתונים האמיתיים שלך.
+                {hasData
+                  ? "שאל אותי על מכירות, פרסום, מוצרים — אני עונה לפי הנתונים מהחנות."
+                  : "עדיין אין נתונים מהחנות. לחץ «איך מפעילים מעקב?» למטה, או חזור לדף «בית» להפעיל את המעקב."}
               </p>
             </div>
           )}
@@ -184,7 +198,7 @@ export default function Chat() {
               <div className="ms-chat-label">
                 {msg.role === "user" ? "אתה" : "העוזר"}
               </div>
-              {msg.content}
+              <ChatMessageBody content={msg.content} />
             </div>
           ))}
           {fetcher.state !== "idle" && (
