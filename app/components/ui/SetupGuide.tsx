@@ -1,4 +1,5 @@
 import { CopyCodeBlock } from "./CopyCodeBlock";
+import { SectionBlock } from "./SectionBlock";
 import { AppLink } from "../AppLink";
 
 type SetupGuideProps = {
@@ -24,32 +25,24 @@ export function SetupGuide({
   const themeEditorUrl = `https://admin.shopify.com/store/${storeHandle(shopDomain)}/themes/current/editor?context=apps`;
   const storefrontUrl = `https://${shopDomain}`;
 
-  return (
-    <s-section heading="איך מתחילים? — 3 צעדים">
-      <div className="ms-steps">
-        <div className={`ms-step ${hasData ? "ms-step-done" : ""}`}>
-          <div className="ms-step-num">1</div>
-          <div>
-            <s-text type="strong">הפעל מעקב בחנות (הדרך הקלה)</s-text>
-            <s-paragraph>
-              לא צריך לגעת בקוד. עושים את זה מתוך עיצוב החנות:
-            </s-paragraph>
-            <ol className="ms-step-list">
-              <li>
-                לחץ «פתח עיצוב חנות» (נפתח בחלון חדש)
-              </li>
-              <li>
-                בצד שמאל למטה: «App embeds» / «הטמעות אפליקציה»
-              </li>
-              <li>
-                הפעל את «מעקב Solution»
-              </li>
-              <li>
-                בשדה «מזהה מעקב» — הדבק את המזהה שלך (למטה)
-              </li>
-              <li>לחץ «שמור» למעלה</li>
-            </ol>
+  if (hasData && hasRecommendations) {
+    return null;
+  }
 
+  return (
+    <SectionBlock
+      title="התקנה — צעד אחר צעד"
+      subtitle="אל תדלג — בלי זה אין מספרים ואין המלצות"
+    >
+      <div className="ms-timeline">
+        <div className={`ms-timeline-item ${hasData ? "is-done" : "is-active"}`}>
+          <div className="ms-timeline-marker">1</div>
+          <div className="ms-timeline-content">
+            <h3 className="ms-timeline-title">הפעל מעקב בחנות</h3>
+            <p className="ms-timeline-text">
+              לחץ «פתח עיצוב חנות» → App embeds → הפעל «מעקב Solution» →
+              הדבק את המזהה → שמור.
+            </p>
             <a
               href={themeEditorUrl}
               target="_blank"
@@ -58,37 +51,25 @@ export function SetupGuide({
             >
               פתח עיצוב חנות
             </a>
-
-            <CopyCodeBlock
-              code={trackingId}
-              label="מזהה המעקב שלך — העתק והדבק בשדה באפליקציה:"
-            />
-
+            <CopyCodeBlock code={trackingId} label="מזהה המעקב שלך:" />
             <details className="ms-details">
-              <summary>דרך מתקדמת — הדבקה ידנית של קוד</summary>
-              <s-paragraph>
-                רק אם אין לך «App embeds»: חנות מקוון → עיצוב → ערוך קוד →
-                theme.liquid → הדבק לפני {"</head>"}:
-              </s-paragraph>
+              <summary>דרך מתקדמת — הדבקת קוד ידנית</summary>
               <CopyCodeBlock code={script} label="שורת הקוד:" />
             </details>
           </div>
         </div>
 
-        <div className={`ms-step ${hasData ? "ms-step-done" : ""}`}>
-          <div className="ms-step-num">2</div>
-          <div>
-            <s-text type="strong">בקר בחנות פעם אחת</s-text>
-            <s-paragraph>
-              {hasData ? (
-                "מעולה — המעקב עובד והנתונים מתחילים להגיע."
-              ) : (
-                <>
-                  אחרי ששמרת בשלב 1, פתח את החנות כמו לקוח רגיל וגלוש ב-2–3
-                  דפים. כך המערכת יודעת שהמעקב פעיל.
-                </>
-              )}
-            </s-paragraph>
+        <div
+          className={`ms-timeline-item ${hasData ? "is-done" : ""} ${!hasData ? "is-next" : "is-active"}`}
+        >
+          <div className="ms-timeline-marker">2</div>
+          <div className="ms-timeline-content">
+            <h3 className="ms-timeline-title">בקר בחנות פעם אחת</h3>
+            <p className="ms-timeline-text">
+              {hasData
+                ? "מעולה — המעקב עובד."
+                : "פתח את החנות, גלוש ב-2–3 דפים, וחזור לכאן."}
+            </p>
             {!hasData ? (
               <a
                 href={storefrontUrl}
@@ -102,31 +83,28 @@ export function SetupGuide({
           </div>
         </div>
 
-        <div className={`ms-step ${hasRecommendations ? "ms-step-done" : ""}`}>
-          <div className="ms-step-num">3</div>
-          <div>
-            <s-text type="strong">קבל המלצות</s-text>
-            <s-paragraph>
-              {hasRecommendations ? (
-                <>
-                  יש לך המלצות מוכנות. עבור לדף «מה כדאי לעשות» לראות מה לשפר
-                  בחנות.
-                </>
-              ) : (
-                <>
-                  לחץ «קבל המלצות» למעלה. המערכת תבדוק את הנתונים ותגיד לך מה
-                  כדאי לעשות.
-                </>
-              )}
-            </s-paragraph>
+        <div
+          className={`ms-timeline-item ${hasRecommendations ? "is-done" : ""} ${hasData ? "is-active" : "is-next"}`}
+        >
+          <div className="ms-timeline-marker">3</div>
+          <div className="ms-timeline-content">
+            <h3 className="ms-timeline-title">קבל המלצות</h3>
+            <p className="ms-timeline-text">
+              {hasRecommendations
+                ? "יש המלצות מוכנות — עבור ל«מה כדאי לעשות»."
+                : "לחץ «קבל המלצות» למעלה."}
+            </p>
             {hasRecommendations ? (
-              <AppLink to="/app/recommendations" className="ms-btn ms-btn-primary ms-step-action">
+              <AppLink
+                to="/app/recommendations"
+                className="ms-btn ms-btn-primary ms-step-action"
+              >
                 לך להמלצות →
               </AppLink>
             ) : null}
           </div>
         </div>
       </div>
-    </s-section>
+    </SectionBlock>
   );
 }

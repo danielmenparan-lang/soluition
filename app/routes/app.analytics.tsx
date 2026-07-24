@@ -76,8 +76,8 @@ export default function Analytics() {
         <PageHero
           title={help.title}
           subtitle={help.subtitle}
-          tips={help.tips}
           variant="analytics"
+          compact
         />
         <HelpPanel title={help.helpTitle} items={help.helpItems} />
         <s-section>
@@ -95,8 +95,8 @@ export default function Analytics() {
       <PageHero
         title={help.title}
         subtitle={help.subtitle}
-        tips={help.tips}
         variant="analytics"
+        compact
       />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 

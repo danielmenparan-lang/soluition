@@ -48,7 +48,7 @@ export default function App() {
         <AppLink to="/app/chat">שאל את העוזר</AppLink>
       </NavMenu>
       <div className="ms-app-shell">
-        <div className="ms-app-content">
+        <div className="ms-app-content ms-app-container">
           <Outlet context={{ supportEmail }} />
         </div>
         <SupportFooter email={supportEmail} />

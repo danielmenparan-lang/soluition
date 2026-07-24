@@ -61,8 +61,8 @@ export default function Segments() {
       <PageHero
         title={help.title}
         subtitle={help.subtitle}
-        tips={help.tips}
         variant="default"
+        compact
       />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 

@@ -67,8 +67,8 @@ export default function Recommendations() {
       <PageHero
         title={help.title}
         subtitle={help.subtitle}
-        tips={help.tips}
         variant="ai"
+        compact
       />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 

@@ -60,8 +60,8 @@ export default function Reports() {
       <PageHero
         title={help.title}
         subtitle={help.subtitle}
-        tips={help.tips}
         variant="reports"
+        compact
       />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 

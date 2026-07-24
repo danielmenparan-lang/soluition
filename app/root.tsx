@@ -10,7 +10,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="ms-body">
         <Outlet />
         <ScrollRestoration />
         <Scripts />

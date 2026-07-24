@@ -16,8 +16,8 @@ import { SetupGuide } from "../components/ui/SetupGuide";
 import { RecommendationCard } from "../components/ui/RecommendationCard";
 import { EmptyState } from "../components/ui/EmptyState";
 import { PageHero } from "../components/ui/PageHero";
-import { HelpPanel } from "../components/ui/HelpPanel";
-import { PAGE_HELP } from "../config/page-help";
+import { ProductJourney, QuickNav } from "../components/ui/ProductJourney";
+import { SectionBlock } from "../components/ui/SectionBlock";
 import { getOrCreateShop } from "../services/shop.server";
 import { getDashboardMetrics } from "../services/analytics.server";
 import { getRecommendations } from "../services/ai.server";
@@ -93,17 +93,21 @@ export default function Overview() {
   useFetcherToast(fetcher);
 
   const hasData = Boolean(metrics && metrics.totalVisitors > 0);
-  const help = PAGE_HELP.overview;
 
   return (
     <s-page>
       <PageHero
-        title={help.title}
-        subtitle={help.subtitle}
-        tips={help.tips}
+        title="Solution"
+        subtitle="מנהל השיווק החכם שלך — פשוט, ברור, בתוך Shopify."
         variant="default"
+        compact
       />
-      <HelpPanel title={help.helpTitle} items={help.helpItems} />
+
+      <ProductJourney
+        hasTracking={hasData}
+        hasData={hasData}
+        hasRecommendations={recommendationCount > 0}
+      />
 
       <SubmitButton
         fetcher={fetcher}
@@ -114,13 +118,9 @@ export default function Overview() {
       </SubmitButton>
 
       {isGenerating && (
-        <s-section>
-          <s-banner tone="info">
-            <s-paragraph>
-              <span className="ms-loading">בודק את הנתונים ומכין המלצות — זה לוקח כדקה...</span>
-            </s-paragraph>
-          </s-banner>
-        </s-section>
+        <div className="ms-status-banner">
+          <span className="ms-loading">בודק נתונים ומכין המלצות — רגע...</span>
+        </div>
       )}
 
       <SetupGuide
@@ -131,8 +131,8 @@ export default function Overview() {
         hasRecommendations={recommendationCount > 0}
       />
 
-      <s-section heading="המספרים שלך — 30 יום אחרונים">
-        {metrics ? (
+      <SectionBlock title="המספרים שלך" subtitle="30 הימים האחרונים">
+        {metrics && hasData ? (
           <div className="ms-metric-grid">
             <MetricCard label="מבקרים" value={metrics.totalVisitors} accent="brand" hint="אנשים שונים שנכנסו" />
             <MetricCard label="ביקורים" value={metrics.totalSessions} accent="info" hint="כמה פעמים נכנסו לחנות" />
@@ -146,73 +146,60 @@ export default function Overview() {
           </div>
         ) : (
           <EmptyState
-            title="עדיין אין נתונים"
-            description="קודם הדבק את שורת המעקב (למעלה) והיכנס לחנות פעם אחת. תוך דקות המספרים יופיעו כאן."
+            icon="chart"
+            title="עדיין אין מספרים"
+            description="אחרי שתפעיל מעקב ותבקר בחנות — המספרים יופיעו כאן אוטומטית."
           />
         )}
-      </s-section>
+      </SectionBlock>
 
-      <s-section heading="מה אפשר לעשות מכאן">
-        <s-stack direction="inline" gap="base">
-          <SubmitButton fetcher={fetcher} intent="generate_recommendations" variant="primary">
-            {isGenerating ? "מכין..." : "קבל המלצות"}
-          </SubmitButton>
-          <SubmitButton fetcher={fetcher} intent="refresh_segments" variant="secondary">
-            עדכן קבוצות
-          </SubmitButton>
-          <SubmitButton fetcher={fetcher} intent="generate_report" variant="secondary">
-            סיכום שבועי
-          </SubmitButton>
-        </s-stack>
-        <div className="ms-link-row">
-          <AppLink to="/app/analytics">→ מה קורה בחנות</AppLink>
-          <AppLink to="/app/recommendations">→ מה כדאי לעשות</AppLink>
-          <AppLink to="/app/chat">→ שאל את העוזר</AppLink>
-        </div>
-      </s-section>
+      <SectionBlock title="לאן ממשיכים?" subtitle="בחר מה שמתאים לך עכשיו">
+        <QuickNav />
+      </SectionBlock>
 
-      <s-section heading="המלצות אחרונות">
-        {recommendations.length > 0 ? (
-          <s-stack direction="block" gap="base">
-            {recommendations.map((rec) => (
-              <RecommendationCard key={rec.id} rec={rec} />
-            ))}
-            {recommendationCount > 3 ? (
-              <AppLink to="/app/recommendations">
-                צפה בכל {recommendationCount} ההמלצות →
-              </AppLink>
-            ) : null}
-          </s-stack>
-        ) : (
-          <EmptyState
-            title="עדיין אין המלצות"
-            description="לחץ «קבל המלצות» למעלה — המערכת תבדוק את הנתונים ותגיד לך מה כדאי לעשות."
-            action={
-              <SubmitButton fetcher={fetcher} intent="generate_recommendations">
-                {isGenerating ? "מכין..." : "קבל המלצות עכשיו"}
-              </SubmitButton>
-            }
-          />
-        )}
-      </s-section>
+      {(recommendationCount > 0 || !hasData) && (
+        <SectionBlock title="המלצות אחרונות">
+          {recommendations.length > 0 ? (
+            <div className="ms-stack">
+              {recommendations.map((rec) => (
+                <RecommendationCard key={rec.id} rec={rec} />
+              ))}
+              {recommendationCount > 3 ? (
+                <AppLink to="/app/recommendations" className="ms-text-link">
+                  צפה בכל {recommendationCount} ההמלצות →
+                </AppLink>
+              ) : null}
+            </div>
+          ) : (
+            <EmptyState
+              icon="spark"
+              title="עדיין אין המלצות"
+              description="לחץ «קבל המלצות» למעלה כשיהיו נתונים."
+              action={
+                <SubmitButton fetcher={fetcher} intent="generate_recommendations">
+                  {isGenerating ? "מכין..." : "קבל המלצות"}
+                </SubmitButton>
+              }
+            />
+          )}
+        </SectionBlock>
+      )}
 
       {segments.length > 0 && (
-        <s-section heading="קבוצות גדולות">
+        <SectionBlock title="קבוצות גדולות" subtitle="לפי מקור תנועה ומכשיר">
           <div className="ms-metric-grid">
             {segments.map((seg) => (
-              <div key={seg.id} className="ms-card">
+              <div key={seg.id} className="ms-card ms-card-soft">
                 <s-text type="strong">{seg.name}</s-text>
-                <div className="ms-metric-value" style={{ fontSize: 22 }}>
-                  {seg.member_count}
-                </div>
+                <div className="ms-metric-value">{seg.member_count}</div>
                 <s-text color="subdued">אנשים בקבוצה</s-text>
               </div>
             ))}
           </div>
-          <div className="ms-link-row">
-            <AppLink to="/app/segments">→ כל הקבוצות</AppLink>
-          </div>
-        </s-section>
+          <AppLink to="/app/segments" className="ms-text-link">
+            → כל הקבוצות
+          </AppLink>
+        </SectionBlock>
       )}
     </s-page>
   );
