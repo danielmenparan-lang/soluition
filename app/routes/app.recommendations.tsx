@@ -59,7 +59,7 @@ export default function Recommendations() {
       acc[cat].push(rec);
       return acc;
     },
-    {} as Record<string, typeof recommendations>,
+    {} as Record<string, (typeof recommendations)[number][]>,
   );
 
   return (

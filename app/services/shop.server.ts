@@ -38,7 +38,7 @@ export async function getShopByDomain(shopDomain: string): Promise<Shop | null> 
     .from("shops")
     .select("*")
     .eq("shop_domain", shopDomain)
-    .single();
+    .maybeSingle();
   return data;
 }
 
@@ -50,6 +50,6 @@ export async function getShopByTrackingId(
     .from("shops")
     .select("*")
     .eq("tracking_id", trackingId)
-    .single();
+    .maybeSingle();
   return data;
 }

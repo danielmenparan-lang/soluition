@@ -32,29 +32,27 @@ export function SubmitButton({
 
   if (slot) {
     return (
-      <>
-        <Form id={formId} method="post" action={actionUrl} style={{ display: "none" }}>
-          {intent ? <input type="hidden" name="intent" value={intent} /> : null}
-          {fields
-            ? Object.entries(fields).map(([name, value]) => (
-                <input key={name} type="hidden" name={name} value={value} />
-              ))
-            : null}
-        </Form>
+      <Form
+        slot={slot}
+        id={formId}
+        method="post"
+        action={actionUrl}
+        style={{ display: "inline" }}
+      >
+        {intent ? <input type="hidden" name="intent" value={intent} /> : null}
+        {fields
+          ? Object.entries(fields).map(([name, value]) => (
+              <input key={name} type="hidden" name={name} value={value} />
+            ))
+          : null}
         <s-button
-          slot={slot}
           variant={variant === "secondary" ? "secondary" : "primary"}
+          type="submit"
           disabled={disabled || undefined}
-          {...({
-            onClick: () => {
-              const form = document.getElementById(formId) as HTMLFormElement | null;
-              form?.requestSubmit();
-            },
-          } as Record<string, unknown>)}
         >
           {children}
         </s-button>
-      </>
+      </Form>
     );
   }
 
@@ -71,7 +69,6 @@ export function SubmitButton({
       <button
         type="submit"
         form={formId}
-        slot={slot}
         disabled={disabled}
         className={className}
       >

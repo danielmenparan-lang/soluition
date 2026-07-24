@@ -33,7 +33,7 @@ export async function resolveCountryFromRequest(
 
   try {
     const response = await fetch(
-      `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=countryCode`,
+      `https://ip-api.com/json/${encodeURIComponent(ip)}?fields=countryCode`,
       { signal: AbortSignal.timeout(2500) },
     );
     if (!response.ok) return null;

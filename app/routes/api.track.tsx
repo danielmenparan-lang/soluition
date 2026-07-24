@@ -38,13 +38,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   try {
     const payload = await parseTrackPayload(request);
-    const country =
-      typeof payload === "object" &&
-      payload !== null &&
-      "country" in payload &&
-      typeof payload.country === "string"
-        ? payload.country
-        : await resolveCountryFromRequest(request);
+    const country = await resolveCountryFromRequest(request);
 
     const result = await processTrackEvent(payload, { country: country ?? undefined });
 

@@ -252,12 +252,21 @@ async function saveRecommendations(
   }
 
   const newIds = data.map((row) => row.id);
-  await supabase
-    .from("ai_recommendations")
-    .update({ status: "dismissed" })
-    .eq("shop_id", shopId)
-    .eq("status", "active")
-    .not("id", "in", `(${newIds.join(",")})`);
+  if (newIds.length > 0) {
+    const { error: dismissError } = await supabase
+      .from("ai_recommendations")
+      .update({ status: "dismissed" })
+      .eq("shop_id", shopId)
+      .eq("status", "active")
+      .not("id", "in", `(${newIds.map((id) => `"${id}"`).join(",")})`);
+
+    if (dismissError) {
+      console.error(
+        "[ai] Failed to dismiss old recommendations:",
+        dismissError.message,
+      );
+    }
+  }
 
   return data;
 }
@@ -325,7 +334,18 @@ export async function chatWithAI(
     .single();
 
   let convId = conversationId;
-  if (!convId) {
+  if (convId) {
+    const { data: ownedConversation } = await supabase
+      .from("chat_conversations")
+      .select("id")
+      .eq("id", convId)
+      .eq("shop_id", shopId)
+      .maybeSingle();
+
+    if (!ownedConversation) {
+      throw new Error("Invalid conversation");
+    }
+  } else {
     const { data: conv, error: convError } = await supabase
       .from("chat_conversations")
       .insert({ shop_id: shopId, title: userMessage.slice(0, 80) })

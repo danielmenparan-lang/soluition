@@ -11,9 +11,25 @@ automatically_update_urls_on_dev = false
 [webhooks]
 api_version = "2026-10"
 
+  [[webhooks.subscriptions]]
+  topics = ["app/uninstalled"]
+  uri = "/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = ["app/scopes_update"]
+  uri = "/webhooks/app/scopes_update"
+
+  [[webhooks.subscriptions]]
+  topics = ["orders/create"]
+  uri = "/webhooks/orders/create"
+
+  [[webhooks.subscriptions]]
+  compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
+  uri = "/webhooks/compliance"
+
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_analytics,read_content,read_customers,read_orders,read_products,write_script_tags"
+scopes = "read_analytics,read_content,read_orders,read_products"
 
 [auth]
 redirect_urls = [

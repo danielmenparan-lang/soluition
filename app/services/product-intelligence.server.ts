@@ -146,7 +146,16 @@ export async function getProductExitDrivers(
       .in("event_type", ["product_view", "session_end", "purchase"])
       .order("created_at", { ascending: true });
 
-    const bySession = new Map<string, typeof events>();
+    const bySession = new Map<
+      string,
+      Array<{
+        session_uuid: string;
+        event_type: string;
+        product_id: string | null;
+        product_title: string | null;
+        created_at: string;
+      }>
+    >();
     for (const event of events ?? []) {
       const list = bySession.get(event.session_uuid) ?? [];
       list.push(event);

@@ -28,7 +28,12 @@ export function AutoGenerateRecommendations({
   useEffect(() => {
     if (fetcher.state !== "idle") return;
 
-    if (fetcher.data && "success" in fetcher.data && fetcher.data.success === false) {
+    if (
+      fetcher.data &&
+      typeof fetcher.data === "object" &&
+      "success" in fetcher.data &&
+      fetcher.data.success === false
+    ) {
       attemptedRef.current = false;
       clearAutoGenerateLock(shopId);
     }
