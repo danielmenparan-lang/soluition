@@ -1,9 +1,15 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { useShopifyFetcher } from "../hooks/useShopifyFetcher";
+import {
+  clearAutoGenerateLock,
+  isAutoGenerateLocked,
+  setAutoGenerateLock,
+} from "../utils/auto-generate-lock";
 
 type ShopifyFetcher = ReturnType<typeof useShopifyFetcher>;
 
 type AutoGenerateRecommendationsProps = {
+  shopId: string;
   fetcher: ShopifyFetcher;
   hasRecommendations: boolean;
   enabled?: boolean;
@@ -11,21 +17,39 @@ type AutoGenerateRecommendationsProps = {
 };
 
 export function AutoGenerateRecommendations({
+  shopId,
   fetcher,
   hasRecommendations,
   enabled = true,
   intent,
 }: AutoGenerateRecommendationsProps) {
-  const started = useRef(false);
+  const attemptedRef = useRef(false);
 
   useEffect(() => {
-    if (!enabled || hasRecommendations || started.current || fetcher.state !== "idle") {
-      return;
-    }
+    if (fetcher.state !== "idle") return;
 
-    started.current = true;
+    if (fetcher.data && "success" in fetcher.data && fetcher.data.success === false) {
+      attemptedRef.current = false;
+      clearAutoGenerateLock(shopId);
+    }
+  }, [fetcher.state, fetcher.data, shopId]);
+
+  useEffect(() => {
+    if (!enabled || hasRecommendations || attemptedRef.current) return;
+    if (fetcher.state !== "idle") return;
+    if (isAutoGenerateLocked(shopId)) return;
+
+    attemptedRef.current = true;
+    setAutoGenerateLock(shopId);
     fetcher.submit(intent ? { intent } : {}, { method: "POST" });
-  }, [enabled, hasRecommendations, fetcher, intent]);
+  }, [
+    enabled,
+    hasRecommendations,
+    shopId,
+    intent,
+    fetcher.state,
+    fetcher.submit,
+  ]);
 
   return null;
 }

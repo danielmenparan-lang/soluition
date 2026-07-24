@@ -236,15 +236,15 @@
 }
 
 .ms-chat-user {
-  margin-right: auto;
-  margin-left: 0;
+  margin-inline-end: auto;
+  margin-inline-start: 0;
   background: #fff;
   border: 1px solid var(--ms-border);
 }
 
 .ms-chat-ai {
-  margin-left: auto;
-  margin-right: 0;
+  margin-inline-start: auto;
+  margin-inline-end: 0;
   background: var(--ms-ai-light);
   border: 1px solid #c4c9ef;
 }

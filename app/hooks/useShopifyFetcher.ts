@@ -5,7 +5,7 @@ import {
   useSearchParams,
   type FetcherSubmitOptions,
 } from "react-router";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 type SubmitTarget = Parameters<ReturnType<typeof useFetcher>["submit"]>[0];
 
@@ -39,25 +39,37 @@ export function useShopifyFetcher<T>() {
   const matches = useMatches();
 
   const actionUrl = useMemo(
-    () => buildActionUrl(location.pathname, searchParams, matches, location.pathname),
+    () =>
+      buildActionUrl(
+        location.pathname,
+        searchParams,
+        matches,
+        location.pathname,
+      ),
     [location.pathname, searchParams, matches],
   );
 
-  const submit = (target: SubmitTarget, options?: FetcherSubmitOptions) => {
-    const actionPath =
-      typeof options?.action === "string"
-        ? options.action.split("?")[0]
-        : location.pathname;
+  const submit = useCallback(
+    (target: SubmitTarget, options?: FetcherSubmitOptions) => {
+      const actionPath =
+        typeof options?.action === "string"
+          ? options.action.split("?")[0]
+          : location.pathname;
 
-    const action = buildActionUrl(
-      location.pathname,
-      searchParams,
-      matches,
-      actionPath,
-    );
+      const action = buildActionUrl(
+        location.pathname,
+        searchParams,
+        matches,
+        actionPath,
+      );
 
-    fetcher.submit(target, { ...options, action });
-  };
+      fetcher.submit(target, { ...options, action });
+    },
+    [fetcher, location.pathname, searchParams, matches],
+  );
 
-  return { ...fetcher, submit, actionUrl, Form: fetcher.Form };
+  return useMemo(
+    () => ({ ...fetcher, submit, actionUrl, Form: fetcher.Form }),
+    [fetcher, submit, actionUrl],
+  );
 }

@@ -1,4 +1,5 @@
 import { CATEGORY_LABELS, PRIORITY_LABELS, priorityClass } from "./labels";
+import { asStringArray } from "../../utils/safe-json";
 import type { AIRecommendation } from "../../types/database.types";
 
 export function RecommendationCard({ rec }: { rec: AIRecommendation }) {
@@ -18,13 +19,16 @@ export function RecommendationCard({ rec }: { rec: AIRecommendation }) {
         {rec.expected_impact ? (
           <s-text color="subdued">השפעה צפויה: {rec.expected_impact}</s-text>
         ) : null}
-        {Array.isArray(rec.action_items) && rec.action_items.length > 0 ? (
-          <s-unordered-list>
-            {(rec.action_items as string[]).map((item, i) => (
-              <s-list-item key={i}>{item}</s-list-item>
-            ))}
-          </s-unordered-list>
-        ) : null}
+        {(() => {
+          const items = asStringArray(rec.action_items);
+          return items.length > 0 ? (
+            <s-unordered-list>
+              {items.map((item, i) => (
+                <s-list-item key={i}>{item}</s-list-item>
+              ))}
+            </s-unordered-list>
+          ) : null;
+        })()}
       </s-stack>
     </div>
   );

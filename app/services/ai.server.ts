@@ -127,12 +127,9 @@ Return JSON array:
   const response = await callClaude(MARKETING_MANAGER_SYSTEM_PROMPT, prompt);
   const recommendations = parseJsonResponse<GeneratedRecommendation[]>(response);
 
-  // Clear old active recommendations
-  await supabase
-    .from("ai_recommendations")
-    .update({ status: "dismissed" })
-    .eq("shop_id", shopId)
-    .eq("status", "active");
+  if (!Array.isArray(recommendations) || recommendations.length === 0) {
+    throw new Error("Claude returned no recommendations");
+  }
 
   const inserts = recommendations.map((rec) => ({
     shop_id: shopId,
@@ -145,12 +142,28 @@ Return JSON array:
     status: "active" as const,
   }));
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("ai_recommendations")
     .insert(inserts)
     .select("*");
 
-  return data ?? [];
+  if (error) {
+    throw new Error(`Failed to save recommendations: ${error.message}`);
+  }
+
+  if (!data?.length) {
+    throw new Error("Recommendations were not saved to the database");
+  }
+
+  const newIds = data.map((row) => row.id);
+  await supabase
+    .from("ai_recommendations")
+    .update({ status: "dismissed" })
+    .eq("shop_id", shopId)
+    .eq("status", "active")
+    .not("id", "in", `(${newIds.join(",")})`);
+
+  return data;
 }
 
 export async function generateWeeklyReport(

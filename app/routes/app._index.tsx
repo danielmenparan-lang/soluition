@@ -5,13 +5,11 @@ import type {
   ShouldRevalidateFunctionArgs,
 } from "react-router";
 import { useLoaderData } from "react-router";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
+import { useFetcherToast } from "../hooks/useFetcherToast";
 import { SubmitButton } from "../components/SubmitButton";
-import { AutoGenerateRecommendations } from "../components/AutoGenerateRecommendations";
 import { AppLink } from "../components/AppLink";
 import { MetricCard } from "../components/ui/MetricCard";
 import { SetupGuide } from "../components/ui/SetupGuide";
@@ -43,7 +41,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     recommendations: recommendations.slice(0, 3),
     recommendationCount: recommendations.length,
     segments: segments.slice(0, 3),
-    trackingScriptUrl: `${process.env.SHOPIFY_APP_URL}/tracker.js`,
+    trackingScriptUrl: process.env.SHOPIFY_APP_URL
+      ? `${process.env.SHOPIFY_APP_URL}/tracker.js`
+      : "/tracker.js",
   };
 };
 
@@ -85,23 +85,14 @@ export default function Overview() {
     trackingScriptUrl,
   } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
-  const shopify = useAppBridge();
-  const hasData = Boolean(metrics && metrics.totalVisitors > 0);
   const isGenerating = fetcher.state !== "idle";
 
-  useEffect(() => {
-    if (fetcher.data?.message) {
-      shopify.toast.show(fetcher.data.message);
-    }
-  }, [fetcher.data, shopify]);
+  useFetcherToast(fetcher);
+
+  const hasData = Boolean(metrics && metrics.totalVisitors > 0);
 
   return (
     <s-page heading="Solution — מנהל השיווק החכם">
-      <AutoGenerateRecommendations
-        fetcher={fetcher}
-        hasRecommendations={recommendationCount > 0}
-        intent="generate_recommendations"
-      />
       <SubmitButton
         fetcher={fetcher}
         slot="primary-action"

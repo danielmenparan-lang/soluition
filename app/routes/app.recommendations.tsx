@@ -5,11 +5,10 @@ import type {
   ShouldRevalidateFunctionArgs,
 } from "react-router";
 import { useLoaderData } from "react-router";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
+import { useFetcherToast } from "../hooks/useFetcherToast";
 import { SubmitButton } from "../components/SubmitButton";
 import { AutoGenerateRecommendations } from "../components/AutoGenerateRecommendations";
 import { RecommendationCard } from "../components/ui/RecommendationCard";
@@ -24,8 +23,8 @@ import {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
-  const recommendations = await getRecommendations(shop.id);
-  return { recommendations };
+  const recommendations = await getRecommendations(shop.id).catch(() => []);
+  return { shop, recommendations };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -43,18 +42,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Recommendations() {
-  const { recommendations } = useLoaderData<typeof loader>();
+  const { shop, recommendations } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
-  const shopify = useAppBridge();
   const isGenerating = fetcher.state !== "idle";
 
-  useEffect(() => {
-    if (fetcher.data?.message) {
-      shopify.toast.show(fetcher.data.message);
-    } else if (fetcher.data?.success) {
-      shopify.toast.show("המלצות חדשות נוצרו");
-    }
-  }, [fetcher.data, shopify]);
+  useFetcherToast(fetcher);
 
   const grouped = recommendations.reduce(
     (acc, rec) => {
@@ -69,6 +61,7 @@ export default function Recommendations() {
   return (
     <s-page heading="המלצות AI">
       <AutoGenerateRecommendations
+        shopId={shop.id}
         fetcher={fetcher}
         hasRecommendations={recommendations.length > 0}
       />

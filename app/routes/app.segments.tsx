@@ -4,11 +4,10 @@ import type {
   LoaderFunctionArgs,
 } from "react-router";
 import { useLoaderData } from "react-router";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
+import { useFetcherToast } from "../hooks/useFetcherToast";
 import { SubmitButton } from "../components/SubmitButton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { getOrCreateShop } from "../services/shop.server";
@@ -23,8 +22,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const shop = await getOrCreateShop(session.shop);
 
   const [segments, breakdown] = await Promise.all([
-    getSegments(shop.id),
-    getSegmentBreakdown(shop.id),
+    getSegments(shop.id).catch(() => []),
+    getSegmentBreakdown(shop.id).catch(() => ({
+      byTrafficSource: [],
+      byCountry: [],
+      byDevice: [],
+    })),
   ]);
 
   return { segments, breakdown };
@@ -36,7 +39,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   try {
     await refreshSegments(shop.id);
-    return { success: true };
+    return { success: true, message: "קהלים עודכנו בהצלחה" };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "רענון קהלים נכשל";
@@ -47,15 +50,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function Segments() {
   const { segments, breakdown } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
-  const shopify = useAppBridge();
-
-  useEffect(() => {
-    if (fetcher.data?.success) {
-      shopify.toast.show("קהלים עודכנו בהצלחה");
-    } else if (fetcher.data?.message) {
-      shopify.toast.show(fetcher.data.message);
-    }
-  }, [fetcher.data, shopify]);
+  useFetcherToast(fetcher);
 
   return (
     <s-page heading="קהלים">

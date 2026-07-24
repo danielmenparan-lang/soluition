@@ -1,0 +1,5 @@
+Solution — your AI marketing manager inside Shopify Admin.
+
+The app tracks store visitors and purchases, analyzes performance with Claude AI, and delivers actionable recommendations, audience segments, and weekly reports — all embedded in your Shopify dashboard.
+
+One-line tracking setup. Real data. Clear next steps for growth.

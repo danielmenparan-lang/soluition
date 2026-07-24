@@ -4,13 +4,13 @@ import type {
   LoaderFunctionArgs,
 } from "react-router";
 import { useLoaderData } from "react-router";
-import { useAppBridge } from "@shopify/app-bridge-react";
-import { useEffect } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
+import { useFetcherToast } from "../hooks/useFetcherToast";
 import { SubmitButton } from "../components/SubmitButton";
 import { EmptyState } from "../components/ui/EmptyState";
+import { asActionItems, asStringArray } from "../utils/safe-json";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   generateWeeklyReport,
@@ -20,7 +20,7 @@ import {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
-  const reports = await getWeeklyReports(shop.id);
+  const reports = await getWeeklyReports(shop.id).catch(() => []);
   return { reports };
 };
 
@@ -41,17 +41,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function Reports() {
   const { reports } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
-  const shopify = useAppBridge();
   const latest = reports[0];
   const isGenerating = fetcher.state !== "idle";
 
-  useEffect(() => {
-    if (fetcher.data?.message) {
-      shopify.toast.show(fetcher.data.message);
-    } else if (fetcher.data?.success) {
-      shopify.toast.show("דוח שבועי נוצר בהצלחה");
-    }
-  }, [fetcher.data, shopify]);
+  useFetcherToast(fetcher);
+
+  const insights = latest ? asStringArray(latest.insights) : [];
+  const topActions = latest ? asActionItems(latest.top_actions) : [];
+  const growthOpportunities = latest ? asStringArray(latest.growth_opportunities) : [];
+  const wastePoints = latest ? asStringArray(latest.waste_points) : [];
 
   return (
     <s-page heading="דוחות שבועיים">
@@ -87,40 +85,54 @@ export default function Reports() {
           </s-section>
 
           <s-section heading="תובנות מרכזיות">
-            <s-unordered-list>
-              {(latest.insights as string[]).map((insight, i) => (
-                <s-list-item key={i}>{insight}</s-list-item>
-              ))}
-            </s-unordered-list>
+            {insights.length > 0 ? (
+              <s-unordered-list>
+                {insights.map((insight, i) => (
+                  <s-list-item key={i}>{insight}</s-list-item>
+                ))}
+              </s-unordered-list>
+            ) : (
+              <s-paragraph>אין תובנות בדוח זה.</s-paragraph>
+            )}
           </s-section>
 
           <s-section heading="פעולות עם Impact גבוה">
-            <s-stack direction="block" gap="base">
-              {(latest.top_actions as Array<{ action: string; impact: string }>).map(
-                (item, i) => (
+            {topActions.length > 0 ? (
+              <s-stack direction="block" gap="base">
+                {topActions.map((item, i) => (
                   <div key={i} className="ms-card">
                     <s-text type="strong">{item.action}</s-text>
                     <s-paragraph>השפעה: {item.impact}</s-paragraph>
                   </div>
-                ),
-              )}
-            </s-stack>
+                ))}
+              </s-stack>
+            ) : (
+              <s-paragraph>אין פעולות מומלצות בדוח זה.</s-paragraph>
+            )}
           </s-section>
 
           <s-section heading="הזדמנויות צמיחה">
-            <s-unordered-list>
-              {(latest.growth_opportunities as string[]).map((opp, i) => (
-                <s-list-item key={i}>{opp}</s-list-item>
-              ))}
-            </s-unordered-list>
+            {growthOpportunities.length > 0 ? (
+              <s-unordered-list>
+                {growthOpportunities.map((opp, i) => (
+                  <s-list-item key={i}>{opp}</s-list-item>
+                ))}
+              </s-unordered-list>
+            ) : (
+              <s-paragraph>אין הזדמנויות צמיחה בדוח זה.</s-paragraph>
+            )}
           </s-section>
 
           <s-section heading="נקודות בזבוז כסף">
-            <s-unordered-list>
-              {(latest.waste_points as string[]).map((point, i) => (
-                <s-list-item key={i}>{point}</s-list-item>
-              ))}
-            </s-unordered-list>
+            {wastePoints.length > 0 ? (
+              <s-unordered-list>
+                {wastePoints.map((point, i) => (
+                  <s-list-item key={i}>{point}</s-list-item>
+                ))}
+              </s-unordered-list>
+            ) : (
+              <s-paragraph>אין נקודות בזבוז בדוח זה.</s-paragraph>
+            )}
           </s-section>
         </>
       )}
