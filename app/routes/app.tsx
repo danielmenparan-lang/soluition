@@ -71,7 +71,7 @@ export default function App() {
         </AppLink>
         <AppLink to="/app/recommendations">Recommendations</AppLink>
         <AppLink to="/app/analytics">Analytics</AppLink>
-        <AppLink to="/app/chat">Chat</AppLink>
+        <AppLink to="/app/chat">יועץ</AppLink>
         <AppLink to="/app/segments">Segments</AppLink>
         <AppLink to="/app/reports">Reports</AppLink>
         <AppLink to="/app/billing">Billing</AppLink>

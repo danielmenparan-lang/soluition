@@ -1266,6 +1266,20 @@
   color: var(--ms-text-subdued);
 }
 
+.ms-chat-rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.ms-chat-rtl .ms-input-row {
+  flex-direction: row-reverse;
+}
+
+.ms-chat-rtl .ms-chat-user {
+  margin-left: 0;
+  margin-right: auto;
+}
+
 .ms-empty-chat {
   border: none !important;
   background: transparent !important;

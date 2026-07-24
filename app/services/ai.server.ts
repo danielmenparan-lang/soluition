@@ -21,7 +21,7 @@ import {
   CHAT_SYSTEM_PROMPT,
   chatReplyFormatHint,
   chatStageHint,
-  userWritesHebrew,
+  prefersHebrewReply,
 } from "../config/chat-voice";
 import { prepareChatContext } from "./chat-context.server";
 import { rejectLowValueReply } from "../utils/chat-quality";
@@ -357,7 +357,7 @@ export async function chatWithAI(
   let reply: string;
 
   if (!hasData && shop && isSetupQuestion(userMessage)) {
-    reply = buildNoDataChatReply(shop, userWritesHebrew(userMessage));
+    reply = buildNoDataChatReply(shop, prefersHebrewReply(userMessage));
   } else {
     const { data: history } = await supabase
       .from("chat_messages")
@@ -366,7 +366,7 @@ export async function chatWithAI(
       .order("created_at", { ascending: true })
       .limit(20);
 
-    const hebrew = userWritesHebrew(userMessage);
+    const hebrew = prefersHebrewReply(userMessage);
 
     const contextPrompt = `${chatStageHint(stage, hebrew)}
 
@@ -399,7 +399,7 @@ ${chatReplyFormatHint(userMessage)}`;
 
     if (rejectLowValueReply(reply)) {
       rawReply = await callClaude(
-        `${CHAT_SYSTEM_PROMPT}\n\nRewrite in simpler language. No jargon. No generic social tips.`,
+        `${CHAT_SYSTEM_PROMPT}\n\nכתוב מחדש בעברית פשוטה. בלי ז'argon. בלי טיפים גנריים לרשתות.`,
         contextPrompt,
         1800,
       );

@@ -133,26 +133,26 @@ export const PAGE_HELP: Record<string, PageHelp> = {
     ],
   },
   chat: {
-    title: "Marketing advisor",
-    subtitle: "Plain-language advice — what to fix and what to do next. English or Hebrew.",
+    title: "יועץ שיווק",
+    subtitle: "עצות ברורות בעברית — מה לתקן ומה לעשות הלאה, לפי הנתונים שלך.",
     tips: [
-      "Simple words, no marketing jargon",
-      "Ask in Hebrew or English",
-      "Private to you — customers never see this",
+      "שפה פשוטה, בלי ז'argon שיווקי",
+      "שאל בעברית — התשובה בעברית",
+      "פרטי — לקוחות לא רואים את זה",
     ],
-    helpTitle: "Example prompts",
+    helpTitle: "שאלות לדוגמה",
     helpItems: [
       {
-        label: "Sales",
-        text: "למה אין מכירות? / Why are there no sales?",
+        label: "מכירות",
+        text: "למה אין מכירות?",
       },
       {
-        label: "Traffic",
+        label: "תנועה",
         text: "איך להביא יותר אנשים לחנות?",
       },
       {
-        label: "Fix first",
-        text: "What should I fix first on my store?",
+        label: "תיקון",
+        text: "מה לתקן קודם בחנות?",
       },
     ],
   },
