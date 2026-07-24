@@ -1,18 +1,13 @@
 import type { Shop } from "../types/database.types";
 
 export function buildNoDataChatReply(shop: Shop): string {
-  return `Your store has no visitor data yet, so I cannot cite traffic or sales numbers.
+  return `Summary: No visitor events are recorded for ${shop.shop_domain}, so performance analysis cannot run yet.
 
-What this means:
-• Solution Tracker may not be enabled in your theme yet, or
-• No one has browsed your storefront since you enabled it.
+Analysis: Solution Tracker is either disabled in the theme or the storefront has not received traffic since activation. Without session data, traffic, conversion, and product metrics are unavailable.
 
-Action items:
-1. Open Solution → Home → click Enable Solution Tracker → Save in the theme editor.
-2. Open your storefront in a new tab and browse Home, a product page, and the cart.
-3. Add a clear headline and one strong product image on your homepage today.
-4. Share your store link with 5 people and ask what confused them on the product page.
-5. Add shipping/returns info near the Add to cart button to reduce buyer hesitation.
-
-Optional tracking ID override: ${shop.tracking_id}`;
+Recommended actions:
+1. Solution → Home → enable the Solution Tracker app embed in the live theme and save.
+2. Visit the storefront (home, product, cart) to generate baseline sessions.
+3. Review homepage value proposition and primary product presentation before driving external traffic.
+4. Return after baseline sessions appear in Analytics to receive data-backed recommendations.`;
 }

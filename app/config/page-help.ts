@@ -133,27 +133,27 @@ export const PAGE_HELP: Record<string, PageHelp> = {
     ],
   },
   chat: {
-    title: "Ask the assistant",
+    title: "Store analyst",
     subtitle:
-      "Get clear action steps for your store — what to fix, promote, or improve this week.",
+      "Structured briefs from your tracking data — Summary, Analysis, Recommended actions.",
     tips: [
-      "Every reply ends with numbered action items",
-      "Tap a prompt below to start",
-      "This chat is for you — customers never see it",
+      "Replies use a professional analyst format",
+      "Select a prompt or type your own question",
+      "Private to you — not visible to customers",
     ],
     helpTitle: "Example prompts",
     helpItems: [
       {
-        label: "This week",
-        text: "What should I do this week? — get 3–5 concrete steps.",
+        label: "Conversion",
+        text: "What is limiting conversion right now?",
       },
       {
-        label: "First sales",
-        text: "How can I get my first sales? — priorities for a new store.",
+        label: "Priority",
+        text: "Which metric should I prioritize this week?",
       },
       {
-        label: "Marketing",
-        text: "Where should I focus my marketing? — based on your traffic data.",
+        label: "Traffic",
+        text: "Where is traffic underperforming?",
       },
     ],
   },

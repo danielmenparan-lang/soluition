@@ -102,17 +102,17 @@ export function shouldRevalidate({
 }
 
 const SUGGESTED_WITH_DATA = [
-  "What should I do this week?",
-  "How can I get my first sales?",
-  "What should I fix first on my store?",
-  "Where should I focus my marketing?",
+  "What is limiting conversion right now?",
+  "Which metric should I prioritize this week?",
+  "Where is traffic underperforming?",
+  "What store changes will move revenue fastest?",
 ];
 
 const SUGGESTED_NO_DATA = [
-  "What should I do first?",
-  "How do I get my first visitors?",
-  "What can I improve before I have data?",
-  "How do I enable tracking?",
+  "Why is there no tracking data?",
+  "What should I configure first?",
+  "How do I validate the setup?",
+  "What should I fix before launch?",
 ];
 
 export default function Chat() {
@@ -176,13 +176,13 @@ export default function Chat() {
   };
 
   return (
-    <s-page heading="Chat assistant">
+    <s-page heading="Store analyst">
       <s-section>
         <div className="ms-chat-intro">
-          <h2 className="ms-chat-intro-title">Ask anything about your store</h2>
+          <h2 className="ms-chat-intro-title">Store analyst</h2>
           <p className="ms-chat-intro-text">
-            Solution analyzes your store data and replies with clear action steps —
-            what to fix, promote, or improve this week.
+            Data-backed briefs with Summary, Analysis, and Recommended actions —
+            written for operators, not generic marketing tips.
           </p>
         </div>
       </s-section>
@@ -192,7 +192,7 @@ export default function Chat() {
         <ChatNotice variant="not-for-customers" />
       </s-section>
 
-      <s-section heading={hasData ? "Get action items" : "Start here"}>
+      <s-section heading={hasData ? "Suggested prompts" : "Setup prompts"}>
         <div className="ms-link-row">
           {suggestedQuestions.map((q) => (
             <Form
@@ -230,8 +230,8 @@ export default function Chat() {
               <h3 className="ms-empty-title">Start a conversation</h3>
               <p className="ms-empty-text">
                 {hasData
-                  ? "Ask a question or tap a prompt below — every reply includes action items."
-                  : "No store data yet — ask what to do first, or enable tracking on Home."}
+                  ? "Ask a question or select a prompt — replies follow a structured analyst format."
+                  : "No session data yet — start with a setup prompt or enable tracking on Home."}
               </p>
             </div>
           )}

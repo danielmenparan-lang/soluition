@@ -16,9 +16,9 @@ import {
   formatChatReply,
   hasAnalyticsData,
   isSparseAnalyticsData,
-  stripDeferredAdvice,
 } from "../utils/format-chat-reply";
 import { buildNoDataChatReply } from "../utils/chat-no-data-reply";
+import { CHAT_REPLY_FORMAT_HINT, CHAT_SYSTEM_PROMPT } from "../config/chat-voice";
 import type {
   AIRecommendation,
   RecommendationCategory,
@@ -45,24 +45,6 @@ Rules:
 - When data exists — every recommendation must cite a specific number, product, page, or traffic source from the JSON.
 - action_items: 2–4 concrete steps in Shopify Admin or the store theme.
 - No markdown, no emojis.`;
-
-const CHAT_SYSTEM_PROMPT = `You are a friendly marketing assistant for a Shopify store owner.
-You speak simple, clear English.
-
-Every reply MUST include a section titled "Action items:" with 3–5 numbered steps the merchant can take today or this week in Shopify Admin or their storefront.
-
-Rules for every reply:
-- Plain text only. NO markdown: no # headers, no **bold**, no code blocks.
-- NO emojis.
-- Short paragraphs. Use numbered steps (1. 2. 3.) or bullet lines starting with • when listing.
-- Be direct and practical for a non-technical merchant.
-- Lead with insight, then end with Action items — never reply with setup instructions only.
-- ALWAYS answer the question now. Use current data when available; fill gaps with proven Shopify best practices (homepage clarity, product photos, trust badges, checkout friction, social proof, email capture).
-- If data is sparse (very few visitors): explain what the numbers mean AND give growth actions. Do NOT claim tracking is broken when visitors > 0.
-- If all metrics are zero: give 2 setup steps for Solution Tracker AND 3 store-prep actions they can do immediately.
-- Never invent metrics. Quote numbers from the JSON when available.
-- FORBIDDEN — never write any of these ideas: come back later, check again in a week, wait 24–48 hours, once you have 20–30 visitors, when you have more data, we will analyze later, I cannot help until.
-- Keep the main answer under 10 lines, then Action items.`;
 
 function isSetupQuestion(message: string): boolean {
   return /מעקב|הפעל|התק|מתחיל|setup|install|איך|עוזר|הורא|embed|עיצוב/i.test(
@@ -384,14 +366,12 @@ export async function chatWithAI(
 
     const sparse = hasData && isSparseAnalyticsData(analyticsSummary);
     const dataNote = !hasData
-      ? "Store has NO analytics data yet (all zeros). Give setup steps plus immediate store-prep actions. Still include Action items. Never defer."
+      ? "No analytics data in the payload (zeros). Note the data gap in Analysis. Include tracking setup in Recommended actions if relevant."
       : sparse
-        ? "Store has EARLY data (very few visitors). Tracking appears active. Analyze what you have NOW and give growth-focused Action items. Never tell the merchant to return later or wait for more visitors."
-        : "Store has analytics data — cite specific numbers and give Action items now.";
+        ? "Early-stage dataset — few visitors. Treat as directional, not statistical. Do not question whether tracking works if visitors > 0."
+        : "Sufficient data for analysis — cite specific metrics.";
 
-    const trackingNote = shop
-      ? `Shop domain: ${shop.shop_domain}. Tracking ID (optional override): ${shop.tracking_id}`
-      : "";
+    const trackingNote = shop ? `Shop: ${shop.shop_domain}` : "";
 
     const contextPrompt = `${dataNote}
 ${trackingNote}
@@ -407,10 +387,10 @@ ${(history ?? [])
 
 User question: ${userMessage}
 
-Answer in plain English. Always end with "Action items:" and 3–5 numbered steps. Never defer analysis to a future date or visitor count.`;
+${CHAT_REPLY_FORMAT_HINT}`;
 
     const rawReply = await callClaude(CHAT_SYSTEM_PROMPT, contextPrompt, 1200);
-    reply = stripDeferredAdvice(formatChatReply(rawReply));
+    reply = formatChatReply(rawReply);
   }
 
   await supabase.from("chat_messages").insert({
