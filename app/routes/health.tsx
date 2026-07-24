@@ -2,6 +2,7 @@ import { getShopifyConfigStatus } from "../config/shopify-app.server";
 import {
   checkSupabaseSessionTable,
   getSupabaseKeyRole,
+  getSupabaseProjectMatch,
   isSupabaseSessionStorageConfigured,
 } from "../services/supabase-session-storage.server";
 
@@ -11,6 +12,7 @@ export const loader = async () => {
     ? "supabase"
     : "prisma";
   const supabaseKeyRole = getSupabaseKeyRole();
+  const supabaseProject = getSupabaseProjectMatch();
   const sessionCheck = await checkSupabaseSessionTable();
 
   const sessionReady = sessionCheck.ready;
@@ -42,7 +44,12 @@ export const loader = async () => {
         urlSet: Boolean(process.env.SUPABASE_URL?.trim()),
         keySet: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
         keyRole: supabaseKeyRole,
-        serviceRoleKeyValid: supabaseKeyRole === "service_role",
+        keyType: supabaseProject.keyType,
+        urlProjectRef: supabaseProject.urlProjectRef,
+        keyProjectRef: supabaseProject.keyProjectRef,
+        projectMatch: supabaseProject.projectMatch,
+        serviceRoleKeyValid:
+          supabaseKeyRole === "service_role" || supabaseKeyRole === "secret",
       },
       hints: [
         !shopifyConfig.apiKeyMatchesApp
@@ -51,11 +58,14 @@ export const loader = async () => {
         !shopifyConfig.appUrlMatches
           ? "SHOPIFY_APP_URL must be https://shopify-marketing-solution.onrender.com"
           : null,
-        supabaseKeyRole && supabaseKeyRole !== "service_role"
-          ? "SUPABASE_SERVICE_ROLE_KEY on Render is wrong — must be service_role key from Supabase API settings (not anon)"
+        supabaseProject.projectMatch === false
+          ? `SUPABASE_URL and key are from different projects — URL has ${supabaseProject.urlProjectRef}, key has ${supabaseProject.keyProjectRef}`
+          : null,
+        supabaseKeyRole === "anon"
+          ? "SUPABASE_SERVICE_ROLE_KEY is anon key — use sb_secret_... or service_role from API Keys"
           : null,
         sessionCheck.error?.includes("Invalid API key")
-          ? "Update SUPABASE_SERVICE_ROLE_KEY in Render from Supabase → Project Settings → API → service_role secret"
+          ? "Key rejected by Supabase — use sb_secret_... (2026) from Project Settings → API Keys, not old JWT service_role"
           : null,
         !sessionReady && sessionCheck.error?.includes("WebSocket")
           ? "WebSocket fix deploying — upgrade Node to 22 or wait for next deploy"

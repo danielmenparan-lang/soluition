@@ -180,7 +180,9 @@ export class SupabaseSessionStorage implements SessionStorage {
 
 export function getSupabaseKeyRole(): string | null {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
-  if (!key || key.split(".").length < 2) return null;
+  if (!key) return null;
+  if (key.startsWith("sb_secret_")) return "secret";
+  if (key.split(".").length < 2) return null;
   try {
     const payload = JSON.parse(
       Buffer.from(key.split(".")[1], "base64url").toString("utf8"),
@@ -189,6 +191,56 @@ export function getSupabaseKeyRole(): string | null {
   } catch {
     return null;
   }
+}
+
+export function getSupabaseProjectMatch(): {
+  urlProjectRef: string | null;
+  keyProjectRef: string | null;
+  keyType: "secret" | "jwt" | "unknown";
+  projectMatch: boolean | null;
+} {
+  const url = process.env.SUPABASE_URL?.trim() ?? "";
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
+  const urlProjectRef = url.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] ?? null;
+
+  if (key.startsWith("sb_secret_")) {
+    return {
+      urlProjectRef,
+      keyProjectRef: null,
+      keyType: "secret",
+      projectMatch: urlProjectRef ? true : null,
+    };
+  }
+
+  if (key.split(".").length >= 2) {
+    try {
+      const payload = JSON.parse(
+        Buffer.from(key.split(".")[1], "base64url").toString("utf8"),
+      ) as { ref?: string };
+      const keyProjectRef = payload.ref ?? null;
+      return {
+        urlProjectRef,
+        keyProjectRef,
+        keyType: "jwt",
+        projectMatch:
+          urlProjectRef && keyProjectRef ? urlProjectRef === keyProjectRef : null,
+      };
+    } catch {
+      return {
+        urlProjectRef,
+        keyProjectRef: null,
+        keyType: "unknown",
+        projectMatch: null,
+      };
+    }
+  }
+
+  return {
+    urlProjectRef,
+    keyProjectRef: null,
+    keyType: "unknown",
+    projectMatch: null,
+  };
 }
 
 export async function checkSupabaseSessionTable(): Promise<{
