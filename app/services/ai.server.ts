@@ -399,7 +399,7 @@ ${chatReplyFormatHint(userMessage)}`;
 
     if (rejectLowValueReply(reply)) {
       rawReply = await callClaude(
-        `${CHAT_SYSTEM_PROMPT}\n\nכתוב מחדש בעברית פשוטה. בלי ז'argon. בלי טיפים גנריים לרשתות.`,
+        `${CHAT_SYSTEM_PROMPT}\n\nRewrite in plain professional English. No jargon. No generic social tips.`,
         contextPrompt,
         1800,
       );

@@ -5,17 +5,17 @@ type ChatNoticeProps = {
 export function ChatNotice({ variant }: ChatNoticeProps) {
   if (variant === "not-for-customers") {
     return (
-      <div className="ms-chat-notice ms-chat-notice-info ms-chat-rtl">
-        <strong>שים לב:</strong> הצ'אט הזה בשבילך — בעל החנות. לקוחות לא רואים אותו.
-        האפליקציה לא מציגה צ'אט בחנות עצמה.
+      <div className="ms-chat-notice ms-chat-notice-info">
+        <strong>Note:</strong> This chat is for you — the store owner. Customers never
+        see it. This app does not add a chat widget to your storefront.
       </div>
     );
   }
 
   return (
-    <div className="ms-chat-notice ms-chat-notice-success ms-chat-rtl">
-      <strong>יועץ שיווק זמין.</strong> שאל על מכירות, מוצרים ושיווק.
-      התשובות מבוססות על נתוני המעקב האמיתיים שלך.
+    <div className="ms-chat-notice ms-chat-notice-success">
+      <strong>Marketing advisor ready.</strong> Ask about sales, products, and marketing.
+      Answers use your real tracking data — plain professional English.
     </div>
   );
 }
