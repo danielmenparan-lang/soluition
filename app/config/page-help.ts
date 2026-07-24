@@ -133,27 +133,27 @@ export const PAGE_HELP: Record<string, PageHelp> = {
     ],
   },
   chat: {
-    title: "Store analyst",
+    title: "Growth consultant",
     subtitle:
-      "Structured briefs from your tracking data — Summary, Analysis, Recommended actions.",
+      "CMO-level strategy from your data — even with early traffic, get moves worth paying for.",
     tips: [
-      "Replies use a professional analyst format",
-      "Select a prompt or type your own question",
+      "Strategic diagnosis, not generic social tips",
+      "Works with sparse data — 1 visitor is enough to start",
       "Private to you — not visible to customers",
     ],
     helpTitle: "Example prompts",
     helpItems: [
       {
-        label: "Conversion",
-        text: "What is limiting conversion right now?",
+        label: "Constraint",
+        text: "What is the real constraint on revenue right now?",
       },
       {
-        label: "Priority",
-        text: "Which metric should I prioritize this week?",
+        label: "Plan",
+        text: "Build a 30-day acquisition plan for this data",
       },
       {
-        label: "Traffic",
-        text: "Where is traffic underperforming?",
+        label: "Positioning",
+        text: "How should I position my hero product?",
       },
     ],
   },

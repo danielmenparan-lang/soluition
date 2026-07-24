@@ -102,17 +102,17 @@ export function shouldRevalidate({
 }
 
 const SUGGESTED_WITH_DATA = [
-  "What is limiting conversion right now?",
-  "Which metric should I prioritize this week?",
-  "Where is traffic underperforming?",
-  "What store changes will move revenue fastest?",
+  "What is the real constraint on revenue right now?",
+  "Build a 30-day acquisition plan for this data",
+  "How should I position my hero product?",
+  "Where should my first marketing dollar go?",
 ];
 
 const SUGGESTED_NO_DATA = [
-  "Why is there no tracking data?",
-  "What should I configure first?",
-  "How do I validate the setup?",
-  "What should I fix before launch?",
+  "Pre-launch: what should I fix before driving traffic?",
+  "Define my ICP and first channel",
+  "Why is there no session data?",
+  "Audit my store for conversion readiness",
 ];
 
 export default function Chat() {
@@ -176,13 +176,13 @@ export default function Chat() {
   };
 
   return (
-    <s-page heading="Store analyst">
+    <s-page heading="Growth consultant">
       <s-section>
         <div className="ms-chat-intro">
-          <h2 className="ms-chat-intro-title">Store analyst</h2>
+          <h2 className="ms-chat-intro-title">Growth consultant</h2>
           <p className="ms-chat-intro-text">
-            Data-backed briefs with Summary, Analysis, and Recommended actions —
-            written for operators, not generic marketing tips.
+            Senior-level strategy from your store data — positioning, acquisition,
+            and conversion moves worth paying for. Not generic social tips.
           </p>
         </div>
       </s-section>

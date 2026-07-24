@@ -15,10 +15,15 @@ import { getSegments } from "./segmentation.server";
 import {
   formatChatReply,
   hasAnalyticsData,
-  isSparseAnalyticsData,
 } from "../utils/format-chat-reply";
 import { buildNoDataChatReply } from "../utils/chat-no-data-reply";
-import { CHAT_REPLY_FORMAT_HINT, CHAT_SYSTEM_PROMPT } from "../config/chat-voice";
+import {
+  CHAT_REPLY_FORMAT_HINT,
+  CHAT_SYSTEM_PROMPT,
+  chatStageHint,
+} from "../config/chat-voice";
+import { prepareChatContext } from "./chat-context.server";
+import { rejectLowValueReply } from "../utils/chat-quality";
 import type {
   AIRecommendation,
   RecommendationCategory,
@@ -313,7 +318,9 @@ export async function chatWithAI(
   userMessage: string,
 ): Promise<{ conversationId: string; reply: string }> {
   const supabase = getSupabase();
-  const analyticsSummary = await prepareAnalyticsSummary(shopId);
+  const chatContext = await prepareChatContext(shopId);
+  const { analyticsSummary, stage, segmentsJson, recommendationsJson, attributionJson } =
+    chatContext;
   const hasData = hasAnalyticsData(analyticsSummary);
 
   const { data: shop } = await supabase
@@ -354,7 +361,7 @@ export async function chatWithAI(
 
   let reply: string;
 
-  if (!hasData && shop && needsStoreData(userMessage) && !isSetupQuestion(userMessage)) {
+  if (!hasData && shop && isSetupQuestion(userMessage)) {
     reply = buildNoDataChatReply(shop);
   } else {
     const { data: history } = await supabase
@@ -364,20 +371,21 @@ export async function chatWithAI(
       .order("created_at", { ascending: true })
       .limit(20);
 
-    const sparse = hasData && isSparseAnalyticsData(analyticsSummary);
-    const dataNote = !hasData
-      ? "No analytics data in the payload (zeros). Note the data gap in Analysis. Include tracking setup in Recommended actions if relevant."
-      : sparse
-        ? "Early-stage dataset — few visitors. Treat as directional, not statistical. Do not question whether tracking works if visitors > 0."
-        : "Sufficient data for analysis — cite specific metrics.";
+    const contextPrompt = `${chatStageHint(stage)}
 
-    const trackingNote = shop ? `Shop: ${shop.shop_domain}` : "";
+Shop: ${shop?.shop_domain ?? "unknown"}
 
-    const contextPrompt = `${dataNote}
-${trackingNote}
-
-Store data:
+Analytics:
 ${analyticsSummary}
+
+Attribution:
+${attributionJson}
+
+Segments:
+${segmentsJson}
+
+Existing recommendations:
+${recommendationsJson}
 
 Recent chat:
 ${(history ?? [])
@@ -389,8 +397,17 @@ User question: ${userMessage}
 
 ${CHAT_REPLY_FORMAT_HINT}`;
 
-    const rawReply = await callClaude(CHAT_SYSTEM_PROMPT, contextPrompt, 1200);
+    let rawReply = await callClaude(CHAT_SYSTEM_PROMPT, contextPrompt, 1800);
     reply = formatChatReply(rawReply);
+
+    if (rejectLowValueReply(reply)) {
+      rawReply = await callClaude(
+        `${CHAT_SYSTEM_PROMPT}\n\nYour last draft included generic low-value tactics. Rewrite with senior consultant-level strategy only.`,
+        contextPrompt,
+        1800,
+      );
+      reply = formatChatReply(rawReply);
+    }
   }
 
   await supabase.from("chat_messages").insert({
