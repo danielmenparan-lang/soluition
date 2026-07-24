@@ -1,5 +1,6 @@
 import { z } from "zod";
 import getSupabase from "../supabase.server";
+import { getShopByDomain, getShopByTrackingId } from "./shop.server";
 import { resolveTrafficSource } from "./attribution.server";
 import { upsertProductAnalytics } from "./product-intelligence.server";
 import type { EventType, Json } from "../types/database.types";
@@ -39,6 +40,20 @@ export interface TrackGeoContext {
   country?: string;
 }
 
+function normalizeShopDomain(value: string): string {
+  const trimmed = value.trim().toLowerCase();
+  if (trimmed.endsWith(".myshopify.com")) return trimmed;
+  return `${trimmed}.myshopify.com`;
+}
+
+async function resolveShopId(trackingKey: string): Promise<string | null> {
+  const byTrackingId = await getShopByTrackingId(trackingKey);
+  if (byTrackingId) return byTrackingId.id;
+
+  const byDomain = await getShopByDomain(normalizeShopDomain(trackingKey));
+  return byDomain?.id ?? null;
+}
+
 export async function processTrackEvent(
   rawPayload: unknown,
   geoContext: TrackGeoContext = {},
@@ -52,17 +67,11 @@ export async function processTrackEvent(
   const supabase = getSupabase();
   const resolvedCountry = geoContext.country ?? payload.country;
 
-  const { data: shop } = await supabase
-    .from("shops")
-    .select("id")
-    .eq("tracking_id", payload.trackingId)
-    .single();
+  const shopId = await resolveShopId(payload.trackingId);
 
-  if (!shop) {
+  if (!shopId) {
     return { success: false, error: "Invalid tracking ID" };
   }
-
-  const shopId = shop.id;
 
   // Upsert visitor
   const { data: existingVisitor } = await supabase

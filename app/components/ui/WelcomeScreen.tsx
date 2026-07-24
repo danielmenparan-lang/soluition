@@ -37,7 +37,7 @@ export function WelcomeScreen({
         </h1>
         <p className="ms-welcome-lead">
           {step === 1
-            ? "Solution tracks visitors, analyzes behavior, and gives clear recommendations. First, turn on tracking in your theme — about one minute."
+            ? "Solution tracks visitors, analyzes behavior, and gives clear recommendations. First, turn on the app embed in your theme — about 30 seconds."
             : step === 2
               ? "Tracking is connected. Open your storefront, browse a few pages, then come back so we can collect data."
               : "You have enough data. Click Get recommendations above to see what to improve."}

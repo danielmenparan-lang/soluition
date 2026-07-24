@@ -44,7 +44,7 @@ export function SetupGuide({
           <p className="ms-timeline-text">
             {hasData
               ? "Tracking is connected."
-              : `Enable "${THEME_EMBED_NAME}" in your live theme, paste your tracking ID, then click Save.`}
+              : `Turn on "${THEME_EMBED_NAME}" in your live theme and click Save — no tracking ID needed.`}
           </p>
           {!hasData ? (
             <>
@@ -56,7 +56,6 @@ export function SetupGuide({
               >
                 Enable {THEME_EMBED_NAME}
               </a>
-              <CopyCodeBlock code={trackingId} label="Your tracking ID — copy and paste in the embed settings:" />
               <ol className="ms-step-list">
                 <li>
                   Click <strong>Enable {THEME_EMBED_NAME}</strong> above (opens Theme editor in a new tab).
@@ -67,9 +66,13 @@ export function SetupGuide({
                 </li>
                 <li>
                   In the left sidebar, open <strong>App embeds</strong> (puzzle icon), turn on{" "}
-                  <strong>{THEME_EMBED_NAME}</strong>, paste your tracking ID, then <strong>Save</strong>.
+                  <strong>{THEME_EMBED_NAME}</strong>, then click <strong>Save</strong>.
                 </li>
               </ol>
+              <CopyCodeBlock
+                code={trackingId}
+                label="Optional override — only if support asks for a custom tracking ID:"
+              />
               <a
                 href={themesAdminUrl}
                 target="_blank"

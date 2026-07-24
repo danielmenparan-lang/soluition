@@ -10,10 +10,9 @@ Why?
 What to do now (about 3 minutes):
 
 1. Open Solution → Home
-2. Click "Enable Solution Tracker" (or go manually: Online Store → Themes → Customize → App embeds)
-3. Turn on Solution Tracker and paste your tracking ID:
-   ${shop.tracking_id}
-4. Click Save in the theme editor, then browse your storefront (2–3 pages)
+2. Click "Enable Solution Tracker" (or: Online Store → Themes → Customize → App embeds)
+3. Turn on Solution Tracker and click Save (no tracking ID required)
+4. Browse your storefront (2–3 pages), then return to the app
 
 Once data flows, I can help with:
 • Where buyers come from

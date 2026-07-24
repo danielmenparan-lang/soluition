@@ -1,15 +1,16 @@
 {% comment %}
   Marketing Solution — Visitor Tracking
-  Add your Tracking ID from the app dashboard Overview page.
+  Works automatically with your shop domain once enabled — no ID paste required.
 {% endcomment %}
 
-{% if block.settings.tracking_id != blank %}
+{% assign tracking_key = block.settings.tracking_id | default: shop.permanent_domain %}
+{% assign tracker_base = block.settings.tracker_url | default: 'https://shopify-marketing-solution.onrender.com' %}
+
 <script
-  src="{{ block.settings.tracker_url }}/tracker.js"
-  data-tracking-id="{{ block.settings.tracking_id }}"
+  src="{{ tracker_base }}/tracker.js"
+  data-tracking-id="{{ tracking_key }}"
   async
 ></script>
-{% endif %}
 
 {% schema %}
 {
@@ -19,8 +20,8 @@
     {
       "type": "text",
       "id": "tracking_id",
-      "label": "Tracking ID",
-      "info": "Copy from Solution app → Home page"
+      "label": "Tracking ID (optional)",
+      "info": "Leave blank — your shop domain is used automatically"
     },
     {
       "type": "text",
