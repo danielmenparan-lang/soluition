@@ -1,6 +1,7 @@
 import type {
   ActionFunctionArgs,
   HeadersFunction,
+  LinksFunction,
   LoaderFunctionArgs,
 } from "react-router";
 import { Outlet, useLoaderData, useRouteError } from "react-router";
@@ -9,8 +10,14 @@ import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { NavMenu } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { AppLink } from "../components/AppLink";
+import { BrandHeader } from "../components/ui/BrandHeader";
 import { SupportFooter } from "../components/ui/SupportFooter";
 import { getSupportEmail } from "../config/support.server";
+import appStyles from "../styles/app.css?url";
+
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: appStyles },
+];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
@@ -39,15 +46,16 @@ export default function App() {
     <AppProvider embedded apiKey={apiKey}>
       <NavMenu>
         <AppLink to="/app" rel="home">
-          בית
+          התחלה
         </AppLink>
-        <AppLink to="/app/analytics">מה קורה בחנות</AppLink>
-        <AppLink to="/app/segments">קבוצות לקוחות</AppLink>
         <AppLink to="/app/recommendations">מה כדאי לעשות</AppLink>
-        <AppLink to="/app/reports">סיכום שבועי</AppLink>
+        <AppLink to="/app/analytics">מה קורה בחנות</AppLink>
         <AppLink to="/app/chat">שאל את העוזר</AppLink>
+        <AppLink to="/app/segments">קבוצות לקוחות</AppLink>
+        <AppLink to="/app/reports">סיכום שבועי</AppLink>
       </NavMenu>
       <div className="ms-app-shell">
+        <BrandHeader />
         <div className="ms-app-content ms-app-container">
           <Outlet context={{ supportEmail }} />
         </div>

@@ -30,6 +30,34 @@ export function SubmitButton({
         ? "ms-btn ms-btn-chip"
         : "ms-btn ms-btn-primary";
 
+  if (slot) {
+    return (
+      <>
+        <Form id={formId} method="post" action={actionUrl} style={{ display: "none" }}>
+          {intent ? <input type="hidden" name="intent" value={intent} /> : null}
+          {fields
+            ? Object.entries(fields).map(([name, value]) => (
+                <input key={name} type="hidden" name={name} value={value} />
+              ))
+            : null}
+        </Form>
+        <s-button
+          slot={slot}
+          variant={variant === "secondary" ? "secondary" : "primary"}
+          disabled={disabled || undefined}
+          {...({
+            onClick: () => {
+              const form = document.getElementById(formId) as HTMLFormElement | null;
+              form?.requestSubmit();
+            },
+          } as Record<string, unknown>)}
+        >
+          {children}
+        </s-button>
+      </>
+    );
+  }
+
   return (
     <>
       <Form id={formId} method="post" action={actionUrl} style={{ display: "none" }}>

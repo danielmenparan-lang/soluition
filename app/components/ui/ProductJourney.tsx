@@ -21,19 +21,19 @@ export function ProductJourney({
   const steps: JourneyStep[] = [
     {
       id: "track",
-      label: "הפעל מעקב",
+      label: "חיבור מעקב",
       done: hasTracking || hasData,
       current: !hasData,
     },
     {
       id: "data",
-      label: "אסוף נתונים",
+      label: "איסוף נתונים",
       done: hasData,
       current: hasTracking && !hasData,
     },
     {
       id: "insights",
-      label: "קבל תובנות",
+      label: "קבלת המלצות",
       done: hasRecommendations,
       current: hasData && !hasRecommendations,
     },
@@ -91,27 +91,27 @@ type QuickNavItem = {
 
 const NAV_ITEMS: QuickNavItem[] = [
   {
-    to: "/app/analytics",
-    title: "מה קורה בחנות",
-    desc: "מספרים, מקורות תנועה ומוצרים",
-    tone: "blue",
-  },
-  {
     to: "/app/recommendations",
     title: "מה כדאי לעשות",
-    desc: "המלצות מסודרות לפי חשיבות",
+    desc: "רשימת פעולות — מה לשפר קודם",
     tone: "green",
+  },
+  {
+    to: "/app/analytics",
+    title: "מה קורה בחנות",
+    desc: "מי נכנס, מאיפה הגיע, מה צפה",
+    tone: "blue",
   },
   {
     to: "/app/chat",
     title: "שאל את העוזר",
-    desc: "שאל שאלה — קבל תשובה",
+    desc: "שאל שאלה על החנות — קבל תשובה",
     tone: "purple",
   },
   {
     to: "/app/reports",
     title: "סיכום שבועי",
-    desc: "מה השתנה ומה לעשות",
+    desc: "מה השתנה השבוע ומה לעשות",
     tone: "gold",
   },
 ];

@@ -15,6 +15,10 @@ export default async function handleRequest(
   reactRouterContext: EntryContext,
 ) {
   addDocumentResponseHeaders(request, responseHeaders);
+  responseHeaders.set(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, max-age=0",
+  );
   const userAgent = request.headers.get("user-agent");
   const callbackName = isbot(userAgent ?? "")
     ? "onAllReady"

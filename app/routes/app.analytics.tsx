@@ -14,6 +14,7 @@ import { MetricCard } from "../components/ui/MetricCard";
 import { EmptyState } from "../components/ui/EmptyState";
 import { PageHero } from "../components/ui/PageHero";
 import { HelpPanel } from "../components/ui/HelpPanel";
+import { AppLink } from "../components/AppLink";
 import { PAGE_HELP } from "../config/page-help";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -72,18 +73,17 @@ export default function Analytics() {
 
   if (!metrics) {
     return (
-      <s-page>
-        <PageHero
-          title={help.title}
-          subtitle={help.subtitle}
-          variant="analytics"
-          compact
-        />
-        <HelpPanel title={help.helpTitle} items={help.helpItems} />
+      <s-page heading="מה קורה בחנות">
         <s-section>
           <EmptyState
-            title="עדיין אין נתונים"
-            description="קודם הדבק את שורת המעקב (בדף הבית) והיכנס לחנות פעם אחת. הנתונים יופיעו כאן."
+            icon="chart"
+            title="עדיין אין נתונים כאן"
+            description="קודם צריך להפעיל מעקב בחנות ולגלוש בה פעם אחת. אחרי זה המספרים יופיעו כאן אוטומטית."
+            action={
+              <AppLink to="/app" className="ms-btn ms-btn-primary">
+                ← חזור להתחלה והפעל מעקב
+              </AppLink>
+            }
           />
         </s-section>
       </s-page>
