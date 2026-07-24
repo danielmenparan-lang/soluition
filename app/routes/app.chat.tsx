@@ -102,17 +102,17 @@ export function shouldRevalidate({
 }
 
 const SUGGESTED_WITH_DATA = [
-  "Why did traffic drop?",
-  "Which product should I promote?",
-  "Where do buyers come from?",
-  "Where am I wasting budget?",
+  "What should I do this week?",
+  "How can I get my first sales?",
+  "What should I fix first on my store?",
+  "Where should I focus my marketing?",
 ];
 
 const SUGGESTED_NO_DATA = [
-  "How do I enable tracking?",
-  "Why is there no data?",
   "What should I do first?",
-  "How do I get started?",
+  "How do I get my first visitors?",
+  "What can I improve before I have data?",
+  "How do I enable tracking?",
 ];
 
 export default function Chat() {
@@ -181,8 +181,8 @@ export default function Chat() {
         <div className="ms-chat-intro">
           <h2 className="ms-chat-intro-title">Ask anything about your store</h2>
           <p className="ms-chat-intro-text">
-            Solution sends your real tracking data to the assistant — it analyzes
-            and replies in plain English. No marketing or tech jargon required.
+            Solution analyzes your store data and replies with clear action steps —
+            what to fix, promote, or improve this week.
           </p>
         </div>
       </s-section>
@@ -192,7 +192,7 @@ export default function Chat() {
         <ChatNotice variant="not-for-customers" />
       </s-section>
 
-      <s-section heading={hasData ? "Suggested questions" : "No data yet? Start here"}>
+      <s-section heading={hasData ? "Get action items" : "Start here"}>
         <div className="ms-link-row">
           {suggestedQuestions.map((q) => (
             <Form
@@ -230,8 +230,8 @@ export default function Chat() {
               <h3 className="ms-empty-title">Start a conversation</h3>
               <p className="ms-empty-text">
                 {hasData
-                  ? "Type a question below, or tap a suggested question."
-                  : "No store data yet — ask \"How do I enable tracking?\" or go to Home."}
+                  ? "Ask a question or tap a prompt below — every reply includes action items."
+                  : "No store data yet — ask what to do first, or enable tracking on Home."}
               </p>
             </div>
           )}

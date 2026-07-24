@@ -15,6 +15,7 @@ import { getSegments } from "./segmentation.server";
 import {
   formatChatReply,
   hasAnalyticsData,
+  isSparseAnalyticsData,
 } from "../utils/format-chat-reply";
 import { buildNoDataChatReply } from "../utils/chat-no-data-reply";
 import type {
@@ -46,14 +47,20 @@ Rules:
 
 const CHAT_SYSTEM_PROMPT = `You are a friendly marketing assistant for a Shopify store owner.
 You speak simple, clear English.
+
+Every reply MUST include a section titled "Action items:" with 3–5 numbered steps the merchant can take this week in Shopify Admin or their storefront.
+
 Rules for every reply:
 - Plain text only. NO markdown: no # headers, no **bold**, no code blocks.
 - NO emojis.
 - Short paragraphs. Use numbered steps (1. 2. 3.) or bullet lines starting with • when listing.
 - Be direct and practical for a non-technical merchant.
-- If store data shows zero visitors, explain that tracking must be enabled first and give concrete steps from the app home page (App embed "Solution Tracker", tracking ID).
-- Never invent numbers. If data is missing, say so honestly and guide setup.
-- Keep answers under 12 lines unless the user asks for detail.`;
+- Lead with insight, then end with Action items — never reply with setup instructions only.
+- If data is sparse (very few visitors/sessions): say data is early. Do NOT claim tracking is broken when visitors > 0. Give concrete marketing and store-improvement actions using the numbers you have.
+- If all metrics are zero: give 2 setup steps for Solution Tracker AND 2–3 store-prep actions they can do immediately.
+- Never invent numbers. Quote metrics from the JSON when available.
+- Never tell the merchant to wait 24–48 hours as the main advice.
+- Keep the main answer under 10 lines, then Action items.`;
 
 function isSetupQuestion(message: string): boolean {
   return /מעקב|הפעל|התק|מתחיל|setup|install|איך|עוזר|הורא|embed|עיצוב/i.test(
@@ -373,12 +380,15 @@ export async function chatWithAI(
       .order("created_at", { ascending: true })
       .limit(20);
 
-    const dataNote = hasData
-      ? "Store has analytics data — use the numbers below."
-      : "Store has NO analytics data yet (all zeros). Do not analyze sales or traffic. Guide setup or answer setup questions only.";
+    const sparse = hasData && isSparseAnalyticsData(analyticsSummary);
+    const dataNote = !hasData
+      ? "Store has NO analytics data yet (all zeros). Give setup steps plus immediate store-prep actions. Still include Action items."
+      : sparse
+        ? "Store has EARLY data (very few visitors). Tracking appears active. Do NOT say tracking is broken. Analyze the numbers you have and give growth-focused Action items for a new store."
+        : "Store has analytics data — cite specific numbers from the JSON.";
 
     const trackingNote = shop
-      ? `Tracking ID for this shop: ${shop.tracking_id}`
+      ? `Shop domain: ${shop.shop_domain}. Tracking ID (optional override): ${shop.tracking_id}`
       : "";
 
     const contextPrompt = `${dataNote}
@@ -395,7 +405,7 @@ ${(history ?? [])
 
 User question: ${userMessage}
 
-Answer in plain Hebrew. No markdown. No emojis.`;
+Answer in plain English. Always end with "Action items:" and 3–5 numbered steps.`;
 
     const rawReply = await callClaude(CHAT_SYSTEM_PROMPT, contextPrompt, 1200);
     reply = formatChatReply(rawReply);

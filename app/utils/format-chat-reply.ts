@@ -27,3 +27,22 @@ export function hasAnalyticsData(summaryJson: string): boolean {
     return false;
   }
 }
+
+/** Too little data for trend analysis — still enough to give action items. */
+export function isSparseAnalyticsData(summaryJson: string): boolean {
+  try {
+    const data = JSON.parse(summaryJson) as {
+      metrics?: {
+        totalVisitors?: number;
+        totalSessions?: number;
+        totalEvents?: number;
+      };
+    };
+    const visitors = data.metrics?.totalVisitors ?? 0;
+    const sessions = data.metrics?.totalSessions ?? 0;
+    const events = data.metrics?.totalEvents ?? 0;
+    return visitors < 10 && sessions < 10 && events < 25;
+  } catch {
+    return true;
+  }
+}

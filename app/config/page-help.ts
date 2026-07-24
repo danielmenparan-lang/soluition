@@ -135,25 +135,25 @@ export const PAGE_HELP: Record<string, PageHelp> = {
   chat: {
     title: "Ask the assistant",
     subtitle:
-      "Ask questions about your store — sales, products, ads. Answers use your real tracking data.",
+      "Get clear action steps for your store — what to fix, promote, or improve this week.",
     tips: [
-      "Ask in plain English",
-      "Tap a suggested question below to start",
+      "Every reply ends with numbered action items",
+      "Tap a prompt below to start",
       "This chat is for you — customers never see it",
     ],
-    helpTitle: "Example questions",
+    helpTitle: "Example prompts",
     helpItems: [
       {
-        label: "Sales",
-        text: "Why did traffic drop this week? — get an explanation from your data.",
+        label: "This week",
+        text: "What should I do this week? — get 3–5 concrete steps.",
+      },
+      {
+        label: "First sales",
+        text: "How can I get my first sales? — priorities for a new store.",
       },
       {
         label: "Marketing",
-        text: "Which product should I promote? — based on what's working in your store.",
-      },
-      {
-        label: "Budget",
-        text: "Where am I wasting ad spend? — find weak channels or pages.",
+        text: "Where should I focus my marketing? — based on your traffic data.",
       },
     ],
   },

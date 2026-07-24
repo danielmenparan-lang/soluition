@@ -1,23 +1,18 @@
 import type { Shop } from "../types/database.types";
 
 export function buildNoDataChatReply(shop: Shop): string {
-  return `Hi! There is no store data yet, so I cannot answer questions like "why did sales drop" accurately.
+  return `Your store has no visitor data yet, so I cannot analyze sales or traffic patterns.
 
-Why?
-• Tracking is not enabled in your theme yet, or
-• No visitors have been recorded since you enabled it.
+What this means:
+• Solution Tracker may not be enabled in your theme yet, or
+• No one has browsed your storefront since you enabled it.
 
-What to do now (about 3 minutes):
+Action items:
+1. Open Solution → Home → click Enable Solution Tracker → Save in the theme editor.
+2. Open your storefront in a new tab and browse Home, a product page, and the cart.
+3. Add a clear headline and one strong product image on your homepage — do this now while tracking starts.
+4. Share your store link with 3–5 people and ask them to visit one product page each.
+5. Return here and ask: "What should I focus on this week?" once Visitors shows 3 or more.
 
-1. Open Solution → Home
-2. Click "Enable Solution Tracker" (or: Online Store → Themes → Customize → App embeds)
-3. Turn on Solution Tracker and click Save (no tracking ID required)
-4. Browse your storefront (2–3 pages), then return to the app
-
-Once data flows, I can help with:
-• Where buyers come from
-• Which products to promote
-• Where budget may be wasted
-
-Need help enabling tracking? Ask "how do I enable tracking" and I will walk you through it.`;
+Optional tracking ID override: ${shop.tracking_id}`;
 }
