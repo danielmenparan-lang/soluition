@@ -57,12 +57,6 @@ function isSetupQuestion(message: string): boolean {
   );
 }
 
-function needsStoreData(message: string): boolean {
-  return /מכיר|ירד|על|תנוע|מוצר|קהל|המר|כסף|ביצוע|פרסום|analytics|traffic|conversion|revenue|sales/i.test(
-    message,
-  );
-}
-
 function getAnthropicClient(): Anthropic {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
