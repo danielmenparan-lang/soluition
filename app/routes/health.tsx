@@ -1,6 +1,7 @@
 import { getShopifyConfigStatus } from "../config/shopify-app.server";
 import {
   checkSupabaseSessionTable,
+  getSupabaseKeyRole,
   isSupabaseSessionStorageConfigured,
 } from "../services/supabase-session-storage.server";
 
@@ -9,6 +10,7 @@ export const loader = async () => {
   const sessionStorageMode = isSupabaseSessionStorageConfigured()
     ? "supabase"
     : "prisma";
+  const supabaseKeyRole = getSupabaseKeyRole();
   const sessionCheck = await checkSupabaseSessionTable();
 
   const sessionReady = sessionCheck.ready;
@@ -39,6 +41,8 @@ export const loader = async () => {
       supabase: {
         urlSet: Boolean(process.env.SUPABASE_URL?.trim()),
         keySet: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
+        keyRole: supabaseKeyRole,
+        serviceRoleKeyValid: supabaseKeyRole === "service_role",
       },
       hints: [
         !shopifyConfig.apiKeyMatchesApp
@@ -47,10 +51,18 @@ export const loader = async () => {
         !shopifyConfig.appUrlMatches
           ? "SHOPIFY_APP_URL must be https://shopify-marketing-solution.onrender.com"
           : null,
+        supabaseKeyRole && supabaseKeyRole !== "service_role"
+          ? "SUPABASE_SERVICE_ROLE_KEY on Render is wrong — must be service_role key from Supabase API settings (not anon)"
+          : null,
+        sessionCheck.error?.includes("Invalid API key")
+          ? "Update SUPABASE_SERVICE_ROLE_KEY in Render from Supabase → Project Settings → API → service_role secret"
+          : null,
         !sessionReady && sessionCheck.error?.includes("WebSocket")
           ? "WebSocket fix deploying — upgrade Node to 22 or wait for next deploy"
           : null,
-        !sessionReady && !sessionCheck.error?.includes("WebSocket")
+        !sessionReady &&
+        !sessionCheck.error?.includes("WebSocket") &&
+        !sessionCheck.error?.includes("Invalid API key")
           ? "Run supabase/session-table.sql in Supabase SQL Editor (creates Session table)"
           : null,
       ].filter(Boolean),

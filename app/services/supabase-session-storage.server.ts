@@ -178,6 +178,19 @@ export class SupabaseSessionStorage implements SessionStorage {
   }
 }
 
+export function getSupabaseKeyRole(): string | null {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!key || key.split(".").length < 2) return null;
+  try {
+    const payload = JSON.parse(
+      Buffer.from(key.split(".")[1], "base64url").toString("utf8"),
+    ) as { role?: string };
+    return payload.role ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function checkSupabaseSessionTable(): Promise<{
   ready: boolean;
   error: string | null;
