@@ -16,6 +16,17 @@ function isIndexRoute(matches: ReturnType<typeof useMatches>): boolean {
   return leaf.pathname === parent.pathname;
 }
 
+/** Index routes share the parent URL — POST must target ?index or React Router returns 405. */
+function needsIndexParam(
+  pathname: string,
+  targetPath: string,
+  matches: ReturnType<typeof useMatches>,
+): boolean {
+  if (targetPath !== pathname) return false;
+  if (pathname === "/app") return true;
+  return isIndexRoute(matches);
+}
+
 function buildActionUrl(
   pathname: string,
   searchParams: URLSearchParams,
@@ -24,7 +35,7 @@ function buildActionUrl(
 ): string {
   const params = new URLSearchParams(searchParams.toString());
 
-  if (isIndexRoute(matches) && targetPath === pathname) {
+  if (needsIndexParam(pathname, targetPath, matches)) {
     params.set("index", "");
   }
 

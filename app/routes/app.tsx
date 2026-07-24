@@ -1,4 +1,8 @@
-import type { HeadersFunction, LoaderFunctionArgs } from "react-router";
+import type {
+  ActionFunctionArgs,
+  HeadersFunction,
+  LoaderFunctionArgs,
+} from "react-router";
 import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
@@ -9,6 +13,18 @@ import { AppLink } from "../components/AppLink";
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
   return { apiKey: process.env.SHOPIFY_API_KEY || "" };
+};
+
+/** Safety net: POST to /app without ?index hits the layout and would 405 otherwise. */
+export const action = async ({ request }: ActionFunctionArgs) => {
+  if (request.method !== "POST") {
+    return new Response(null, { status: 405 });
+  }
+
+  return {
+    success: false,
+    message: "שגיאת ניווט — רענן את הדף ונסה שוב",
+  };
 };
 
 export default function App() {

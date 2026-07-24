@@ -21,6 +21,7 @@
     "typecheck": "react-router typegen && tsc --noEmit",
     "db:seed": "tsx scripts/seed-demo-data.ts",
     "ai:test": "tsx scripts/test-ai-pipeline.ts",
+    "routes:test": "node scripts/test-post-routes.mjs",
     "db:test": "node scripts/test-database-url.mjs",
     "db:migrate": "prisma migrate deploy"
   },
