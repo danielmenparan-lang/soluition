@@ -124,6 +124,7 @@ export default function Overview() {
       )}
 
       <SetupGuide
+        shopDomain={shop.shop_domain}
         trackingId={shop.tracking_id}
         trackingScriptUrl={trackingScriptUrl}
         hasData={hasData}
