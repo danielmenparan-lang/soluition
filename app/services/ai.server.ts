@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import getSupabase from "../supabase.server";
-import { prepareAnalyticsSummary } from "./analytics.server";
+import { getDashboardMetrics, prepareAnalyticsSummary } from "./analytics.server";
 import {
   analyzeProducts,
   analyzeProductExitDrivers,
@@ -29,8 +29,21 @@ You analyze visitor behavior, product performance, traffic sources, and conversi
 You provide specific, actionable marketing recommendations — not generic advice.
 
 Always respond in valid JSON when asked for structured output.
-Be direct, data-driven, and prioritize high-impact actions.
-Respond in the same language as the user's question (Hebrew or English).`;
+Be direct, data-driven, and prioritize high-impact actions.`;
+
+const RECOMMENDATIONS_SYSTEM_PROMPT = `You analyze Shopify store data collected by the Solution app.
+The code gathers real metrics from Supabase (visitors, sessions, products, traffic sources, segments).
+Your job: interpret ONLY that data and return actionable recommendations in plain Hebrew.
+
+Rules:
+- Titles, descriptions, expected_impact, and every action_items step must be in Hebrew.
+- Plain language: say "מעקב", "מבקרים", "עגלת קניות", "אחוז קונים" — not English jargon.
+- Brand names are OK: Shopify, Facebook, Instagram, Google.
+- Do NOT invent numbers. Quote only metrics present in the JSON payload.
+- If all metrics are zero — say so and focus on enabling tracking first. Do not suggest paid ads or advanced marketing yet.
+- When data exists — every recommendation must cite a specific number, product, page, or traffic source from the JSON.
+- action_items: 2–4 concrete steps in Shopify Admin or the store theme.
+- No markdown, no emojis.`;
 
 const CHAT_SYSTEM_PROMPT = `You are a friendly marketing assistant for a Shopify store owner.
 You speak simple, clear Hebrew (unless the user writes in English).
@@ -111,10 +124,73 @@ function parseJsonResponse<T>(text: string): T {
   return JSON.parse(jsonStr.trim()) as T;
 }
 
+const PRIORITY_ORDER: Record<string, number> = {
+  high: 0,
+  medium: 1,
+  low: 2,
+};
+
+function sortRecommendations<T extends { priority: string }>(items: T[]): T[] {
+  return [...items].sort(
+    (a, b) =>
+      (PRIORITY_ORDER[a.priority] ?? 9) - (PRIORITY_ORDER[b.priority] ?? 9),
+  );
+}
+
+function buildRecommendationsPrompt(
+  analyticsSummary: string,
+  productInsights: unknown[],
+  segments: Array<{ name: string; members: number }>,
+  attributionContext: string | null,
+  hasData: boolean,
+): string {
+  const countRule = hasData
+    ? "צור 6–10 המלצות."
+    : "הנתונים ריקים (0 מבקרים). צור 3–4 המלצות בלבד — קודם הפעלת מעקב, אחר כך הכנת החנות. אל תמליץ על פרסום ממומן.";
+
+  const dataRule = hasData
+    ? "- כל המלצה חייבת לצטט מספר, מוצר, דף, או מקור תנועה מה-JSON למעלה.\n- אם אין נתון שתומך בהמלצה — אל תכלול אותה."
+    : "- התבסס על העובדה שהמטריקות הן 0 — הסבר שאין עדיין נתונים ומה לעשות כדי שייווצרו.";
+
+  return `נתח את נתוני החנות הבאים (נאספו אוטומטית על ידי Solution) וצור המלצות בעברית פשוטה.
+${countRule}
+
+נתוני החנות (30 יום):
+${analyticsSummary}
+
+ניתוח פרסום:
+${attributionContext ?? "[]"}
+
+תובנות מוצרים (חישוב מקדים בקוד):
+${JSON.stringify(productInsights.slice(0, 10), null, 2)}
+
+קבוצות לקוחות:
+${JSON.stringify(segments, null, 2)}
+
+כללים:
+${dataRule}
+- אל תחזור על אותה המלצה פעמיים.
+- retargeting רק אם יש מספיק מבקרים או קונים בנתונים.
+
+החזר מערך JSON:
+[
+  {
+    "category": "marketing|product|conversion|retargeting",
+    "title": "כותרת קצרה בעברית",
+    "description": "מה הנתונים מראים ולמה זה חשוב",
+    "priority": "high|medium|low",
+    "expected_impact": "משפט אחד בעברית",
+    "action_items": ["צעד 1", "צעד 2", "צעד 3"]
+  }
+]`;
+}
+
 export async function generateRecommendations(
   shopId: string,
 ): Promise<AIRecommendation[]> {
-  const supabase = getSupabase();
+  const metrics = await getDashboardMetrics(shopId);
+  const hasData = metrics.totalVisitors > 0;
+
   const analyticsSummary = await prepareAnalyticsSummary(shopId);
   const productMetrics = await getProductMetrics(shopId);
   const productInsights = [
@@ -122,44 +198,35 @@ export async function generateRecommendations(
     ...analyzeProductExitDrivers(await getProductExitDrivers(shopId)),
   ];
   const segments = await getSegments(shopId);
+  const attributionContext = hasData
+    ? await buildAttributionContext(shopId)
+    : null;
 
-  const hasData = analyticsSummary.includes('"totalVisitors":') &&
-    !analyticsSummary.includes('"totalVisitors": 0');
+  const prompt = buildRecommendationsPrompt(
+    analyticsSummary,
+    productInsights,
+    segments.map((s) => ({ name: s.name, members: s.member_count })),
+    attributionContext,
+    hasData,
+  );
 
-  const prompt = `Analyze this Shopify store data and generate marketing recommendations.
-
-Store Analytics:
-${analyticsSummary}
-
-Product Insights:
-${JSON.stringify(productInsights.slice(0, 10), null, 2)}
-
-Audience Segments:
-${JSON.stringify(segments.map((s) => ({ name: s.name, members: s.member_count })), null, 2)}
-
-${hasData ? "" : "Note: The store has little or no tracking data yet. Base recommendations on e-commerce best practices for a new Shopify store, and mention installing the tracking script to unlock deeper insights.\n"}
-
-Generate 8-12 recommendations across these categories: marketing, product, conversion, retargeting.
-
-Return JSON array:
-[
-  {
-    "category": "marketing|product|conversion|retargeting",
-    "title": "Short title",
-    "description": "Detailed explanation based on the data",
-    "priority": "high|medium|low",
-    "expected_impact": "Estimated impact (e.g. +15% conversion)",
-    "action_items": ["Step 1", "Step 2", "Step 3"]
-  }
-]`;
-
-  const response = await callClaude(MARKETING_MANAGER_SYSTEM_PROMPT, prompt);
-  const recommendations = parseJsonResponse<GeneratedRecommendation[]>(response);
+  const response = await callClaude(RECOMMENDATIONS_SYSTEM_PROMPT, prompt);
+  const recommendations = sortRecommendations(
+    parseJsonResponse<GeneratedRecommendation[]>(response),
+  );
 
   if (!Array.isArray(recommendations) || recommendations.length === 0) {
     throw new Error("Claude returned no recommendations");
   }
 
+  return saveRecommendations(shopId, recommendations);
+}
+
+async function saveRecommendations(
+  shopId: string,
+  recommendations: GeneratedRecommendation[],
+): Promise<AIRecommendation[]> {
+  const supabase = getSupabase();
   const inserts = recommendations.map((rec) => ({
     shop_id: shopId,
     category: rec.category,
@@ -340,7 +407,9 @@ export async function getRecommendations(
     .eq("shop_id", shopId)
     .eq("status", "active")
     .order("generated_at", { ascending: false });
-  return data ?? [];
+
+  const rows = data ?? [];
+  return sortRecommendations(rows);
 }
 
 export async function getWeeklyReports(shopId: string) {

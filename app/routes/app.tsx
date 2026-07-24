@@ -50,7 +50,7 @@ export default function App() {
         </AppLink>
         <AppLink to="/app/recommendations">מה כדאי לעשות</AppLink>
         <AppLink to="/app/analytics">מה קורה בחנות</AppLink>
-        <AppLink to="/app/chat">שאל את העוזר</AppLink>
+        <AppLink to="/app/chat">צ&apos;אט</AppLink>
         <AppLink to="/app/segments">קבוצות לקוחות</AppLink>
         <AppLink to="/app/reports">סיכום שבועי</AppLink>
       </NavMenu>

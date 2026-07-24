@@ -104,8 +104,8 @@ const NAV_ITEMS: QuickNavItem[] = [
   },
   {
     to: "/app/chat",
-    title: "שאל את העוזר",
-    desc: "שאל שאלה על החנות — קבל תשובה",
+    title: "צ'אט",
+    desc: "שאל שאלה — העוזר מנתח את הנתונים ועונה",
     tone: "purple",
   },
   {

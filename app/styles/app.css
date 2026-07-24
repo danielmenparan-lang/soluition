@@ -1160,3 +1160,126 @@
   line-height: 1.4;
   max-width: 420px;
 }
+
+.ms-rec-actions {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--ms-border);
+}
+
+.ms-rec-actions-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ms-brand-dark);
+}
+
+.ms-chat-promo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, #fff 0%, var(--ms-ai-light) 100%);
+  border: 1px solid #c4c9ef;
+  border-radius: var(--ms-radius);
+  padding: 20px 22px;
+  box-shadow: var(--ms-shadow-md);
+}
+
+.ms-chat-promo-kicker {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ms-ai);
+}
+
+.ms-chat-promo-title {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.ms-chat-promo-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ms-text-subdued);
+  max-width: 520px;
+}
+
+.ms-chat-promo-btn {
+  flex-shrink: 0;
+}
+
+.ms-chat-intro {
+  background: #fff;
+  border: 1px solid var(--ms-border);
+  border-radius: var(--ms-radius);
+  padding: 18px 20px;
+  border-right: 4px solid var(--ms-ai);
+}
+
+.ms-chat-intro-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.ms-chat-intro-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ms-text-subdued);
+}
+
+.ms-empty-chat {
+  border: none !important;
+  background: transparent !important;
+  padding: 24px 12px !important;
+}
+
+.ms-chat-new-link {
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.ms-chat-history {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ms-chat-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--ms-border);
+  border-radius: var(--ms-radius-sm);
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+}
+
+.ms-chat-history-item:hover {
+  border-color: var(--ms-ai);
+  background: var(--ms-ai-light);
+}
+
+.ms-chat-history-item.is-active {
+  border-color: var(--ms-ai);
+  background: var(--ms-ai-light);
+}
+
+.ms-chat-history-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.ms-chat-history-date {
+  font-size: 12px;
+  color: var(--ms-text-subdued);
+  flex-shrink: 0;
+}

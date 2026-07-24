@@ -3,6 +3,8 @@ import { asStringArray } from "../../utils/safe-json";
 import type { AIRecommendation } from "../../types/database.types";
 
 export function RecommendationCard({ rec }: { rec: AIRecommendation }) {
+  const actions = asStringArray(rec.action_items);
+
   return (
     <div className="ms-card ms-card-ai">
       <s-stack direction="block" gap="small">
@@ -17,18 +19,18 @@ export function RecommendationCard({ rec }: { rec: AIRecommendation }) {
         </s-stack>
         <s-paragraph>{rec.description}</s-paragraph>
         {rec.expected_impact ? (
-          <s-text color="subdued">השפעה צפויה: {rec.expected_impact}</s-text>
+          <s-text color="subdued">למה זה שווה: {rec.expected_impact}</s-text>
         ) : null}
-        {(() => {
-          const items = asStringArray(rec.action_items);
-          return items.length > 0 ? (
+        {actions.length > 0 ? (
+          <div className="ms-rec-actions">
+            <p className="ms-rec-actions-title">מה לעשות:</p>
             <s-unordered-list>
-              {items.map((item, i) => (
+              {actions.map((item, i) => (
                 <s-list-item key={i}>{item}</s-list-item>
               ))}
             </s-unordered-list>
-          ) : null;
-        })()}
+          </div>
+        ) : null}
       </s-stack>
     </div>
   );

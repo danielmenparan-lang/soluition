@@ -1,4 +1,5 @@
 import { SetupGuide } from "./SetupGuide";
+import { ChatPromo } from "./ChatPromo";
 
 type WelcomeScreenProps = {
   shopDomain: string;
@@ -22,7 +23,12 @@ const VALUE_POINTS = [
   {
     icon: "✅",
     title: "אומרת לך מה לעשות",
-    text: "רשימה ברורה — מה לפרסם, מה לשפר, ומה לתקן קודם.",
+    text: "רשימת המלצות ברורה — מה לפרסם, מה לשפר, ומה לתקן קודם.",
+  },
+  {
+    icon: "💬",
+    title: "עונה על שאלות שלך",
+    text: "צ'אט — שאל על מכירות, מוצרים ופרסום. העוזר מנתח את הנתונים ועונה.",
   },
 ];
 
@@ -80,6 +86,8 @@ export function WelcomeScreen({
         hasRecommendations={hasRecommendations}
         embedded
       />
+
+      <ChatPromo />
     </div>
   );
 }

@@ -10,24 +10,49 @@ import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { useFetcherToast } from "../hooks/useFetcherToast";
-import { PageHero } from "../components/ui/PageHero";
-import { HelpPanel } from "../components/ui/HelpPanel";
+import { AppLink } from "../components/AppLink";
 import { ChatNotice } from "../components/ui/ChatNotice";
 import { ChatMessageBody } from "../components/ui/ChatMessageBody";
-import { PAGE_HELP } from "../config/page-help";
 import { getOrCreateShop } from "../services/shop.server";
-import { chatWithAI, getChatConversations } from "../services/ai.server";
+import {
+  chatWithAI,
+  getChatConversations,
+  getChatMessages,
+} from "../services/ai.server";
 import { getDashboardMetrics } from "../services/analytics.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
+  const url = new URL(request.url);
+  const conversationId = url.searchParams.get("c");
+
   const [conversations, metrics] = await Promise.all([
     getChatConversations(shop.id).catch(() => []),
     getDashboardMetrics(shop.id).catch(() => null),
   ]);
+
   const hasData = Boolean(metrics && metrics.totalVisitors > 0);
-  return { conversations, hasData };
+  let initialMessages: Array<{ role: "user" | "assistant"; content: string }> =
+    [];
+
+  if (conversationId) {
+    const belongsToShop = conversations.some((c) => c.id === conversationId);
+    if (belongsToShop) {
+      const history = await getChatMessages(conversationId).catch(() => []);
+      initialMessages = history.map((message) => ({
+        role: message.role as "user" | "assistant",
+        content: message.content,
+      }));
+    }
+  }
+
+  return {
+    conversations,
+    hasData,
+    conversationId: conversationId && initialMessages.length > 0 ? conversationId : null,
+    initialMessages,
+  };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -81,21 +106,27 @@ const SUGGESTED_NO_DATA = [
 ];
 
 export default function Chat() {
-  const { conversations, hasData } = useLoaderData<typeof loader>();
+  const { conversations, hasData, conversationId: loadedConversationId, initialMessages } =
+    useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
   const { Form, actionUrl } = fetcher;
-  const [messages, setMessages] = useState<
-    Array<{ role: "user" | "assistant"; content: string }>
-  >([]);
-  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [messages, setMessages] = useState(initialMessages);
+  const [conversationId, setConversationId] = useState<string | null>(
+    loadedConversationId,
+  );
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const submittingRef = useRef(false);
   const processedReplyRef = useRef<string | null>(null);
 
   useFetcherToast(fetcher);
-  const help = PAGE_HELP.chat;
   const suggestedQuestions = hasData ? SUGGESTED_WITH_DATA : SUGGESTED_NO_DATA;
+
+  useEffect(() => {
+    setMessages(initialMessages);
+    setConversationId(loadedConversationId);
+    processedReplyRef.current = null;
+  }, [initialMessages, loadedConversationId]);
 
   useEffect(() => {
     if (fetcher.state !== "idle") return;
@@ -135,17 +166,21 @@ export default function Chat() {
   };
 
   return (
-    <s-page>
-      <PageHero
-        title={help.title}
-        subtitle={help.subtitle}
-        variant="ai"
-        compact
-      />
-      <HelpPanel title={help.helpTitle} items={help.helpItems} />
+    <s-page heading="צ'אט עם העוזר">
+      <s-section>
+        <div className="ms-chat-intro">
+          <h2 className="ms-chat-intro-title">שאל כל שאלה על החנות</h2>
+          <p className="ms-chat-intro-text">
+            Solution שולחת לעוזר את הנתונים האמיתיים מהחנות — הוא מנתח ועונה
+            בעברית. לא צריך לדעת שיווק או טכנולוגיה.
+          </p>
+        </div>
+      </s-section>
 
-      <ChatNotice variant="owner" />
-      <ChatNotice variant="not-for-customers" />
+      <s-section>
+        <ChatNotice variant="owner" />
+        <ChatNotice variant="not-for-customers" />
+      </s-section>
 
       <s-section heading={hasData ? "שאלות לדוגמה" : "עדיין אין נתונים? התחל כאן"}>
         <div className="ms-link-row">
@@ -178,15 +213,15 @@ export default function Chat() {
         </div>
       </s-section>
 
-      <s-section>
+      <s-section heading="שיחה">
         <div className="ms-chat-panel">
           {messages.length === 0 && (
-            <div className="ms-empty" style={{ border: "none", background: "transparent" }}>
-              <h3 className="ms-empty-title">שלום!</h3>
+            <div className="ms-empty ms-empty-chat">
+              <h3 className="ms-empty-title">התחל שיחה</h3>
               <p className="ms-empty-text">
                 {hasData
-                  ? "שאל אותי על מכירות, פרסום, מוצרים — אני עונה לפי הנתונים מהחנות."
-                  : "עדיין אין נתונים מהחנות. לחץ «איך מפעילים מעקב?» למטה, או חזור לדף «בית» להפעיל את המעקב."}
+                  ? "כתוב שאלה למטה, או לחץ על אחת מהשאלות לדוגמה."
+                  : "עדיין אין נתונים מהחנות — שאל «איך מפעילים מעקב?» או חזור ל«התחלה»."}
               </p>
             </div>
           )}
@@ -202,7 +237,7 @@ export default function Chat() {
             </div>
           ))}
           {fetcher.state !== "idle" && (
-            <div className="ms-loading">חושב על תשובה...</div>
+            <div className="ms-loading">מנתח נתונים וחושב על תשובה...</div>
           )}
           <div ref={bottomRef} />
         </div>
@@ -238,18 +273,29 @@ export default function Chat() {
             </button>
           </div>
         </Form>
+        {conversationId ? (
+          <AppLink to="/app/chat" className="ms-text-link ms-chat-new-link">
+            + שיחה חדשה
+          </AppLink>
+        ) : null}
       </s-section>
 
       {conversations.length > 0 && (
         <s-section heading="שיחות קודמות">
-          <s-unordered-list>
-            {conversations.slice(0, 5).map((c) => (
-              <s-list-item key={c.id}>
-                {c.title ?? "שיחה"} —{" "}
-                {new Date(c.updated_at).toLocaleDateString("he-IL")}
-              </s-list-item>
+          <div className="ms-chat-history">
+            {conversations.slice(0, 8).map((c) => (
+              <AppLink
+                key={c.id}
+                to={`/app/chat?c=${c.id}`}
+                className={`ms-chat-history-item ${conversationId === c.id ? "is-active" : ""}`}
+              >
+                <span className="ms-chat-history-title">{c.title ?? "שיחה"}</span>
+                <span className="ms-chat-history-date">
+                  {new Date(c.updated_at).toLocaleDateString("he-IL")}
+                </span>
+              </AppLink>
             ))}
-          </s-unordered-list>
+          </div>
         </s-section>
       )}
     </s-page>
