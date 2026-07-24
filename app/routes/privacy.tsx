@@ -45,7 +45,7 @@ export default function Privacy() {
 
       <h2>Billing</h2>
       <p>
-        Paid plans are billed through Shopify. Free includes 1 scan and 2 AI outputs
+        Paid plans are billed through Shopify. Free includes 3 scans and 5 AI outputs
         per month; Starter ($9/mo) includes 5 each; Unlimited ($19/mo) has no caps.
       </p>
 

@@ -25,8 +25,9 @@ Testing instructions for Shopify reviewer (paste into Partners):
    Manual path: Online Store → Themes → Customize (live theme) → App embeds (puzzle icon) → Solution Tracker → Save.
 3. Open the storefront in a new tab. Visit Home, a product page, and the cart.
 4. Return to Solution → Home. Click "Get recommendations" (uses 1 free AI output).
-5. Open Chat and ask: "Where does my traffic come from?"
-6. Optional: Billing page shows Free (1 scan + 2 outputs), Starter $9/mo, Unlimited $19/mo.
+5. Open Advisor and ask: "Why are there no sales?" (uses 1 AI output).
+6. Open Segments → Refresh groups (uses 1 scan). Optional: Reports → Generate report.
+7. Billing page shows Free (3 scans + 5 outputs), Starter $9/mo, Unlimited $19/mo.
 
 Install link (dev store):
 https://admin.shopify.com/store/solution-vyndgruj/oauth/install?client_id=00eb38f774ffba914d98a6800f4c5df5

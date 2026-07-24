@@ -13,16 +13,16 @@ export type PlanDefinition = {
 
 export const PLAN_LIMITS: Record<PlanTier, PlanDefinition> = {
   free: {
-    scans: 1,
-    outputs: 2,
+    scans: 3,
+    outputs: 5,
     label: "Free",
     price: "$0",
     priceDetail: "Free forever",
     billingAmount: 0,
-    description: "Try Solution on your store — tracking, analytics, and your first AI insights.",
+    description: "Try Solution on your store — enough to test tracking, recommendations, chat, and reports.",
     highlights: [
-      "1 scan per month",
-      "2 AI outputs per month",
+      "3 scans per month",
+      "5 AI outputs per month",
       "Visitor tracking & analytics",
       "Setup guide included",
     ],

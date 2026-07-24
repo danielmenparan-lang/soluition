@@ -10,7 +10,7 @@ Short description — paste into listing (EN):
 (see description-en.txt — full text)
 
 Short description summary (EN):
-Solution tracks visitor behavior on your Shopify store, analyzes data with Claude AI, and shows recommendations, segments, and weekly reports — all inside Admin. Free: 1 scan + 2 AI outputs. Starter $9/mo. Unlimited $19/mo.
+Solution tracks visitor behavior on your Shopify store, analyzes data with Claude AI, and shows recommendations, segments, and weekly reports — all inside Admin. Free: 3 scans + 5 AI outputs. Starter $9/mo. Unlimited $19/mo.
 
 Search keywords:
 marketing, analytics, AI, recommendations, conversion, tracking, segments, Claude, dashboard, behavior
