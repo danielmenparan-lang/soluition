@@ -15,6 +15,9 @@ import { MetricCard } from "../components/ui/MetricCard";
 import { SetupGuide } from "../components/ui/SetupGuide";
 import { RecommendationCard } from "../components/ui/RecommendationCard";
 import { EmptyState } from "../components/ui/EmptyState";
+import { PageHero } from "../components/ui/PageHero";
+import { HelpPanel } from "../components/ui/HelpPanel";
+import { PAGE_HELP } from "../config/page-help";
 import { getOrCreateShop } from "../services/shop.server";
 import { getDashboardMetrics } from "../services/analytics.server";
 import { getRecommendations } from "../services/ai.server";
@@ -90,9 +93,18 @@ export default function Overview() {
   useFetcherToast(fetcher);
 
   const hasData = Boolean(metrics && metrics.totalVisitors > 0);
+  const help = PAGE_HELP.overview;
 
   return (
-    <s-page heading="Solution — מנהל השיווק החכם">
+    <s-page>
+      <PageHero
+        title={help.title}
+        subtitle={help.subtitle}
+        tips={help.tips}
+        variant="default"
+      />
+      <HelpPanel title={help.helpTitle} items={help.helpItems} />
+
       <SubmitButton
         fetcher={fetcher}
         slot="primary-action"
@@ -100,13 +112,6 @@ export default function Overview() {
       >
         {isGenerating ? "מייצר המלצות..." : "יצירת המלצות AI"}
       </SubmitButton>
-
-      <s-section>
-        <p className="ms-page-intro">
-          האפליקציה אוספת נתונים מהחנות, מנתחת אותם עם Claude AI, ומציגה המלצות
-          שיווק, קהלים ודוחות — הכול מתוך Shopify Admin.
-        </p>
-      </s-section>
 
       {isGenerating && (
         <s-section>

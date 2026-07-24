@@ -27,3 +27,10 @@ Capture from Shopify Admin → Apps → solution:
 2. AI Recommendations (המלצות AI)
 3. Analytics (אנליטיקה)
 4. AI Chat (צ'אט AI)
+
+Support email (Partners listing + app footer):
+support@solu-ai.com
+(Override in Render: SUPPORT_EMAIL=your@email.com)
+
+Privacy policy URL:
+https://shopify-marketing-solution.onrender.com/privacy

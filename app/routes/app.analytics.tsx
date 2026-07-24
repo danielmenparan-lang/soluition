@@ -12,6 +12,9 @@ import {
 import { getProductExitDrivers } from "../services/product-intelligence.server";
 import { MetricCard } from "../components/ui/MetricCard";
 import { EmptyState } from "../components/ui/EmptyState";
+import { PageHero } from "../components/ui/PageHero";
+import { HelpPanel } from "../components/ui/HelpPanel";
+import { PAGE_HELP } from "../config/page-help";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -65,9 +68,18 @@ export default function Analytics() {
   const { metrics, bouncePages, lowConversionPages, productExitDrivers } =
     useLoaderData<typeof loader>();
 
+  const help = PAGE_HELP.analytics;
+
   if (!metrics) {
     return (
-      <s-page heading="אנליטיקה">
+      <s-page>
+        <PageHero
+          title={help.title}
+          subtitle={help.subtitle}
+          tips={help.tips}
+          variant="analytics"
+        />
+        <HelpPanel title={help.helpTitle} items={help.helpItems} />
         <s-section>
           <EmptyState
             title="אין נתוני אנליטיקה"
@@ -79,13 +91,14 @@ export default function Analytics() {
   }
 
   return (
-    <s-page heading="אנליטיקה">
-      <s-section>
-        <p className="ms-page-intro">
-          תמונת מצב מלאה של הביצועים — מקורות תנועה, מוצרים, דפים בעייתיים
-          ונקודות יציאה.
-        </p>
-      </s-section>
+    <s-page>
+      <PageHero
+        title={help.title}
+        subtitle={help.subtitle}
+        tips={help.tips}
+        variant="analytics"
+      />
+      <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
       <s-section heading="מדדים">
         <div className="ms-metric-grid">

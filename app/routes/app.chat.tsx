@@ -10,6 +10,9 @@ import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { useFetcherToast } from "../hooks/useFetcherToast";
+import { PageHero } from "../components/ui/PageHero";
+import { HelpPanel } from "../components/ui/HelpPanel";
+import { PAGE_HELP } from "../config/page-help";
 import { getOrCreateShop } from "../services/shop.server";
 import { chatWithAI, getChatConversations } from "../services/ai.server";
 
@@ -78,6 +81,7 @@ export default function Chat() {
   const processedReplyRef = useRef<string | null>(null);
 
   useFetcherToast(fetcher);
+  const help = PAGE_HELP.chat;
 
   useEffect(() => {
     if (fetcher.state !== "idle") return;
@@ -117,13 +121,14 @@ export default function Chat() {
   };
 
   return (
-    <s-page heading="צ'אט AI — מנהל השיווק">
-      <s-section>
-        <p className="ms-page-intro">
-          שאל שאלות על הביצועים, המוצרים והקהלים — Claude עונה על בסיס נתוני
-          החנות האמיתיים שלך.
-        </p>
-      </s-section>
+    <s-page>
+      <PageHero
+        title={help.title}
+        subtitle={help.subtitle}
+        tips={help.tips}
+        variant="ai"
+      />
+      <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
       <s-section heading="שאלות מומלצות">
         <div className="ms-link-row">

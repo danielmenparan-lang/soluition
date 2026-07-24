@@ -1,38 +1,45 @@
+import { useLoaderData } from "react-router";
+import { getSupportEmail } from "../config/support.server";
+
+export const loader = () => ({ supportEmail: getSupportEmail() });
+
 export default function Privacy() {
+  const { supportEmail } = useLoaderData<typeof loader>();
+
   return (
-    <div style={{ maxWidth: "720px", margin: "40px auto", padding: "24px", fontFamily: "system-ui, sans-serif", lineHeight: 1.6 }}>
-      <h1>Privacy Policy — Marketing Solution</h1>
-      <p>Last updated: July 2026</p>
+    <div className="ms-static-page">
+      <h1>מדיניות פרטיות — Solution AI Marketing</h1>
+      <p>עודכן: יולי 2026</p>
 
-      <h2>What we collect</h2>
+      <h2>מה אנחנו אוספים</h2>
       <p>
-        Marketing Solution collects storefront visitor behavior (page views, product views,
-        cart actions, traffic source, device type, country) to provide analytics and AI
-        recommendations to merchants who install the app.
+        Solution אוספת נתוני התנהגות מבקרים בחנות (צפיות בדפים, מוצרים, עגלת
+        קניות, מקור תנועה, סוג מכשיר, מדינה) כדי לספק אנליטיקה והמלצות AI
+        לסוחרים שהתקינו את האפליקציה.
       </p>
 
-      <h2>How we use data</h2>
+      <h2>איך משתמשים בנתונים</h2>
       <p>
-        Data is used solely to power merchant dashboards, audience segments, and marketing
-        recommendations within the Shopify Admin app. We do not sell visitor data.
+        הנתונים משמשים אך ורק להצגת דשבord, קהלים והמלצות שיווק בתוך Shopify
+        Admin. אנחנו לא מוכרים נתוני מבקרים.
       </p>
 
-      <h2>Data storage</h2>
+      <h2>אחסון</h2>
       <p>
-        Analytics data is stored in Supabase (PostgreSQL). Shopify OAuth session data is stored
-        securely for app authentication.
+        נתוני אנליטיקה נשמרים ב-Supabase (PostgreSQL). נתוני OAuth של Shopify
+        נשמרים בצורה מאובטחת לצורך אימות.
       </p>
 
-      <h2>Third parties</h2>
+      <h2>צד שלישי</h2>
       <p>
-        We use Anthropic Claude for AI-generated insights. Data sent to AI is aggregated store
-        analytics, not raw customer PII.
+        אנחנו משתמשים ב-Anthropic Claude ליצירת תובנות AI. הנתונים שנשלחים
+        הם סיכומים מצטברים — לא PII גolמי של לקוחות.
       </p>
 
-      <h2>Contact</h2>
+      <h2>יצירת קשר</h2>
       <p>
-        For privacy questions contact the app developer via the Shopify App Store listing or
-        your store admin support channel.
+        לשאלות פרטיות או תמיכה:{" "}
+        <a href={`mailto:${supportEmail}`}>{supportEmail}</a>
       </p>
     </div>
   );

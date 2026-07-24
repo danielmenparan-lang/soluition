@@ -10,6 +10,9 @@ import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { useFetcherToast } from "../hooks/useFetcherToast";
 import { SubmitButton } from "../components/SubmitButton";
 import { EmptyState } from "../components/ui/EmptyState";
+import { PageHero } from "../components/ui/PageHero";
+import { HelpPanel } from "../components/ui/HelpPanel";
+import { PAGE_HELP } from "../config/page-help";
 import { asActionItems, asStringArray } from "../utils/safe-json";
 import { getOrCreateShop } from "../services/shop.server";
 import {
@@ -45,6 +48,7 @@ export default function Reports() {
   const isGenerating = fetcher.state !== "idle";
 
   useFetcherToast(fetcher);
+  const help = PAGE_HELP.reports;
 
   const insights = latest ? asStringArray(latest.insights) : [];
   const topActions = latest ? asActionItems(latest.top_actions) : [];
@@ -52,17 +56,18 @@ export default function Reports() {
   const wastePoints = latest ? asStringArray(latest.waste_points) : [];
 
   return (
-    <s-page heading="דוחות שבועיים">
+    <s-page>
+      <PageHero
+        title={help.title}
+        subtitle={help.subtitle}
+        tips={help.tips}
+        variant="reports"
+      />
+      <HelpPanel title={help.helpTitle} items={help.helpItems} />
+
       <SubmitButton fetcher={fetcher} slot="primary-action">
         {isGenerating ? "מייצר..." : "יצירת דוח שבועי"}
       </SubmitButton>
-
-      <s-section>
-        <p className="ms-page-intro">
-          דוח AI שבועי עם תובנות, פעולות מומלצות, הזדמנויות צמיחה ונקודות בזבוז
-          — מבוסס על נתוני 7 הימים האחרונים.
-        </p>
-      </s-section>
 
       {!latest ? (
         <s-section>

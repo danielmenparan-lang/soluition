@@ -285,3 +285,201 @@
   gap: 8px;
   margin-top: 12px;
 }
+
+/* App shell */
+.ms-app-shell {
+  min-height: 100%;
+  background: linear-gradient(180deg, #f9fafb 0%, #f6f6f7 100%);
+}
+
+.ms-app-content {
+  padding-bottom: 8px;
+}
+
+/* Hero headers */
+.ms-hero {
+  border-radius: var(--ms-radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  border: 1px solid var(--ms-border);
+  box-shadow: var(--ms-shadow);
+}
+
+.ms-hero-default {
+  background: linear-gradient(135deg, #fff 0%, #f0faf7 100%);
+  border-right: 4px solid var(--ms-brand);
+}
+
+.ms-hero-ai {
+  background: linear-gradient(135deg, #fff 0%, var(--ms-ai-light) 100%);
+  border-right: 4px solid var(--ms-ai);
+}
+
+.ms-hero-analytics {
+  background: linear-gradient(135deg, #fff 0%, #eef4fc 100%);
+  border-right: 4px solid var(--ms-info);
+}
+
+.ms-hero-reports {
+  background: linear-gradient(135deg, #fff 0%, #fff8e6 100%);
+  border-right: 4px solid var(--ms-warning);
+}
+
+.ms-hero-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ms-text);
+  line-height: 1.25;
+}
+
+.ms-hero-subtitle {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ms-text-subdued);
+  max-width: 720px;
+}
+
+.ms-hero-tips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ms-hero-tips li {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--ms-border);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ms-text);
+}
+
+/* Help panel */
+.ms-help-panel {
+  background: #fff;
+  border: 1px solid var(--ms-border);
+  border-radius: var(--ms-radius);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--ms-shadow);
+}
+
+.ms-help-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ms-help-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.ms-help-panel-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ms-text);
+}
+
+.ms-help-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.ms-help-item {
+  background: var(--ms-surface);
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid transparent;
+}
+
+.ms-help-item-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ms-brand-dark);
+  margin-bottom: 4px;
+}
+
+.ms-help-item-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ms-text-subdued);
+}
+
+/* Support footer */
+.ms-support-footer {
+  margin-top: 24px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--ms-border);
+  background: #fff;
+}
+
+.ms-support-inner {
+  max-width: 960px;
+}
+
+.ms-support-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ms-support-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ms-text);
+}
+
+.ms-support-email {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ms-brand);
+  text-decoration: none;
+}
+
+.ms-support-email:hover {
+  color: var(--ms-brand-dark);
+  text-decoration: underline;
+}
+
+.ms-support-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ms-text-subdued);
+}
+
+/* Privacy / static pages */
+.ms-static-page {
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 32px;
+  background: #fff;
+  border: 1px solid var(--ms-border);
+  border-radius: var(--ms-radius);
+  box-shadow: var(--ms-shadow);
+  line-height: 1.65;
+  color: var(--ms-text);
+}
+
+.ms-static-page h1 {
+  margin-top: 0;
+  font-size: 28px;
+}
+
+.ms-static-page h2 {
+  margin-top: 28px;
+  font-size: 18px;
+  color: var(--ms-brand-dark);
+}

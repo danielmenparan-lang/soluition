@@ -9,10 +9,15 @@ import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { NavMenu } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { AppLink } from "../components/AppLink";
+import { SupportFooter } from "../components/ui/SupportFooter";
+import { getSupportEmail } from "../config/support.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
-  return { apiKey: process.env.SHOPIFY_API_KEY || "" };
+  return {
+    apiKey: process.env.SHOPIFY_API_KEY || "",
+    supportEmail: getSupportEmail(),
+  };
 };
 
 /** Safety net: POST to /app without ?index hits the layout and would 405 otherwise. */
@@ -28,7 +33,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function App() {
-  const { apiKey } = useLoaderData<typeof loader>();
+  const { apiKey, supportEmail } = useLoaderData<typeof loader>();
 
   return (
     <AppProvider embedded apiKey={apiKey}>
@@ -42,7 +47,12 @@ export default function App() {
         <AppLink to="/app/reports">דוחות</AppLink>
         <AppLink to="/app/chat">צ'אט AI</AppLink>
       </NavMenu>
-      <Outlet />
+      <div className="ms-app-shell">
+        <div className="ms-app-content">
+          <Outlet context={{ supportEmail }} />
+        </div>
+        <SupportFooter email={supportEmail} />
+      </div>
     </AppProvider>
   );
 }

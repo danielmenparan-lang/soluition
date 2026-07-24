@@ -10,6 +10,9 @@ import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { useFetcherToast } from "../hooks/useFetcherToast";
 import { SubmitButton } from "../components/SubmitButton";
 import { EmptyState } from "../components/ui/EmptyState";
+import { PageHero } from "../components/ui/PageHero";
+import { HelpPanel } from "../components/ui/HelpPanel";
+import { PAGE_HELP } from "../config/page-help";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   getSegments,
@@ -51,19 +54,21 @@ export default function Segments() {
   const { segments, breakdown } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
   useFetcherToast(fetcher);
+  const help = PAGE_HELP.segments;
 
   return (
-    <s-page heading="קהלים">
+    <s-page>
+      <PageHero
+        title={help.title}
+        subtitle={help.subtitle}
+        tips={help.tips}
+        variant="default"
+      />
+      <HelpPanel title={help.helpTitle} items={help.helpItems} />
+
       <SubmitButton fetcher={fetcher} slot="primary-action">
         {fetcher.state !== "idle" ? "מעדכן..." : "רענון קהלים"}
       </SubmitButton>
-
-      <s-section>
-        <p className="ms-page-intro">
-          קהלים אוטומטיים לפי מקור תנועה, מדינה, מכשיר ועוד — לשימוש בקמפיינים
-          ורימרקטינג.
-        </p>
-      </s-section>
 
       <s-section heading="קהלים אוטומטיים">
         {segments.length === 0 ? (

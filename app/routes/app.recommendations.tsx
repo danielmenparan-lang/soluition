@@ -13,6 +13,9 @@ import { SubmitButton } from "../components/SubmitButton";
 import { AutoGenerateRecommendations } from "../components/AutoGenerateRecommendations";
 import { RecommendationCard } from "../components/ui/RecommendationCard";
 import { EmptyState } from "../components/ui/EmptyState";
+import { PageHero } from "../components/ui/PageHero";
+import { HelpPanel } from "../components/ui/HelpPanel";
+import { PAGE_HELP } from "../config/page-help";
 import { CATEGORY_LABELS } from "../components/ui/labels";
 import { getOrCreateShop } from "../services/shop.server";
 import {
@@ -47,6 +50,7 @@ export default function Recommendations() {
   const isGenerating = fetcher.state !== "idle";
 
   useFetcherToast(fetcher);
+  const help = PAGE_HELP.recommendations;
 
   const grouped = recommendations.reduce(
     (acc, rec) => {
@@ -59,7 +63,15 @@ export default function Recommendations() {
   );
 
   return (
-    <s-page heading="המלצות AI">
+    <s-page>
+      <PageHero
+        title={help.title}
+        subtitle={help.subtitle}
+        tips={help.tips}
+        variant="ai"
+      />
+      <HelpPanel title={help.helpTitle} items={help.helpItems} />
+
       <AutoGenerateRecommendations
         shopId={shop.id}
         fetcher={fetcher}
@@ -68,13 +80,6 @@ export default function Recommendations() {
       <SubmitButton fetcher={fetcher} slot="primary-action">
         {isGenerating ? "מייצר..." : "יצירת המלצות חדשות"}
       </SubmitButton>
-
-      <s-section>
-        <p className="ms-page-intro">
-          Claude מנתח את נתוני החנות שלך — תנועה, מוצרים, קהלים — ומציע פעולות
-          שיווק ממוקדות עם עדיפות והשפעה צפויה.
-        </p>
-      </s-section>
 
       {isGenerating && (
         <s-section>
