@@ -10,7 +10,10 @@ Subtitle / tagline (EN):
 AI marketing intelligence built into Shopify Admin
 
 Short description — paste into listing (HE):
-Solution עוקבת אחרי מבקרים ורכישות בחנות Shopify, מנתחת את הנתונים עם Claude AI, ומציגה המלצות שיווק, קהלים ודוחות שבועיים — הכול בתוך Admin, בלי כלים חיצוניים. התקנה: שורת מעקב אחת, והדשבord מתחיל לעבוד.
+(see description-he.txt — full text)
+
+Checklist before submit:
+assets/listing/submission-checklist.txt
 
 Short description — paste into listing (EN):
 Solution tracks visitors and sales on your Shopify store, analyzes data with Claude AI, and shows marketing recommendations, audience segments, and weekly reports — all inside Admin. Add one tracking line and your dashboard goes live.
@@ -23,10 +26,10 @@ Upload assets/app-icon.png (1200×1200)
 
 Screenshots:
 Capture from Shopify Admin → Apps → solution:
-1. Overview (סקירה) — metrics + setup guide
-2. AI Recommendations (המלצות AI)
-3. Analytics (אנליטיקה)
-4. AI Chat (צ'אט AI)
+1. התחלה — ProductExplainer + setup guide
+2. מה כדאי לעשות — recommendations
+3. מה קורה בחנות — analytics
+4. צ'אט — chat assistant
 
 Support email (Partners listing + app footer):
 vonx.support@gmail.com

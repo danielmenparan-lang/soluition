@@ -1,5 +1,6 @@
 import { SetupGuide } from "./SetupGuide";
 import { ChatPromo } from "./ChatPromo";
+import { ProductExplainer } from "./ProductExplainer";
 
 type WelcomeScreenProps = {
   shopDomain: string;
@@ -8,29 +9,6 @@ type WelcomeScreenProps = {
   hasData: boolean;
   hasRecommendations: boolean;
 };
-
-const VALUE_POINTS = [
-  {
-    icon: "👀",
-    title: "רואה מי נכנס לחנות",
-    text: "כמה אנשים ביקרו, מאיפה הגיעו, ומה הם צפו.",
-  },
-  {
-    icon: "📈",
-    title: "מבינה מה עובד ומה לא",
-    text: "איזה מוצרים מושכים, איפה אנשים עוזבים, ומה מביא מכירות.",
-  },
-  {
-    icon: "✅",
-    title: "אומרת לך מה לעשות",
-    text: "רשימת המלצות ברורה — מה לפרסם, מה לשפר, ומה לתקן קודם.",
-  },
-  {
-    icon: "💬",
-    title: "עונה על שאלות שלך",
-    text: "צ'אט — שאל על מכירות, מוצרים ופרסום. העוזר מנתח את הנתונים ועונה.",
-  },
-];
 
 export function WelcomeScreen({
   shopDomain,
@@ -61,22 +39,7 @@ export function WelcomeScreen({
         </p>
       </div>
 
-      {step === 1 ? (
-        <div className="ms-welcome-values">
-          <p className="ms-welcome-values-title">מה Solution עושה בשבילך?</p>
-          <div className="ms-welcome-value-grid">
-            {VALUE_POINTS.map((point) => (
-              <div key={point.title} className="ms-welcome-value-card">
-                <span className="ms-welcome-value-icon" aria-hidden>
-                  {point.icon}
-                </span>
-                <strong className="ms-welcome-value-name">{point.title}</strong>
-                <p className="ms-welcome-value-text">{point.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : null}
+      {step === 1 ? <ProductExplainer /> : null}
 
       <SetupGuide
         shopDomain={shopDomain}

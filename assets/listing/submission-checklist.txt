@@ -1,0 +1,25 @@
+=== צ'ק-ליסט שליחה ל-Shopify App Store ===
+
+לפני Submit for review:
+
+[ ] git push + Render deploy הושלם (https://shopify-marketing-solution.onrender.com/health → ok: true)
+[ ] npm run deploy:shopify — webhooks + theme extension עלו ל-Partners
+[ ] Privacy policy חיה: https://shopify-marketing-solution.onrender.com/privacy
+[ ] Support email: vonx.support@gmail.com (ב-Partners + באפליקציה)
+[ ] App icon 1200×1200: assets/app-icon.png
+[ ] 4 screenshots מ-Shopify Admin (התחלה, המלצות, אנליטיקס, צ'אט)
+[ ] תיאור HE/EN מ-assets/listing/description-*.txt
+[ ] חנות בדיקה עם מעקב פעיל + נתונים אמיתיים להדגמה
+[ ] (אופציונלי) orders/create webhook — דורש Protected customer data ב-Partners לפני הפעלה
+
+ב-Partners → Apps → solution → Listing:
+- App name: Solution — AI Marketing
+- Category: Marketing / Analytics
+- Privacy: https://shopify-marketing-solution.onrender.com/privacy
+- Support: vonx.support@gmail.com
+
+Testing instructions for reviewer:
+1. Apps → Solution → «התחלה»
+2. Themes → Customize → App embeds → «מעקב Solution» → Save
+3. Visit storefront, return to app
+4. «קבל המלצות» or «צ'אט»
