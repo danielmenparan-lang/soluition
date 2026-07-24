@@ -90,6 +90,9 @@ export async function generateRecommendations(
   ];
   const segments = await getSegments(shopId);
 
+  const hasData = analyticsSummary.includes('"totalVisitors":') &&
+    !analyticsSummary.includes('"totalVisitors": 0');
+
   const prompt = `Analyze this Shopify store data and generate marketing recommendations.
 
 Store Analytics:
@@ -100,6 +103,8 @@ ${JSON.stringify(productInsights.slice(0, 10), null, 2)}
 
 Audience Segments:
 ${JSON.stringify(segments.map((s) => ({ name: s.name, members: s.member_count })), null, 2)}
+
+${hasData ? "" : "Note: The store has little or no tracking data yet. Base recommendations on e-commerce best practices for a new Shopify store, and mention installing the tracking script to unlock deeper insights.\n"}
 
 Generate 8-12 recommendations across these categories: marketing, product, conversion, retargeting.
 

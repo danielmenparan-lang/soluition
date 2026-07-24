@@ -2,6 +2,7 @@ import type {
   ActionFunctionArgs,
   HeadersFunction,
   LoaderFunctionArgs,
+  ShouldRevalidateFunctionArgs,
 } from "react-router";
 import { useLoaderData } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
@@ -10,6 +11,7 @@ import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { SubmitButton } from "../components/SubmitButton";
+import { AutoGenerateRecommendations } from "../components/AutoGenerateRecommendations";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   generateRecommendations,
@@ -26,8 +28,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
-  await generateRecommendations(shop.id);
-  return { success: true };
+
+  try {
+    await generateRecommendations(shop.id);
+    return { success: true };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "יצירת המלצות נכשלה";
+    return { success: false, message };
+  }
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -45,6 +54,8 @@ export default function Recommendations() {
   useEffect(() => {
     if (fetcher.data?.success) {
       shopify.toast.show("המלצות חדשות נוצרו");
+    } else if (fetcher.data?.message) {
+      shopify.toast.show(fetcher.data.message);
     }
   }, [fetcher.data, shopify]);
 
@@ -60,6 +71,10 @@ export default function Recommendations() {
 
   return (
     <s-page heading="המלצות AI">
+      <AutoGenerateRecommendations
+        fetcher={fetcher}
+        hasRecommendations={recommendations.length > 0}
+      />
       <SubmitButton fetcher={fetcher} slot="primary-action">
         {fetcher.state !== "idle" ? "מייצר..." : "יצירת המלצות חדשות"}
       </SubmitButton>
@@ -67,8 +82,9 @@ export default function Recommendations() {
       {recommendations.length === 0 ? (
         <s-section>
           <s-paragraph>
-            אין המלצות עדיין. לחץ על &quot;יצירת המלצות חדשות&quot; כדי שה-AI
-            ינתח את נתוני החנות ויציע פעולות.
+            {fetcher.state !== "idle"
+              ? "מושך נתונים, שולח ל-Claude, ויוצר המלצות..."
+              : 'אין המלצות עדיין. לחץ על "יצירת המלצות חדשות" או המתן — ההמלצות ייווצרו אוטומטית.'}
           </s-paragraph>
         </s-section>
       ) : (
@@ -117,6 +133,14 @@ export default function Recommendations() {
       )}
     </s-page>
   );
+}
+
+export function shouldRevalidate({
+  formAction,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) {
+  if (formAction) return true;
+  return defaultShouldRevalidate;
 }
 
 export const headers: HeadersFunction = (headersArgs) => {

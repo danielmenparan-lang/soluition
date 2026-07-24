@@ -51,6 +51,10 @@ export const loader = async () => {
         serviceRoleKeyValid:
           supabaseKeyRole === "service_role" || supabaseKeyRole === "secret",
       },
+      anthropic: {
+        apiKeySet: Boolean(process.env.ANTHROPIC_API_KEY?.trim()),
+        apiKeyPrefix: process.env.ANTHROPIC_API_KEY?.trim().slice(0, 8) ?? null,
+      },
       hints: [
         !shopifyConfig.apiKeyMatchesApp
           ? "SHOPIFY_API_KEY wrong — must be 00eb38f774ffba914d98a6800f4c5df5"
@@ -74,6 +78,9 @@ export const loader = async () => {
         !sessionCheck.error?.includes("WebSocket") &&
         !sessionCheck.error?.includes("Invalid API key")
           ? "Run supabase/session-table.sql in Supabase SQL Editor (creates Session table)"
+          : null,
+        !process.env.ANTHROPIC_API_KEY?.trim()
+          ? "ANTHROPIC_API_KEY missing — AI recommendations, reports, and chat will fail"
           : null,
       ].filter(Boolean),
     },

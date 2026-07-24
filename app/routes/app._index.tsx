@@ -2,6 +2,7 @@ import type {
   ActionFunctionArgs,
   HeadersFunction,
   LoaderFunctionArgs,
+  ShouldRevalidateFunctionArgs,
 } from "react-router";
 import { useLoaderData } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
@@ -10,6 +11,7 @@ import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { SubmitButton } from "../components/SubmitButton";
+import { AutoGenerateRecommendations } from "../components/AutoGenerateRecommendations";
 import { getOrCreateShop } from "../services/shop.server";
 import { getDashboardMetrics } from "../services/analytics.server";
 import { getRecommendations } from "../services/ai.server";
@@ -81,6 +83,11 @@ export default function Overview() {
 
   return (
     <s-page heading="Marketing Solution — סקירה כללית">
+      <AutoGenerateRecommendations
+        fetcher={fetcher}
+        hasRecommendations={recommendations.length > 0}
+        intent="generate_recommendations"
+      />
       <SubmitButton
         fetcher={fetcher}
         slot="primary-action"
@@ -145,6 +152,14 @@ export default function Overview() {
         </s-stack>
       </s-section>
 
+      {recommendations.length === 0 && fetcher.state !== "idle" && (
+        <s-section heading="יוצר המלצות AI">
+          <s-paragraph>
+            מושך נתונים מ-Supabase, שולח ל-Claude, ויוצר המלצות שיווק...
+          </s-paragraph>
+        </s-section>
+      )}
+
       {recommendations.length > 0 && (
         <s-section heading="המלצות AI אחרונות">
           {recommendations.map((rec) => (
@@ -184,6 +199,14 @@ function MetricCard({ label, value }: { label: string; value: string | number })
       <s-heading>{String(value)}</s-heading>
     </s-box>
   );
+}
+
+export function shouldRevalidate({
+  formAction,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) {
+  if (formAction) return true;
+  return defaultShouldRevalidate;
 }
 
 export const headers: HeadersFunction = (headersArgs) => {

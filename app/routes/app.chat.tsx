@@ -99,9 +99,19 @@ export default function Chat() {
                 name="conversationId"
                 value={conversationId ?? ""}
               />
-              <s-button type="submit" disabled={fetcher.state !== "idle"}>
+              <button
+                type="submit"
+                disabled={fetcher.state !== "idle"}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc",
+                  background: "#fff",
+                  cursor: "pointer",
+                }}
+              >
                 {q}
-              </s-button>
+              </button>
             </Form>
           ))}
         </s-stack>
@@ -173,9 +183,21 @@ export default function Chat() {
               }}
               disabled={fetcher.state !== "idle"}
             />
-            <s-button type="submit" disabled={fetcher.state !== "idle"}>
+            <button
+              type="submit"
+              disabled={fetcher.state !== "idle"}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "8px",
+                border: "none",
+                background: "#303030",
+                color: "#fff",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
               שלח
-            </s-button>
+            </button>
           </s-stack>
         </Form>
       </s-section>

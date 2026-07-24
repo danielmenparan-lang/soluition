@@ -20,6 +20,7 @@
     "prisma": "prisma",
     "typecheck": "react-router typegen && tsc --noEmit",
     "db:seed": "tsx scripts/seed-demo-data.ts",
+    "ai:test": "tsx scripts/test-ai-pipeline.ts",
     "db:test": "node scripts/test-database-url.mjs",
     "db:migrate": "prisma migrate deploy"
   },
