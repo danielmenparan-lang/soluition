@@ -34,8 +34,6 @@ import { HomeHero } from "../components/ui/HomeHero";
 
 import { TrendChart } from "../components/ui/TrendChart";
 
-import { RfmBarChart } from "../components/ui/RfmBarChart";
-
 import { PriorityActionCard } from "../components/ui/PriorityActionCard";
 
 import { AdvisorQuickAsk } from "../components/ui/AdvisorQuickAsk";
@@ -87,8 +85,6 @@ import {
   buildThemesAdminUrl,
 
 } from "../config/theme-embed";
-
-import { POSITIONING } from "../config/positioning";
 
 
 
@@ -487,14 +483,6 @@ export default function Overview() {
 
         <s-section>
 
-          <div className="ms-home-positioning">
-
-            <h2 className="ms-home-positioning-title">{POSITIONING.homeHeadline}</h2>
-
-            <p className="ms-home-positioning-sub">{POSITIONING.homeSubheadline}</p>
-
-          </div>
-
           <HomeHero
 
             intelligence={intelligence}
@@ -508,48 +496,6 @@ export default function Overview() {
         </s-section>
 
       ) : null}
-
-
-
-      <s-section>
-
-        <div className="ms-home-charts">
-
-          <TrendChart
-
-            title={hasShopifyData ? "Revenue trend" : "Visitor trend"}
-
-            subtitle="Last 30 days"
-
-            points={chartPoints}
-
-            currency={hasShopifyData ? intelligence?.primaryCurrency : undefined}
-
-            valueLabel={hasShopifyData ? "30-day total" : "30-day visitors"}
-
-            emptyMessage={
-
-              hasShopifyData
-
-                ? "Sync Shopify orders to see revenue over time."
-
-                : "Enable tracking and browse your storefront."
-
-            }
-
-            accent={hasShopifyData ? "#0a9b7a" : "#6d5ef7"}
-
-          />
-
-          {intelligence?.hasShopifyOrders ? (
-
-            <RfmBarChart segments={intelligence.rfm} />
-
-          ) : null}
-
-        </div>
-
-      </s-section>
 
 
 
@@ -600,6 +546,42 @@ export default function Overview() {
           />
 
         )}
+
+      </s-section>
+
+
+
+      <s-section heading="Last 30 days">
+
+        <div className="ms-home-charts ms-home-charts-compact">
+
+          <TrendChart
+
+            title={hasShopifyData ? "Revenue" : "Visitors"}
+
+            subtitle="Daily trend"
+
+            points={chartPoints}
+
+            currency={hasShopifyData ? intelligence?.primaryCurrency : undefined}
+
+            valueLabel={hasShopifyData ? "Total" : "Total"}
+
+            emptyMessage={
+
+              hasShopifyData
+
+                ? "Sync orders to see revenue."
+
+                : "Turn on tracking and browse your store."
+
+            }
+
+            accent={hasShopifyData ? "#0a9b7a" : "#6d5ef7"}
+
+          />
+
+        </div>
 
       </s-section>
 
