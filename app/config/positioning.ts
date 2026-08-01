@@ -4,31 +4,27 @@
 export const POSITIONING = {
   productName: "Solution",
   tagline: "Find why people visit but don't buy",
-  subtagline: "Simple fixes, ranked by what matters most.",
+  homePitch: "Solution checks your store and tells you what to fix — in plain English.",
 
-  homeHeadline: "Why no sales?",
-  homeSubheadline: "Your store score and 3 things to fix — from your real data.",
-
-  brandTagline: "Why no sales? Simple fixes that work.",
+  brandTagline: "Check your store. Fix what's wrong. Sell more.",
 
   welcomeTitle: "Let's find why sales are stuck",
   welcomeLead:
-    "Turn on tracking, browse your store once, and we'll show what's wrong and what to fix.",
+    "Turn on tracking, browse your store once, and we'll show what to fix.",
 
-  chatKicker: "Chat",
-  chatTitle: "Ask anything about your store",
-  chatText:
-    "Clear answers in plain English. Uses your store data. Customers never see this.",
+  chatKicker: "Start here",
+  chatTitle: "Chat — ask why no sales",
+  chatText: "Clear answers from your store data. Only you see this.",
 
-  proTitle: "See the full picture",
-  proText: "Sync orders, see repeat buyers, unlimited chat and fixes — $29/mo.",
+  proTitle: "Unlock full store data",
+  proText: "Order sync, repeat buyers, unlimited chat & fixes — $29/mo.",
 
   appStoreName: "Solution — Fix Store Conversion",
-  appStoreSubtitle: "Why no sales? Get simple fixes ranked by impact.",
+  appStoreSubtitle: "Why no sales? Simple fixes ranked by impact.",
 } as const;
 
 export const CHAT_STARTERS = [
   "Why no sales?",
-  "What should I fix first?",
-  "Which page loses buyers?",
+  "What to fix first?",
+  "Bad product page?",
 ] as const;

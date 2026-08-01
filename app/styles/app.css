@@ -1,27 +1,29 @@
 :root {
-  --ms-brand: #0a9b7a;
-  --ms-brand-light: #dff7ef;
-  --ms-brand-dark: #047a5c;
-  --ms-brand-glow: rgba(10, 155, 122, 0.18);
-  --ms-accent: #ff6b4a;
-  --ms-accent-light: #fff0ec;
-  --ms-ai: #6d5ef7;
-  --ms-ai-light: #f0edff;
-  --ms-warning: #e0950d;
-  --ms-warning-light: #fff8e8;
-  --ms-critical: #e0452f;
-  --ms-info: #3d7ee8;
-  --ms-info-light: #ebf2ff;
-  --ms-surface: #f4f7fb;
-  --ms-surface-warm: #faf8f5;
-  --ms-border: #dce3ed;
-  --ms-text: #15202b;
-  --ms-text-subdued: #5c6b7a;
-  --ms-radius: 18px;
-  --ms-radius-sm: 12px;
-  --ms-shadow: 0 2px 8px rgba(21, 32, 43, 0.06);
-  --ms-shadow-md: 0 8px 28px rgba(21, 32, 43, 0.1);
-  --ms-shadow-brand: 0 8px 32px var(--ms-brand-glow);
+  --ms-brand: #0d9488;
+  --ms-brand-light: #ecfdf5;
+  --ms-brand-soft: #f0fdfa;
+  --ms-brand-dark: #0f766e;
+  --ms-brand-glow: rgba(13, 148, 136, 0.15);
+  --ms-accent: #14b8a6;
+  --ms-accent-light: #ecfdf5;
+  --ms-ai: #0f766e;
+  --ms-ai-light: #ecfdf5;
+  --ms-warning: #d97706;
+  --ms-warning-light: #fffbeb;
+  --ms-critical: #dc2626;
+  --ms-critical-soft: #fef2f2;
+  --ms-info: #0d9488;
+  --ms-info-light: #ecfdf5;
+  --ms-surface: #f8fafb;
+  --ms-surface-warm: #fafafa;
+  --ms-border: #e2e8f0;
+  --ms-text: #1e293b;
+  --ms-text-subdued: #64748b;
+  --ms-radius: 16px;
+  --ms-radius-sm: 10px;
+  --ms-shadow: 0 1px 3px rgba(30, 41, 59, 0.06);
+  --ms-shadow-md: 0 8px 24px rgba(30, 41, 59, 0.08);
+  --ms-shadow-brand: 0 8px 28px var(--ms-brand-glow);
   --ms-font: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
@@ -109,13 +111,13 @@
 }
 
 .ms-badge-high {
-  background: #fee9e8;
+  background: var(--ms-critical-soft);
   color: var(--ms-critical);
 }
 
 .ms-badge-medium {
-  background: #ffef9d;
-  color: #8a6116;
+  background: var(--ms-warning-light);
+  color: var(--ms-warning);
 }
 
 .ms-badge-low {
@@ -1565,19 +1567,73 @@
 
 /* ─── Home dashboard v2 ─── */
 
+/* ─── Home: 10-second clarity ─── */
+
+.ms-home-pitch {
+  background: var(--ms-brand-soft);
+  border: 1px solid rgba(13, 148, 136, 0.12);
+  border-radius: var(--ms-radius);
+  padding: 18px 20px;
+}
+
+.ms-home-pitch-tagline {
+  margin: 0 0 14px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--ms-text);
+}
+
+.ms-home-pitch-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ms-home-pitch-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ms-brand-dark);
+  background: #fff;
+  border: 1px solid rgba(13, 148, 136, 0.15);
+  border-radius: 999px;
+  padding: 6px 12px 6px 6px;
+}
+
+.ms-home-pitch-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--ms-brand);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* ─── Home dashboard ─── */
+
 .ms-store-snapshot {
   background: #fff;
   border: 1px solid var(--ms-border);
   border-radius: var(--ms-radius);
   padding: 24px;
   box-shadow: var(--ms-shadow);
+  border-top: 3px solid var(--ms-brand);
 }
 
-.ms-store-snapshot-great { border-top: 4px solid #16a34a; }
-.ms-store-snapshot-good { border-top: 4px solid #65a30d; }
-.ms-store-snapshot-ok { border-top: 4px solid #ca8a04; }
-.ms-store-snapshot-warn { border-top: 4px solid #ea580c; }
-.ms-store-snapshot-bad { border-top: 4px solid #dc2626; }
+.ms-store-snapshot-great,
+.ms-store-snapshot-good,
+.ms-store-snapshot-ok,
+.ms-store-snapshot-warn,
+.ms-store-snapshot-bad {
+  border-top-color: var(--ms-brand);
+}
 
 .ms-store-snapshot-top {
   display: flex;
@@ -1619,17 +1675,19 @@
 .ms-store-snapshot-score {
   flex-shrink: 0;
   text-align: center;
-  min-width: 100px;
-  padding: 12px 16px;
+  min-width: 108px;
+  padding: 14px 16px;
   border-radius: var(--ms-radius-sm);
-  background: var(--ms-surface);
+  background: var(--ms-brand-soft);
+  border: 1px solid rgba(13, 148, 136, 0.12);
 }
 
 .ms-store-snapshot-number {
   display: block;
-  font-size: 44px;
+  font-size: 40px;
   font-weight: 800;
   line-height: 1;
+  color: var(--ms-brand-dark);
 }
 
 .ms-store-snapshot-outof {
@@ -1638,22 +1696,28 @@
   color: var(--ms-text-subdued);
 }
 
-.ms-store-snapshot-grade-a .ms-store-snapshot-number { color: #16a34a; }
-.ms-store-snapshot-grade-b .ms-store-snapshot-number { color: #65a30d; }
-.ms-store-snapshot-grade-c .ms-store-snapshot-number { color: #ca8a04; }
-.ms-store-snapshot-grade-d .ms-store-snapshot-number { color: #ea580c; }
-.ms-store-snapshot-grade-f .ms-store-snapshot-number { color: #dc2626; }
+.ms-store-snapshot-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--ms-text-subdued);
+  max-width: 120px;
+  margin-inline: auto;
+}
 
-.ms-store-snapshot-grade-a { background: #f0fdf4; }
-.ms-store-snapshot-grade-b { background: #f7fee7; }
-.ms-store-snapshot-grade-c { background: #fefce8; }
-.ms-store-snapshot-grade-d { background: #fff7ed; }
-.ms-store-snapshot-grade-f { background: #fef2f2; }
+.ms-store-snapshot-grade-a .ms-store-snapshot-number,
+.ms-store-snapshot-grade-b .ms-store-snapshot-number,
+.ms-store-snapshot-grade-c .ms-store-snapshot-number,
+.ms-store-snapshot-grade-d .ms-store-snapshot-number,
+.ms-store-snapshot-grade-f .ms-store-snapshot-number {
+  color: var(--ms-brand-dark);
+}
 
 .ms-store-snapshot-bar {
   height: 8px;
   border-radius: 999px;
-  background: #e8eaed;
+  background: #e2e8f0;
   overflow: hidden;
   margin-bottom: 20px;
 }
@@ -1661,14 +1725,17 @@
 .ms-store-snapshot-bar-fill {
   height: 100%;
   border-radius: 999px;
+  background: linear-gradient(90deg, var(--ms-brand), var(--ms-accent));
   transition: width 0.6s ease;
 }
 
-.ms-store-snapshot-warn .ms-store-snapshot-bar-fill { background: #ea580c; }
-.ms-store-snapshot-bad .ms-store-snapshot-bar-fill { background: #dc2626; }
-.ms-store-snapshot-ok .ms-store-snapshot-bar-fill { background: #ca8a04; }
-.ms-store-snapshot-good .ms-store-snapshot-bar-fill { background: #65a30d; }
-.ms-store-snapshot-great .ms-store-snapshot-bar-fill { background: #16a34a; }
+.ms-store-snapshot-warn .ms-store-snapshot-bar-fill,
+.ms-store-snapshot-bad .ms-store-snapshot-bar-fill,
+.ms-store-snapshot-ok .ms-store-snapshot-bar-fill,
+.ms-store-snapshot-good .ms-store-snapshot-bar-fill,
+.ms-store-snapshot-great .ms-store-snapshot-bar-fill {
+  background: linear-gradient(90deg, var(--ms-brand), var(--ms-accent));
+}
 
 .ms-store-snapshot-kpis {
   display: grid;
@@ -2145,72 +2212,63 @@
 }
 
 .ms-advisor-quick {
-  background: linear-gradient(135deg, var(--ms-ai-light) 0%, #fff 55%);
-  border: 1px solid rgba(109, 94, 247, 0.2);
+  background: var(--ms-brand-soft);
+  border: 1px solid rgba(13, 148, 136, 0.15);
   border-radius: var(--ms-radius);
   padding: 22px;
 }
 
-/* Featured chat block — top of Home */
+/* Featured chat — unified teal */
 .ms-chat-featured {
   position: relative;
-  background: linear-gradient(135deg, #6d5ef7 0%, #0a9b7a 100%);
+  background: linear-gradient(135deg, var(--ms-brand-soft) 0%, #fff 100%);
+  border: 1px solid rgba(13, 148, 136, 0.2);
   border-radius: var(--ms-radius);
-  padding: 28px 24px;
-  color: #fff;
-  box-shadow: 0 12px 40px rgba(109, 94, 247, 0.35);
+  padding: 24px;
+  box-shadow: var(--ms-shadow-brand);
 }
 
-.ms-chat-featured-badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  background: rgba(255, 255, 255, 0.22);
-  padding: 5px 10px;
-  border-radius: 999px;
-  margin-bottom: 12px;
+.ms-chat-featured-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .ms-chat-featured .ms-advisor-quick-kicker {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--ms-brand);
+  font-weight: 800;
 }
 
 .ms-chat-featured .ms-advisor-quick-title {
-  color: #fff;
-  font-size: 24px;
+  color: var(--ms-text);
+  font-size: 22px;
 }
 
 .ms-chat-featured .ms-advisor-quick-text {
-  color: rgba(255, 255, 255, 0.9);
-  max-width: 520px;
+  color: var(--ms-text-subdued);
+  max-width: 480px;
 }
 
-.ms-chat-featured-cta {
+.ms-btn-chip-soft {
   background: #fff !important;
-  color: #4a3fd9 !important;
-  font-weight: 700;
-  margin-top: 4px;
+  color: var(--ms-brand-dark) !important;
+  border: 1px solid rgba(13, 148, 136, 0.25) !important;
 }
 
-.ms-chat-featured-cta:hover {
-  background: #f5f3ff !important;
+.ms-btn-chip-soft:hover {
+  background: var(--ms-brand-soft) !important;
+  border-color: var(--ms-brand) !important;
 }
 
-.ms-btn-chip-light {
-  background: rgba(255, 255, 255, 0.18) !important;
-  color: #fff !important;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
-}
-
-.ms-btn-chip-light:hover {
-  background: rgba(255, 255, 255, 0.28) !important;
+.ms-btn-lg {
+  padding: 12px 22px !important;
+  font-size: 15px !important;
+  align-self: flex-start;
 }
 
 .ms-home-link-card-chat {
-  border-color: var(--ms-ai);
-  background: linear-gradient(180deg, var(--ms-ai-light) 0%, #fff 100%);
+  border-color: rgba(13, 148, 136, 0.3);
+  background: linear-gradient(180deg, var(--ms-brand-soft) 0%, #fff 100%);
 }
 
 .ms-advisor-quick-kicker {
@@ -2218,7 +2276,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--ms-ai);
+  color: var(--ms-brand);
   margin: 0 0 4px;
 }
 
@@ -2252,7 +2310,7 @@
 .ms-pro-card-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 80% 20%, rgba(109, 94, 247, 0.12), transparent 55%),
+  background: radial-gradient(circle at 80% 20%, rgba(13, 148, 136, 0.1), transparent 55%),
     linear-gradient(135deg, var(--ms-brand-light), #fff);
   pointer-events: none;
 }

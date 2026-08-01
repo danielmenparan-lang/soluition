@@ -37,6 +37,7 @@ import { TrendChart } from "../components/ui/TrendChart";
 import { PriorityActionCard } from "../components/ui/PriorityActionCard";
 
 import { AdvisorQuickAsk } from "../components/ui/AdvisorQuickAsk";
+import { HomePitch } from "../components/ui/HomePitch";
 
 import { ProUpgradeCard } from "../components/ui/ProUpgradeCard";
 
@@ -471,6 +472,18 @@ export default function Overview() {
 
 
 
+      {hasData ? (
+
+        <s-section>
+
+          <HomePitch />
+
+        </s-section>
+
+      ) : null}
+
+
+
       <s-section>
 
         <AdvisorQuickAsk featured />
@@ -577,7 +590,7 @@ export default function Overview() {
 
             }
 
-            accent={hasShopifyData ? "#0a9b7a" : "#6d5ef7"}
+            accent={hasShopifyData ? "#0d9488" : "#0d9488"}
 
           />
 

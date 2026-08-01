@@ -20,11 +20,11 @@ export function BrandLogo({
         d="M14 30V18h5.2l3.4 8.2L26 18h5v12h-3.6V23.8L24.8 30h-2.9l-2.6-6.2V30H14z"
         fill="#fff"
       />
-      <circle cx="34" cy="16" r="4" fill="#6d5ef7" opacity="0.95" />
+      <circle cx="34" cy="16" r="4" fill="#14b8a6" opacity="0.95" />
       <defs>
         <linearGradient id="ms-logo-grad" x1="8" y1="6" x2="42" y2="42">
-          <stop stopColor="#0a9b7a" />
-          <stop offset="1" stopColor="#047a5c" />
+          <stop stopColor="#0d9488" />
+          <stop offset="1" stopColor="#0f766e" />
         </linearGradient>
       </defs>
     </svg>

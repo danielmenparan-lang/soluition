@@ -1,6 +1,5 @@
-import { AppLink } from "../AppLink";
 import { formatMoney } from "../../utils/format-currency";
-import { getStoreScoreCopy } from "../../utils/store-score-copy";
+import { getStoreScoreCopy, getScoreHint } from "../../utils/store-score-copy";
 import type { StoreIntelligence } from "../../types/store-intelligence.types";
 
 type HomeHeroProps = {
@@ -22,16 +21,17 @@ export function HomeHero({
     <div className={`ms-store-snapshot ms-store-snapshot-${copy.tone}`}>
       <div className="ms-store-snapshot-top">
         <div className="ms-store-snapshot-copy">
-          <p className="ms-store-snapshot-label">How is your store doing?</p>
+          <p className="ms-store-snapshot-label">Your store today</p>
           <h2 className="ms-store-snapshot-verdict">{copy.verdict}</h2>
           <p className="ms-store-snapshot-explain">{copy.explain}</p>
         </div>
         <div
           className={`ms-store-snapshot-score ms-store-snapshot-grade-${storeHealthGrade.toLowerCase()}`}
-          aria-label={`Store score ${storeHealthScore} out of 100, grade ${storeHealthGrade}`}
+          aria-label={`Store score ${storeHealthScore} out of 100`}
         >
           <span className="ms-store-snapshot-number">{storeHealthScore}</span>
           <span className="ms-store-snapshot-outof">/ 100</span>
+          <span className="ms-store-snapshot-hint">{getScoreHint(storeHealthScore)}</span>
         </div>
       </div>
 
@@ -50,35 +50,25 @@ export function HomeHero({
 
       <div className="ms-store-snapshot-kpis">
         <div className="ms-store-snapshot-kpi">
-          <span className="ms-store-snapshot-kpi-label">Visitors (30d)</span>
+          <span className="ms-store-snapshot-kpi-label">Visitors</span>
           <strong>{visitorCount !== null ? visitorCount : "—"}</strong>
         </div>
         <div className="ms-store-snapshot-kpi">
           <span className="ms-store-snapshot-kpi-label">Sales rate</span>
           <strong>{sessionConversion !== null ? `${sessionConversion}%` : "—"}</strong>
-          <span className="ms-store-snapshot-kpi-hint">Visitors who buy</span>
         </div>
         <div className="ms-store-snapshot-kpi">
-          <span className="ms-store-snapshot-kpi-label">Orders (30d)</span>
+          <span className="ms-store-snapshot-kpi-label">Orders</span>
           <strong>{intelligence.orders.totalOrders}</strong>
         </div>
         <div className="ms-store-snapshot-kpi">
-          <span className="ms-store-snapshot-kpi-label">Revenue (30d)</span>
+          <span className="ms-store-snapshot-kpi-label">Revenue</span>
           <strong>
             {intelligence.hasShopifyOrders
               ? formatMoney(intelligence.revenue.totalRevenue, currency)
               : "—"}
           </strong>
         </div>
-      </div>
-
-      <div className="ms-store-snapshot-actions">
-        <AppLink to="/app/chat" className="ms-btn ms-btn-primary">
-          Ask Chat — why no sales?
-        </AppLink>
-        <AppLink to="/app/recommendations" className="ms-btn ms-btn-secondary">
-          See all fixes
-        </AppLink>
       </div>
     </div>
   );
