@@ -1,12 +1,13 @@
-Solution — AI marketing intelligence for your Shopify store.
+Solution — מוצא מה חוסם מכירות בחנות Shopify שלך.
 
-Solution tracks visitor behavior, analyzes patterns, and delivers clear recommendations — what to promote, fix, or improve. All inside Shopify Admin.
+Solution עוקב אחרי מבקרים, ממפה את משפך ההמרה, ומראה איפה אנשים נושרים. AI מדרג את התיקונים עם ההשפעה הגבוהה ביותר — דפי מוצר, תמחור, איכות תנועה — בשפה פשוטה בתוך Shopify Admin.
 
-• Visitor behavior tracking
-• Data-driven AI recommendations
-• Chat assistant — ask questions, get answers
-• Customer segments and weekly reports
+• משפך המרה — מבקרים → צפיות במוצר → checkout → רכישה
+• ציון בריאות החנות (A–F) מהזמנות, לקוחות חוזרים וקטלוג
+• תיקונים מדורגים לפי impact
+• מאמן המרה — שאל "למה אין מכירות?" וקבל צעדים
+• סיכום שבועי
 
-Pricing: Free — 3 scans + 5 AI outputs. Starter $9/mo — 5 each. Unlimited $19/mo.
+תמחור: חינם — 2 scans + 3 פלטי AI. Pro $29/חודש — סנכרון הזמנות Shopify, LTV, AI ללא הגבלה.
 
-Setup: Enable the Solution Tracker app embed in your theme, then browse your storefront once.
+התקנה: Home → הפעל Solution Tracker ב-theme → גלוש בחנות פעם אחת → Generate priorities.

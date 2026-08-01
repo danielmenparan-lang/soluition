@@ -30,24 +30,24 @@ export function buildOnboardingProgress(
     {
       id: "embed",
       label: "Enable store tracking",
-      detail: "Turn on the Solution embed in your theme (30 seconds).",
+      detail: "Required to see your funnel and where visitors drop off.",
       done: input.hasVisitorData,
       href: input.themeEmbedUrl,
       external: true,
     },
     {
       id: "data",
-      label: "Collect store data",
+      label: "Collect conversion data",
       detail: input.hasShopifyData
-        ? "Shopify orders connected."
-        : "Browse your storefront or sync Shopify orders (Pro).",
+        ? "Orders synced — funnel + revenue active."
+        : "Browse your storefront or sync orders (Pro) to diagnose blockers.",
       done: trackingDone,
       href: "/app/analytics",
     },
     {
       id: "insight",
-      label: "Get your first insight",
-      detail: "Generate AI recommendations from your data.",
+      label: "Get ranked fixes",
+      detail: "Generate priorities — what to fix first for more sales.",
       done: input.hasRecommendations,
     },
   ];

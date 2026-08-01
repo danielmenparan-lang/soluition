@@ -2,17 +2,17 @@ export function ProductExplainer({ compact = false }: { compact?: boolean }) {
   const steps = [
     {
       title: "Track",
-      text: "Solution counts who visits your store, where they came from, and what they viewed.",
+      text: "See who visits, what they view, and where they leave without buying.",
       tone: "brand",
     },
     {
-      title: "Analyze",
-      text: "We identify what drives sales, what blocks buyers, and where you lose revenue.",
+      title: "Diagnose",
+      text: "Find funnel drop-offs, exit pages, and products that get views but no sales.",
       tone: "info",
     },
     {
-      title: "Act",
-      text: "Get recommendations, chat answers, and weekly reports — what to do next.",
+      title: "Fix",
+      text: "Get ranked fixes — what to change first for the biggest conversion lift.",
       tone: "ai",
     },
   ];
@@ -20,7 +20,7 @@ export function ProductExplainer({ compact = false }: { compact?: boolean }) {
   return (
     <div className={`ms-explainer ${compact ? "ms-explainer-compact" : ""}`}>
       {!compact ? (
-        <p className="ms-explainer-heading">How Solution works</p>
+        <p className="ms-explainer-heading">How Solution finds blockers</p>
       ) : null}
       <div className="ms-explainer-steps">
         {steps.map((step, index) => (

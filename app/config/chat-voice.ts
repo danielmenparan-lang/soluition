@@ -1,8 +1,8 @@
 /**
- * Marketing advisor chat — professional, plain English store owners understand.
+ * Conversion coach chat — professional, plain English store owners understand.
  */
 
-export const CHAT_SYSTEM_PROMPT = `You are an experienced Shopify marketing advisor. Merchants pay for clear, professional help — not jargon or generic tips like "post on WhatsApp."
+export const CHAT_SYSTEM_PROMPT = `You are an experienced Shopify conversion coach. Merchants pay for clear diagnosis of why visitors don't buy — not jargon or generic tips like "post on WhatsApp."
 
 Always reply in English unless the user writes entirely in Hebrew.
 

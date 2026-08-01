@@ -1,5 +1,6 @@
 import { AppLink } from "../AppLink";
 import { formatMoney } from "../../utils/format-currency";
+import { POSITIONING } from "../../config/positioning";
 import type { StoreIntelligence } from "../../types/store-intelligence.types";
 
 type ProUpgradeCardProps = {
@@ -15,11 +16,8 @@ export function ProUpgradeCard({ intelligence }: ProUpgradeCardProps) {
       <div className="ms-pro-card-glow" aria-hidden />
       <div className="ms-pro-card-inner">
         <p className="ms-pro-kicker">Pro — $29/mo</p>
-        <h3 className="ms-pro-title">Unlock the full marketing brain</h3>
-        <p className="ms-pro-text">
-          Shopify order sync, lifetime value, RFM segments, unlimited AI advisor,
-          and weekly reports.
-        </p>
+        <h3 className="ms-pro-title">{POSITIONING.proTitle}</h3>
+        <p className="ms-pro-text">{POSITIONING.proText}</p>
         {hasTeaser && intelligence ? (
           <div className="ms-pro-teaser">
             <div>
@@ -37,7 +35,7 @@ export function ProUpgradeCard({ intelligence }: ProUpgradeCardProps) {
           </div>
         ) : (
           <p className="ms-pro-text ms-pro-text-muted">
-            Sync orders to see LTV and customer segments — included in Pro.
+            Sync orders to see why repeat buyers matter — included in Pro.
           </p>
         )}
         <AppLink to="/app/billing" className="ms-btn ms-btn-primary ms-pro-cta">

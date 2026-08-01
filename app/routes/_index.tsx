@@ -27,8 +27,8 @@ export default function Index() {
         lineHeight: 1.6,
       }}
     >
-      <h1 style={{ fontSize: "1.5rem" }}>Marketing Solution</h1>
-      <p>AI Marketing Intelligence for Shopify</p>
+      <h1 style={{ fontSize: "1.5rem" }}>Solution</h1>
+      <p>Find what's blocking sales on your Shopify store</p>
       <p style={{ color: "#555", marginTop: "24px" }}>
         Open the app from <strong>Shopify Admin → Apps → solution</strong>.
         <br />

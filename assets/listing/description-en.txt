@@ -1,12 +1,13 @@
-Solution — AI marketing intelligence for your Shopify store.
+Solution — find what's blocking sales on your Shopify store.
 
-Solution tracks visitor behavior, analyzes patterns, and gives clear recommendations — what to promote, fix, or improve. All inside Shopify Admin, in English.
+Solution tracks visitors, maps your conversion funnel, and shows where people drop off. AI ranks the highest-impact fixes — product pages, pricing signals, traffic quality — in plain English inside Shopify Admin.
 
-• Visitor behavior tracking
-• Data-driven AI recommendations
-• Chat assistant — ask questions, get answers
-• Customer segments and weekly reports
+• Conversion funnel — visitors → product views → checkout → purchase
+• Store Health Score (A–F) from orders, repeat rate, and catalog
+• Top fixes ranked by impact — dismiss or mark done as you work
+• Conversion coach — ask "why no sales?" and get steps in Admin
+• Weekly summary — what changed and what to fix next
 
-Pricing: Free — 3 scans + 5 AI outputs. Starter $9/mo — 5 each. Unlimited $19/mo.
+Pricing: Free — 2 scans + 3 AI outputs. Pro $29/mo — Shopify order sync, LTV & RFM, unlimited AI.
 
-Setup: Enable the Solution Tracker app embed in your theme — then browse your storefront once.
+Setup (2 minutes): Home → enable the Solution Tracker app embed in your theme → browse your storefront once → Generate priorities.

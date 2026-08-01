@@ -4,30 +4,30 @@ Before Submit for review:
 
 [x] git push + Render deploy (https://shopify-marketing-solution.onrender.com/health → ok: true)
 [x] npm run deploy:shopify — webhooks + theme extension on Partners
-[ ] Render Environment → SCOPES = empty (or delete the variable)
+[ ] Protected Customer Data approved (Partners → API access) for order webhooks
+[ ] Render Environment → SCOPES = read_orders,read_products
 [ ] Privacy policy live: https://shopify-marketing-solution.onrender.com/privacy
 [ ] Support email in Partners: vonx.support@gmail.com
 [ ] App icon 1200×1200: assets/app-icon.png
-[ ] 4 screenshots from Shopify Admin (Home, Recommendations, Analytics, Chat)
+[ ] 4 screenshots from Shopify Admin (Home, Analytics, Fixes, Ask)
 [ ] Paste EN description from assets/listing/description-en.txt
-[ ] Demo store with tracking enabled + real visitor data
+[ ] Demo store with tracking enabled + visitor data
 
 Partners → Apps → solution → Listing:
-- App name: Solution — AI Marketing
-- Category: Marketing / Analytics
+- App name: Solution — Fix Store Conversion
+- Category: Store optimization / Analytics
 - Privacy: https://shopify-marketing-solution.onrender.com/privacy
 - Support: vonx.support@gmail.com
-- Pricing: Free plan + $9 Starter + $19 Unlimited (configured in app)
+- Pricing: Free + Pro $29/mo (configured in app)
 
 Testing instructions for Shopify reviewer (paste into Partners):
 1. Install the app on the development store.
-2. Open Solution → Home. Click "Enable Solution Tracker" (opens Theme editor). Turn on the "Solution Tracker" app embed, paste the tracking ID from Home, click Save.
-   Manual path: Online Store → Themes → Customize (live theme) → App embeds (puzzle icon) → Solution Tracker → Save.
+2. Open Solution → Home. Click "Enable Solution Tracker" (opens Theme editor). Turn on the "Solution Tracker" app embed, click Save.
 3. Open the storefront in a new tab. Visit Home, a product page, and the cart.
-4. Return to Solution → Home. Click "Get recommendations" (uses 1 free AI output).
-5. Open Advisor and ask: "Why are there no sales?" (uses 1 AI output).
-6. Open Segments → Refresh groups (uses 1 scan). Optional: Reports → Generate report.
-7. Billing page shows Free (3 scans + 5 outputs), Starter $9/mo, Unlimited $19/mo.
+4. Return to Solution → Home. Click "Generate priorities" (uses 1 free AI output).
+5. Open Ask and ask: "Why aren't visitors buying?" (uses 1 AI output).
+6. Open Analytics — confirm funnel and visitor metrics appear.
+7. Billing page shows Free (2 scans + 3 outputs) and Pro $29/mo.
 
 Install link (dev store):
 https://admin.shopify.com/store/solution-vyndgruj/oauth/install?client_id=00eb38f774ffba914d98a6800f4c5df5

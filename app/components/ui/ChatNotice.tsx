@@ -14,8 +14,7 @@ export function ChatNotice({ variant }: ChatNoticeProps) {
 
   return (
     <div className="ms-chat-notice ms-chat-notice-success">
-      <strong>Marketing advisor ready.</strong> Ask about sales, products, and marketing.
-      Answers use your real tracking data — plain professional English.
+      <strong>Conversion coach ready.</strong> Ask why visitors aren't buying — answers use your funnel and store data.
     </div>
   );
 }

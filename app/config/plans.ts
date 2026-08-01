@@ -20,13 +20,13 @@ export const PLAN_LIMITS: Record<PlanTier, PlanDefinition> = {
     priceDetail: "Free forever",
     billingAmount: 0,
     description:
-      "Visitor tracking, Store Health Score, and a limited taste of AI insights.",
+      "Conversion funnel, Store Health Score, and ranked AI fixes — free tier to diagnose blockers.",
     highlights: [
       "2 scans per month",
       "3 AI outputs per month",
-      "Storefront visitor tracking",
-      "Store Health Score (when data exists)",
-      "Theme tracker setup guide",
+      "Visitor tracking & funnel",
+      "Store Health Score",
+      "Top fixes ranked by impact",
     ],
   },
   pro: {
@@ -37,13 +37,13 @@ export const PLAN_LIMITS: Record<PlanTier, PlanDefinition> = {
     priceDetail: "$29 / month",
     billingAmount: 29,
     description:
-      "Full AI Store Marketing Advisor — Shopify order sync, LTV, RFM, cohorts, and unlimited AI.",
+      "Full conversion intelligence — order sync, LTV, repeat buyers, unlimited AI fixes.",
     highlights: [
       "Unlimited scans & AI outputs",
       "Shopify order + catalog sync",
-      "LTV, RFM & cohort dashboards",
-      "60+ KPIs per analysis for AI",
-      "Weekly reports & advisor chat",
+      "LTV, RFM & repeat-buyer insights",
+      "Funnel + exit-page diagnosis",
+      "Weekly conversion reports",
     ],
   },
 };

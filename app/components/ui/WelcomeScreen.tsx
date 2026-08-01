@@ -2,6 +2,7 @@ import { BrandLogo } from "./BrandLogo";
 import { ProductExplainer } from "./ProductExplainer";
 import { ChatPromo } from "./ChatPromo";
 import { THEME_EMBED_NAME } from "../../config/theme-embed";
+import { POSITIONING } from "../../config/positioning";
 import type { OnboardingProgress } from "../../services/onboarding.server";
 
 type WelcomeScreenProps = {
@@ -16,20 +17,20 @@ export function WelcomeScreen({ themeEmbedUrl, progress }: WelcomeScreenProps) {
     <div className="ms-welcome">
       <div className="ms-welcome-intro ms-welcome-intro-v2">
         <BrandLogo size={56} className="ms-welcome-logo" />
-        <p className="ms-welcome-kicker">Welcome to Solution</p>
+        <p className="ms-welcome-kicker">Welcome to {POSITIONING.productName}</p>
         <h1 className="ms-welcome-title">
           {step === 1
-            ? "Your AI marketing advisor starts here"
+            ? POSITIONING.welcomeTitle
             : step === 2
-              ? "Almost there — one more step"
-              : "You're set up — let's grow sales"}
+              ? "Almost there — one more browse"
+              : "Ready — see what's blocking sales"}
         </h1>
         <p className="ms-welcome-lead">
           {step === 1
-            ? "Turn on the app embed in your theme, then browse your storefront once. Solution tracks visitors, syncs Shopify orders on Pro, and tells you exactly what to fix."
+            ? POSITIONING.welcomeLead
             : step === 2
-              ? "Tracking is connected. Browse a few product pages on your live store, or upgrade to Pro to sync orders for LTV and RFM insights."
-              : "Generate your first priorities — Solution ranks what will move revenue fastest."}
+              ? "Tracking is on. Open your live store, visit 2–3 product pages, then come back for your funnel and fixes."
+              : "Generate priorities — Solution ranks what will unblock sales fastest."}
         </p>
         {step === 1 ? (
           <a

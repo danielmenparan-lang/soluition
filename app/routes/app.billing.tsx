@@ -104,8 +104,8 @@ export default function BillingPage() {
   return (
     <s-page heading="Billing">
       <PageHero
-        title="Plans that grow with your store"
-        subtitle="Start free. Upgrade to Pro when you want Shopify order intelligence and unlimited AI."
+        title="Plans for stores that want more sales"
+        subtitle="Start free — diagnose blockers. Pro adds order sync, LTV, and unlimited AI fixes."
         variant="default"
         compact
       />

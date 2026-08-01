@@ -35,7 +35,7 @@ export function HomeHero({
             style={{ width: `${intelligence.storeHealthScore}%` }}
           />
         </div>
-        <p className="ms-hero-score-hint">Based on orders, repeat rate, inventory & discounts</p>
+        <p className="ms-hero-score-hint">Score reflects orders, repeat buyers, discounts & stock issues</p>
       </div>
 
       <div className="ms-hero-kpis">

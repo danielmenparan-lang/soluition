@@ -88,6 +88,8 @@ import {
 
 } from "../config/theme-embed";
 
+import { POSITIONING } from "../config/positioning";
+
 
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -477,6 +479,14 @@ export default function Overview() {
 
         <s-section>
 
+          <div className="ms-home-positioning">
+
+            <h2 className="ms-home-positioning-title">{POSITIONING.homeHeadline}</h2>
+
+            <p className="ms-home-positioning-sub">{POSITIONING.homeSubheadline}</p>
+
+          </div>
+
           <HomeHero
 
             intelligence={intelligence}
@@ -535,7 +545,7 @@ export default function Overview() {
 
 
 
-      <s-section heading="This week's priorities">
+      <s-section heading="Top fixes this week">
 
         {priorityActions.length > 0 ? (
 
@@ -551,7 +561,7 @@ export default function Overview() {
 
               <AppLink to="/app/recommendations" className="ms-text-link">
 
-                View all {recommendationCount} recommendations →
+                View all {recommendationCount} fixes →
 
               </AppLink>
 
@@ -565,9 +575,9 @@ export default function Overview() {
 
             icon="spark"
 
-            title="No priorities yet"
+            title="No fixes yet"
 
-            description="Solution will analyze your store and surface the highest-impact actions here."
+            description="Solution will diagnose your funnel and rank what's blocking sales here."
 
             action={
 
@@ -613,9 +623,9 @@ export default function Overview() {
 
           <AppLink to="/app/analytics" className="ms-home-link-card">
 
-            <strong>Full analytics</strong>
+            <strong>Conversion analytics</strong>
 
-            <span>Traffic, products, Shopify intelligence</span>
+            <span>Funnel, exit pages, traffic sources</span>
 
           </AppLink>
 

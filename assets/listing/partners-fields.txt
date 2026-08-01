@@ -1,28 +1,28 @@
 === Shopify Partners → Apps → solution → Listing ===
 
 App name (display):
-Solution — AI Marketing
+Solution — Fix Store Conversion
 
 Subtitle / tagline (EN):
-AI marketing intelligence built into Shopify Admin
+See why visitors don't buy. Get AI fixes ranked by impact.
 
 Short description — paste into listing (EN):
 (see description-en.txt — full text)
 
 Short description summary (EN):
-Solution tracks visitor behavior on your Shopify store, analyzes data with Claude AI, and shows recommendations, segments, and weekly reports — all inside Admin. Free: 3 scans + 5 AI outputs. Starter $9/mo. Unlimited $19/mo.
+Solution tracks visitors, maps your conversion funnel, and ranks AI fixes by revenue impact — inside Shopify Admin. Free: 2 scans + 3 AI outputs. Pro $29/mo: order sync, LTV, unlimited AI.
 
 Search keywords:
-marketing, analytics, AI, recommendations, conversion, tracking, segments, Claude, dashboard, behavior
+conversion, CRO, sales, analytics, AI, Shopify, funnel, bounce, checkout, recommendations, tracking, fix, store health
 
 Icon:
 Upload assets/app-icon.png (1200×1200)
 
 Screenshots (capture from Shopify Admin → Apps → solution):
-1. Home — setup guide + ProductExplainer
-2. Recommendations — AI action list
-3. Analytics — traffic and product metrics
-4. Chat — assistant conversation
+1. Home — Store Health Score + priorities
+2. Analytics — funnel + conversion charts
+3. Fixes — AI action list ranked by impact
+4. Ask — conversion coach chat
 
 Support email:
 vonx.support@gmail.com
