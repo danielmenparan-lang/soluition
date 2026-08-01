@@ -1,22 +1,24 @@
 import { AppLink } from "../AppLink";
-import type { UsageSummary } from "../config/plans";
+import { BrandLogo } from "./BrandLogo";
+import type { UsageSummary } from "../../config/plans";
 
 export function BrandHeader({ usage }: { usage?: UsageSummary }) {
   return (
     <header className="ms-brand-header" role="banner">
       <div className="ms-brand-header-inner">
-        <span className="ms-brand-mark" aria-hidden>
-          S
-        </span>
+        <BrandLogo size={44} />
         <div className="ms-brand-copy">
           <strong className="ms-brand-name">Solution</strong>
           <span className="ms-brand-tagline">
-            See what happens in your store — and what to do next
+            AI marketing advisor for your Shopify store
           </span>
         </div>
         {usage ? (
           <AppLink to="/app/billing" className="ms-usage-pill">
-            {usage.planLabel} · {usage.outputsUsed}/{usage.outputLimit} outputs
+            {usage.planLabel}
+            {usage.plan === "free"
+              ? ` · ${usage.outputsUsed}/${usage.outputLimit} AI`
+              : " · Pro"}
           </AppLink>
         ) : null}
       </div>

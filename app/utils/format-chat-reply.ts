@@ -18,11 +18,16 @@ export function formatChatReply(text: string): string {
 export function hasAnalyticsData(summaryJson: string): boolean {
   try {
     const data = JSON.parse(summaryJson) as {
+      visitorAnalytics?: { totalVisitors?: number; totalSessions?: number };
       metrics?: { totalVisitors?: number; totalSessions?: number };
+      shopifyStoreIntelligence?: { orders?: { totalOrders?: number } };
     };
-    const visitors = data.metrics?.totalVisitors ?? 0;
-    const sessions = data.metrics?.totalSessions ?? 0;
-    return visitors > 0 || sessions > 0;
+    const visitors =
+      data.visitorAnalytics?.totalVisitors ?? data.metrics?.totalVisitors ?? 0;
+    const sessions =
+      data.visitorAnalytics?.totalSessions ?? data.metrics?.totalSessions ?? 0;
+    const orders = data.shopifyStoreIntelligence?.orders?.totalOrders ?? 0;
+    return visitors > 0 || sessions > 0 || orders > 0;
   } catch {
     return false;
   }
@@ -32,16 +37,24 @@ export function hasAnalyticsData(summaryJson: string): boolean {
 export function isSparseAnalyticsData(summaryJson: string): boolean {
   try {
     const data = JSON.parse(summaryJson) as {
+      visitorAnalytics?: {
+        totalVisitors?: number;
+        totalSessions?: number;
+        totalEvents?: number;
+      };
       metrics?: {
         totalVisitors?: number;
         totalSessions?: number;
         totalEvents?: number;
       };
+      shopifyStoreIntelligence?: { orders?: { totalOrders?: number } };
     };
-    const visitors = data.metrics?.totalVisitors ?? 0;
-    const sessions = data.metrics?.totalSessions ?? 0;
-    const events = data.metrics?.totalEvents ?? 0;
-    return visitors < 10 && sessions < 10 && events < 25;
+    const va = data.visitorAnalytics ?? data.metrics;
+    const visitors = va?.totalVisitors ?? 0;
+    const sessions = va?.totalSessions ?? 0;
+    const events = va?.totalEvents ?? 0;
+    const orders = data.shopifyStoreIntelligence?.orders?.totalOrders ?? 0;
+    return visitors < 10 && sessions < 10 && events < 25 && orders < 3;
   } catch {
     return true;
   }

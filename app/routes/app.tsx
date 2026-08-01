@@ -8,12 +8,13 @@ import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { NavMenu } from "@shopify/app-bridge-react";
-import { authenticate, STARTER_PLAN, UNLIMITED_PLAN } from "../shopify.server";
+import { authenticate, PRO_PLAN, STARTER_PLAN, UNLIMITED_PLAN } from "../shopify.server";
 import { AppLink } from "../components/AppLink";
 import { BrandHeader } from "../components/ui/BrandHeader";
 import { SupportFooter } from "../components/ui/SupportFooter";
 import { getSupportEmail } from "../config/support.server";
 import { getOrCreateShop } from "../services/shop.server";
+import { maybeSyncShopifyData } from "../services/shopify-sync.server";
 import {
   getUsage,
   planFromSubscriptionName,
@@ -27,11 +28,16 @@ export const links: LinksFunction = () => [
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session, billing } = await authenticate.admin(request);
+  const { session, billing, admin } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
 
+  const usage = await getUsage(shop.id);
+  if (usage.plan === "pro") {
+    void maybeSyncShopifyData(admin, shop.id);
+  }
+
   const check = await billing.check({
-    plans: [STARTER_PLAN, UNLIMITED_PLAN],
+    plans: [PRO_PLAN, STARTER_PLAN, UNLIMITED_PLAN],
     isTest: process.env.NODE_ENV !== "production",
   });
 
@@ -69,9 +75,9 @@ export default function App() {
         <AppLink to="/app" rel="home">
           Home
         </AppLink>
-        <AppLink to="/app/recommendations">Recommendations</AppLink>
-        <AppLink to="/app/analytics">Analytics</AppLink>
         <AppLink to="/app/chat">Advisor</AppLink>
+        <AppLink to="/app/analytics">Analytics</AppLink>
+        <AppLink to="/app/recommendations">Recommendations</AppLink>
         <AppLink to="/app/segments">Segments</AppLink>
         <AppLink to="/app/reports">Reports</AppLink>
         <AppLink to="/app/billing">Billing</AppLink>

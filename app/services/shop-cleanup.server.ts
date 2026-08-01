@@ -1,4 +1,6 @@
 import getSupabase from "../supabase.server";
+import type { Json } from "../types/database.types";
+import { anonymizeCustomerOrders } from "./shop-orders.server";
 
 /** Deletes shop row; ON DELETE CASCADE removes analytics, chat, recommendations, etc. */
 export async function deleteShopDataByDomain(shopDomain: string): Promise<void> {
@@ -35,9 +37,13 @@ export async function redactCustomerData(
     .eq("visitor_id", visitorKey);
 
   const visitorIds = (visitors ?? []).map((v) => v.id);
-  if (visitorIds.length === 0) return;
+  if (visitorIds.length === 0) {
+    await anonymizeCustomerOrders(shop.id, customerId);
+    return;
+  }
 
   await supabase.from("visitors").delete().in("id", visitorIds);
+  await anonymizeCustomerOrders(shop.id, customerId);
 }
 
 export async function exportCustomerData(
@@ -63,8 +69,25 @@ export async function exportCustomerData(
     .eq("visitor_id", visitorKey);
 
   const visitorUuids = (visitors ?? []).map((v) => v.id);
+
+  const { data: orders } = await supabase
+    .from("shop_orders")
+    .select(
+      "shopify_order_id, order_number, total_price, currency, ordered_at, financial_status, country_code",
+    )
+    .eq("shop_id", shop.id)
+    .eq("customer_id", customerId);
+
   if (visitorUuids.length === 0) {
-    return { shop: shopDomain, customerId, records: [] };
+    return {
+      shop: shopDomain,
+      customerId,
+      exportedAt: new Date().toISOString(),
+      visitors: [],
+      sessions: [],
+      events: [],
+      orders: orders ?? [],
+    };
   }
 
   const [sessions, events] = await Promise.all([
@@ -83,6 +106,7 @@ export async function exportCustomerData(
     visitors: visitors ?? [],
     sessions: sessions.data ?? [],
     events: events.data ?? [],
+    orders: orders ?? [],
   };
 }
 
@@ -122,6 +146,6 @@ export async function storeCustomerDataExport(
 
   await supabase
     .from("shops")
-    .update({ settings: { ...settings, gdprExports: nextExports } })
+    .update({ settings: { ...settings, gdprExports: nextExports as Json } })
     .eq("id", shop.id);
 }

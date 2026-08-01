@@ -14,7 +14,7 @@ if (typeof globalThis.WebSocket === "undefined") {
 }
 
 const EXPECTED_CLIENT_ID = "00eb38f774ffba914d98a6800f4c5df5";
-const EXPECTED_APP_URL = "https://shopify-marketing-solution.onrender.com";
+const EXPECTED_APP_URL = "https://app.solution.com.im";
 
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -59,6 +59,17 @@ if (useSupabaseSessions) {
     });
   } catch {
     console.error("[render-start] Session table missing — app login will fail until SQL is run");
+  }
+  try {
+    execSync("node scripts/ensure-store-intelligence-tables.mjs", {
+      cwd: appRoot,
+      stdio: "inherit",
+      env: process.env,
+    });
+  } catch {
+    console.error(
+      "[render-start] shop_orders/shop_products missing — run supabase/migrations/002_store_intelligence.sql",
+    );
   }
 } else if (!dbCheck.valid) {
   console.error("[render-start] DATABASE_URL problems:");

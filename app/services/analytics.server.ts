@@ -8,6 +8,9 @@ import {
   getProductExitDrivers,
   type ProductMetrics,
 } from "./product-intelligence.server";
+import {
+  getStoreIntelligence,
+} from "./store-intelligence.server";
 
 export interface DashboardMetrics {
   totalVisitors: number;
@@ -220,38 +223,54 @@ export async function prepareAnalyticsSummary(
   days = 30,
 ): Promise<string> {
   const metrics = await getDashboardMetrics(shopId, days);
-  const [bouncePages, lowConversionPages, productExitDrivers] = await Promise.all([
-    getHighBouncePages(shopId, days, 5),
-    getHighTrafficLowConversionPages(shopId, days, 5),
-    getProductExitDrivers(shopId, days, 5),
-  ]);
+  const [bouncePages, lowConversionPages, productExitDrivers, storeIntel] =
+    await Promise.all([
+      getHighBouncePages(shopId, days, 5),
+      getHighTrafficLowConversionPages(shopId, days, 5),
+      getProductExitDrivers(shopId, days, 5),
+      getStoreIntelligence(shopId, days),
+    ]);
 
   return JSON.stringify(
     {
       period: `Last ${days} days`,
-      metrics: {
+      metricCount: storeIntel.metricCount,
+      storeHealth: {
+        score: storeIntel.storeHealthScore,
+        grade: storeIntel.storeHealthGrade,
+      },
+      dataQuality: storeIntel.dataQuality,
+      visitorAnalytics: {
         totalVisitors: metrics.totalVisitors,
         totalSessions: metrics.totalSessions,
         totalEvents: metrics.totalEvents,
         conversionRate: `${metrics.conversionRate}%`,
         avgSessionDuration: `${metrics.avgSessionDuration}s`,
         abandonmentRate: `${metrics.abandonmentRate}%`,
+        topTrafficSources: metrics.topTrafficSources.slice(0, 5),
+        topProducts: metrics.topProducts.slice(0, 10).map((p) => ({
+          title: p.productTitle,
+          views: p.views,
+          purchases: p.purchases,
+          conversionRate: `${p.conversionRate}%`,
+          revenue: p.revenue,
+          returningPurchasers: p.returningPurchasers,
+        })),
+        topCountries: metrics.topCountries.slice(0, 5),
+        peakConversionHours: metrics.peakConversionHours,
+        highBouncePages: bouncePages,
+        highTrafficLowConversionPages: lowConversionPages,
+        productExitDrivers,
       },
-      topTrafficSources: metrics.topTrafficSources.slice(0, 5),
-      topProducts: metrics.topProducts.slice(0, 10).map((p) => ({
-        title: p.productTitle,
-        views: p.views,
-        purchases: p.purchases,
-        conversionRate: `${p.conversionRate}%`,
-        revenue: p.revenue,
-      })),
-      topCountries: metrics.topCountries.slice(0, 5),
-      peakConversionHours: metrics.peakConversionHours,
-      highBouncePages: bouncePages,
-      highTrafficLowConversionPages: lowConversionPages,
-      productExitDrivers,
+      shopifyStoreIntelligence: storeIntel,
     },
     null,
     2,
   );
+}
+
+export async function getStoreHealthSummary(shopId: string, days = 30) {
+  const metrics = await getDashboardMetrics(shopId, days).catch(() => null);
+  const intelligence = await getStoreIntelligence(shopId, days);
+  return { metrics, intelligence };
 }

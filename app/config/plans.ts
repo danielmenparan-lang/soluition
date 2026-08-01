@@ -1,4 +1,4 @@
-export type PlanTier = "free" | "starter" | "unlimited";
+export type PlanTier = "free" | "pro";
 
 export type PlanDefinition = {
   scans: number;
@@ -13,50 +13,37 @@ export type PlanDefinition = {
 
 export const PLAN_LIMITS: Record<PlanTier, PlanDefinition> = {
   free: {
-    scans: 3,
-    outputs: 5,
+    scans: 2,
+    outputs: 3,
     label: "Free",
     price: "$0",
     priceDetail: "Free forever",
     billingAmount: 0,
-    description: "Try Solution on your store — enough to test tracking, recommendations, chat, and reports.",
+    description:
+      "Visitor tracking, Store Health Score, and a limited taste of AI insights.",
     highlights: [
-      "3 scans per month",
-      "5 AI outputs per month",
-      "Visitor tracking & analytics",
-      "Setup guide included",
+      "2 scans per month",
+      "3 AI outputs per month",
+      "Storefront visitor tracking",
+      "Store Health Score (when data exists)",
+      "Theme tracker setup guide",
     ],
   },
-  starter: {
-    scans: 5,
-    outputs: 5,
-    label: "Starter",
-    price: "$9",
-    priceDetail: "$9 / month",
-    billingAmount: 9,
-    description: "For stores ready to run regular scans, recommendations, and advisor chats.",
-    highlights: [
-      "5 scans per month",
-      "5 AI outputs per month",
-      "Recommendations & weekly reports",
-      "Marketing advisor chat",
-      "All Free features",
-    ],
-  },
-  unlimited: {
+  pro: {
     scans: Number.POSITIVE_INFINITY,
     outputs: Number.POSITIVE_INFINITY,
-    label: "Unlimited",
-    price: "$19",
-    priceDetail: "$19 / month",
-    billingAmount: 19,
-    description: "No caps — for active stores using AI weekly across chat, reports, and segments.",
+    label: "Pro",
+    price: "$29",
+    priceDetail: "$29 / month",
+    billingAmount: 29,
+    description:
+      "Full AI Store Marketing Advisor — Shopify order sync, LTV, RFM, cohorts, and unlimited AI.",
     highlights: [
-      "Unlimited scans",
-      "Unlimited AI outputs",
-      "Recommendations & weekly reports",
-      "Marketing advisor chat",
-      "Priority for growing stores",
+      "Unlimited scans & AI outputs",
+      "Shopify order + catalog sync",
+      "LTV, RFM & cohort dashboards",
+      "60+ KPIs per analysis for AI",
+      "Weekly reports & advisor chat",
     ],
   },
 };
@@ -84,4 +71,12 @@ export function formatOutputLimit(outputs: number): string {
   return outputs === Number.POSITIVE_INFINITY
     ? "Unlimited AI outputs"
     : `${outputs} AI output${outputs === 1 ? "" : "s"}`;
+}
+
+/** Maps legacy stored plan values to current tiers */
+export function normalizePlanTier(value: unknown): PlanTier {
+  if (value === "pro" || value === "starter" || value === "unlimited") {
+    return "pro";
+  }
+  return "free";
 }

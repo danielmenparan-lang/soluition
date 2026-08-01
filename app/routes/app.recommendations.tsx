@@ -22,6 +22,7 @@ import {
   generateRecommendations,
   getRecommendations,
 } from "../services/ai.server";
+import { updateRecommendationStatus } from "../services/recommendations.server";
 import {
   assertCanOutput,
   recordOutput,
@@ -38,12 +39,31 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
+  const formData = await request.formData();
+  const intent = formData.get("intent");
 
   try {
-    await assertCanOutput(shop.id);
-    await generateRecommendations(shop.id);
-    await recordOutput(shop.id);
-    return { success: true, message: "Recommendations are ready" };
+    if (intent === "dismiss_recommendation") {
+      const id = formData.get("recommendationId");
+      if (typeof id === "string" && id) {
+        await updateRecommendationStatus(shop.id, id, "dismissed");
+        return { success: true, message: "Dismissed." };
+      }
+    }
+    if (intent === "complete_recommendation") {
+      const id = formData.get("recommendationId");
+      if (typeof id === "string" && id) {
+        await updateRecommendationStatus(shop.id, id, "completed");
+        return { success: true, message: "Marked as done." };
+      }
+    }
+    if (intent === "generate_recommendations" || !intent) {
+      await assertCanOutput(shop.id);
+      await generateRecommendations(shop.id);
+      await recordOutput(shop.id);
+      return { success: true, message: "Recommendations are ready" };
+    }
+    return { success: false, message: "Unknown action" };
   } catch (error) {
     if (error instanceof UsageLimitError) {
       return { success: false, message: error.message };
@@ -86,9 +106,10 @@ export default function Recommendations() {
         shopId={shop.id}
         fetcher={fetcher}
         hasRecommendations={recommendations.length > 0}
+        enabled={false}
       />
-      <SubmitButton fetcher={fetcher} slot="primary-action">
-        {isGenerating ? "Preparing..." : "New recommendations"}
+      <SubmitButton fetcher={fetcher} slot="primary-action" intent="generate_recommendations">
+        {isGenerating ? "Analyzing…" : "Generate new set"}
       </SubmitButton>
 
       {isGenerating && (
@@ -103,10 +124,10 @@ export default function Recommendations() {
         <s-section>
           <EmptyState
             title="No recommendations yet"
-            description="Recommendations generate when you open this page, or click New recommendations above."
+            description="Run a scan from Home or click below — Solution ranks actions by revenue impact."
             action={
-              <SubmitButton fetcher={fetcher}>
-                {isGenerating ? "Preparing..." : "Get recommendations now"}
+              <SubmitButton fetcher={fetcher} intent="generate_recommendations">
+                {isGenerating ? "Analyzing…" : "Generate recommendations"}
               </SubmitButton>
             }
           />
@@ -119,7 +140,7 @@ export default function Recommendations() {
           >
             <s-stack direction="block" gap="base">
               {recs.map((rec) => (
-                <RecommendationCard key={rec.id} rec={rec} />
+                <RecommendationCard key={rec.id} rec={rec} fetcher={fetcher} />
               ))}
             </s-stack>
           </s-section>

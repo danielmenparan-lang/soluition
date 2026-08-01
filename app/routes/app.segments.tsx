@@ -8,6 +8,9 @@ import { SubmitButton } from "../components/SubmitButton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { PageHero } from "../components/ui/PageHero";
 import { HelpPanel } from "../components/ui/HelpPanel";
+import { SegmentCard } from "../components/ui/SegmentCard";
+import { HorizontalBarChart } from "../components/ui/HorizontalBarChart";
+import { AppLink } from "../components/AppLink";
 import { PAGE_HELP } from "../config/page-help";
 import { getOrCreateShop } from "../services/shop.server";
 import {
@@ -45,7 +48,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     await assertCanScan(shop.id);
     await refreshSegments(shop.id);
     await recordScan(shop.id);
-    return { success: true, message: "Customer segments updated" };
+    return { success: true, message: "Segments updated from latest data." };
   } catch (error) {
     if (error instanceof UsageLimitError) {
       return { success: false, message: error.message };
@@ -60,86 +63,85 @@ export default function Segments() {
   const fetcher = useShopifyFetcher<typeof action>();
   useFetcherToast(fetcher);
   const help = PAGE_HELP.segments;
+  const isRefreshing = fetcher.state !== "idle";
 
   return (
-    <s-page>
+    <s-page heading="Segments">
       <PageHero title={help.title} subtitle={help.subtitle} variant="default" compact />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
-      <SubmitButton fetcher={fetcher} slot="primary-action">
-        {fetcher.state !== "idle" ? "Refreshing..." : "Refresh segments"}
+      <SubmitButton fetcher={fetcher} slot="primary-action" intent="refresh_segments">
+        {isRefreshing ? "Refreshing…" : "Refresh segments"}
       </SubmitButton>
 
-      <s-section heading="Your segments">
+      <s-section heading="Audience groups">
         {segments.length === 0 ? (
           <EmptyState
+            icon="chart"
             title="No segments yet"
-            description="Enable tracking first, then click Refresh segments."
+            description="Enable tracking on Home, browse your storefront, then refresh segments to group visitors by source, device, and country."
             action={
-              <SubmitButton fetcher={fetcher}>
-                {fetcher.state !== "idle" ? "Refreshing..." : "Refresh segments"}
-              </SubmitButton>
+              <div className="ms-empty-actions-row">
+                <AppLink to="/app" className="ms-btn ms-btn-secondary">
+                  Go to Home
+                </AppLink>
+                <SubmitButton fetcher={fetcher} intent="refresh_segments">
+                  {isRefreshing ? "Refreshing…" : "Refresh now"}
+                </SubmitButton>
+              </div>
             }
           />
         ) : (
-          <div className="ms-metric-grid">
+          <div className="ms-segment-grid">
             {segments.map((seg) => (
-              <div key={seg.id} className="ms-card">
-                <s-stack direction="block" gap="small">
-                  <s-text type="strong">{seg.name}</s-text>
-                  <s-badge>{seg.segment_type}</s-badge>
-                  <s-paragraph>{seg.description}</s-paragraph>
-                  <div className="ms-metric-value" style={{ fontSize: 24 }}>
-                    {seg.member_count}
-                  </div>
-                  <s-text color="subdued">people in segment</s-text>
-                  {seg.refreshed_at ? (
-                    <s-text color="subdued">
-                      Updated: {new Date(seg.refreshed_at).toLocaleDateString("en-US")}
-                    </s-text>
-                  ) : null}
-                </s-stack>
-              </div>
+              <SegmentCard
+                key={seg.id}
+                name={seg.name}
+                description={seg.description}
+                segmentType={seg.segment_type}
+                memberCount={seg.member_count}
+                refreshedAt={seg.refreshed_at}
+              />
             ))}
           </div>
         )}
       </s-section>
 
-      {breakdown.byTrafficSource.length > 0 && (
-        <s-section heading="Traffic sources">
-          <div className="ms-metric-grid">
-            {breakdown.byTrafficSource.slice(0, 8).map((s) => (
-              <div key={s.source} className="ms-card">
-                <s-text type="strong">{s.source}</s-text>
-                <s-paragraph>{s.count} sessions</s-paragraph>
-              </div>
-            ))}
-          </div>
-        </s-section>
-      )}
-
-      {breakdown.byCountry.length > 0 && (
-        <s-section heading="By country">
-          <div className="ms-metric-grid">
-            {breakdown.byCountry.slice(0, 8).map((c) => (
-              <div key={c.country} className="ms-card">
-                <s-text type="strong">{c.country}</s-text>
-                <s-paragraph>{c.count} visitors</s-paragraph>
-              </div>
-            ))}
-          </div>
-        </s-section>
-      )}
-
-      {breakdown.byDevice.length > 0 && (
-        <s-section heading="By device">
-          <div className="ms-metric-grid">
-            {breakdown.byDevice.map((d) => (
-              <div key={d.device} className="ms-card">
-                <s-text type="strong">{d.device}</s-text>
-                <s-paragraph>{d.count} visitors</s-paragraph>
-              </div>
-            ))}
+      {(breakdown.byTrafficSource.length > 0 ||
+        breakdown.byCountry.length > 0 ||
+        breakdown.byDevice.length > 0) && (
+        <s-section>
+          <div className="ms-home-charts">
+            {breakdown.byTrafficSource.length > 0 ? (
+              <HorizontalBarChart
+                title="Sessions by source"
+                accent="#3d7ee8"
+                items={breakdown.byTrafficSource.slice(0, 8).map((s) => ({
+                  label: s.source,
+                  value: s.count,
+                }))}
+              />
+            ) : null}
+            {breakdown.byCountry.length > 0 ? (
+              <HorizontalBarChart
+                title="Visitors by country"
+                accent="#0a9b7a"
+                items={breakdown.byCountry.slice(0, 8).map((c) => ({
+                  label: c.country,
+                  value: c.count,
+                }))}
+              />
+            ) : null}
+            {breakdown.byDevice.length > 0 ? (
+              <HorizontalBarChart
+                title="Visitors by device"
+                accent="#6d5ef7"
+                items={breakdown.byDevice.map((d) => ({
+                  label: d.device,
+                  value: d.count,
+                }))}
+              />
+            ) : null}
           </div>
         </s-section>
       )}

@@ -1,7 +1,12 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect, useLoaderData } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
-import { authenticate, STARTER_PLAN, UNLIMITED_PLAN } from "../shopify.server";
+import {
+  authenticate,
+  PRO_PLAN,
+  STARTER_PLAN,
+  UNLIMITED_PLAN,
+} from "../shopify.server";
 import { getOrCreateShop } from "../services/shop.server";
 import { PLAN_LIMITS } from "../config/plans";
 import {
@@ -13,13 +18,31 @@ import {
 import { SubmitButton } from "../components/SubmitButton";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { SectionBlock } from "../components/ui/SectionBlock";
+import { PageHero } from "../components/ui/PageHero";
+
+const BILLABLE_PLANS: ("Pro" | "Starter" | "Unlimited")[] = [
+  PRO_PLAN,
+  STARTER_PLAN,
+  UNLIMITED_PLAN,
+];
+
+const COMPARE_ROWS = [
+  { feature: "Storefront visitor tracking", free: true, pro: true },
+  { feature: "Store Health Score", free: true, pro: true },
+  { feature: "Analytics & funnel charts", free: true, pro: true },
+  { feature: "Shopify order sync", free: false, pro: true },
+  { feature: "LTV, RFM & cohorts", free: false, pro: true },
+  { feature: "AI outputs / month", free: "3", pro: "Unlimited" },
+  { feature: "Scans / month", free: "2", pro: "Unlimited" },
+  { feature: "Weekly AI reports", free: "Limited", pro: "Unlimited" },
+];
 
 async function resolveActivePlan(
   shopId: string,
   billing: Awaited<ReturnType<typeof authenticate.admin>>["billing"],
 ) {
   const check = await billing.check({
-    plans: [STARTER_PLAN, UNLIMITED_PLAN],
+    plans: BILLABLE_PLANS,
     isTest: process.env.NODE_ENV !== "production",
   });
 
@@ -50,17 +73,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const returnUrl = `${appUrl}/app/billing`;
   const isTest = process.env.NODE_ENV !== "production";
 
-  if (plan === "starter") {
+  if (plan === "pro") {
     return billing.request({
-      plan: STARTER_PLAN,
-      isTest,
-      returnUrl,
-    });
-  }
-
-  if (plan === "unlimited") {
-    return billing.request({
-      plan: UNLIMITED_PLAN,
+      plan: PRO_PLAN,
       isTest,
       returnUrl,
     });
@@ -73,7 +88,7 @@ export default function BillingPage() {
   const { usage } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
 
-  const tiers = (["free", "starter", "unlimited"] as const).map((id) => {
+  const tiers = (["free", "pro"] as const).map((id) => {
     const plan = PLAN_LIMITS[id];
     return {
       id,
@@ -87,11 +102,18 @@ export default function BillingPage() {
   });
 
   return (
-    <s-page heading="Plans & usage">
+    <s-page heading="Billing">
+      <PageHero
+        title="Plans that grow with your store"
+        subtitle="Start free. Upgrade to Pro when you want Shopify order intelligence and unlimited AI."
+        variant="default"
+        compact
+      />
+
       <s-section>
         <SectionBlock
           title="Your usage this month"
-          subtitle={`Current plan: ${usage.planLabel} (${usage.planPrice})`}
+          subtitle={`${usage.planLabel} · ${usage.planPrice}`}
         >
           <div className="ms-metric-grid">
             <div className="ms-card ms-card-soft">
@@ -99,73 +121,85 @@ export default function BillingPage() {
               <div className="ms-metric-value">
                 {usage.scansUsed} / {usage.scanLimit}
               </div>
-              <s-text color="subdued">Segment refresh & data recompute</s-text>
+              <s-text color="subdued">Segments & Shopify sync</s-text>
             </div>
             <div className="ms-card ms-card-soft">
               <s-text type="strong">AI outputs</s-text>
               <div className="ms-metric-value">
                 {usage.outputsUsed} / {usage.outputLimit}
               </div>
-              <s-text color="subdued">
-                Recommendations, reports, and chat replies
-              </s-text>
+              <s-text color="subdued">Advisor, priorities, reports</s-text>
             </div>
           </div>
         </SectionBlock>
       </s-section>
 
       <s-section>
-        <SectionBlock
-          title="Choose a plan"
-          subtitle={`Free includes ${PLAN_LIMITS.free.scans} scan and ${PLAN_LIMITS.free.outputs} AI outputs. Upgrade when you need more.`}
-        >
-          <div className="ms-plan-grid">
-            {tiers.map((tier) => (
-              <div
-                key={tier.id}
-                className={`ms-card ms-plan-card ${tier.current ? "ms-plan-current" : ""}`}
-              >
-                <s-text type="strong">{tier.name}</s-text>
-                <div className="ms-plan-price">{tier.price}</div>
-                <s-text color="subdued">{tier.priceDetail}</s-text>
-                <p className="ms-plan-description">{tier.description}</p>
-                <ul className="ms-plan-list">
-                  {tier.highlights.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-                {tier.current ? (
-                  <s-text color="subdued">Current plan</s-text>
-                ) : tier.id === "free" ? (
-                  <s-text color="subdued">Default for new installs</s-text>
-                ) : (
-                  <SubmitButton fetcher={fetcher} fields={{ plan: tier.id }}>
-                    Upgrade to {tier.name}
-                  </SubmitButton>
-                )}
-              </div>
-            ))}
-          </div>
-        </SectionBlock>
+        <div className="ms-plan-grid">
+          {tiers.map((tier) => (
+            <div
+              key={tier.id}
+              className={`ms-card ms-plan-card ${tier.current ? "ms-plan-current" : ""} ${tier.id === "pro" ? "ms-plan-featured" : ""}`}
+            >
+              {tier.id === "pro" ? (
+                <span className="ms-plan-badge">Most popular</span>
+              ) : null}
+              <s-text type="strong">{tier.name}</s-text>
+              <div className="ms-plan-price">{tier.price}</div>
+              <s-text color="subdued">{tier.priceDetail}</s-text>
+              <p className="ms-plan-description">{tier.description}</p>
+              <ul className="ms-plan-list">
+                {tier.highlights.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              {tier.current ? (
+                <s-text color="subdued">Current plan</s-text>
+              ) : tier.id === "free" ? (
+                <s-text color="subdued">Included for all stores</s-text>
+              ) : (
+                <SubmitButton fetcher={fetcher} fields={{ plan: tier.id }}>
+                  Upgrade to Pro
+                </SubmitButton>
+              )}
+            </div>
+          ))}
+        </div>
       </s-section>
 
-      <s-section>
-        <SectionBlock title="What counts as usage?" subtitle="Simple and predictable">
-          <div className="ms-stack">
-            <p>
-              <strong>Scan</strong> — refreshing customer groups / recomputing segments
-              from your tracking data.
-            </p>
-            <p>
-              <strong>AI output</strong> — generating recommendations, weekly reports,
-              or each assistant chat reply powered by Claude.
-            </p>
-            <p>
-              Viewing analytics and setup steps are always free on every plan (
-              {PLAN_LIMITS.free.scans} scan + {PLAN_LIMITS.free.outputs} output on Free).
-            </p>
-          </div>
-        </SectionBlock>
+      <s-section heading="Compare plans">
+        <div className="ms-compare-table-wrap">
+          <table className="ms-compare-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Free</th>
+                <th>Pro</th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARE_ROWS.map((row) => (
+                <tr key={row.feature}>
+                  <td>{row.feature}</td>
+                  <td>
+                    {typeof row.free === "boolean"
+                      ? row.free
+                        ? "✓"
+                        : "—"
+                      : row.free}
+                  </td>
+                  <td>
+                    {typeof row.pro === "boolean"
+                      ? row.pro
+                        ? "✓"
+                        : "—"
+                      : row.pro}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </s-section>
     </s-page>
   );

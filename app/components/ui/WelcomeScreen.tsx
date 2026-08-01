@@ -1,46 +1,35 @@
-import { SetupGuide } from "./SetupGuide";
-import { ChatPromo } from "./ChatPromo";
+import { BrandLogo } from "./BrandLogo";
 import { ProductExplainer } from "./ProductExplainer";
+import { ChatPromo } from "./ChatPromo";
 import { THEME_EMBED_NAME } from "../../config/theme-embed";
+import type { OnboardingProgress } from "../../services/onboarding.server";
 
 type WelcomeScreenProps = {
-  shopDomain: string;
-  trackingId: string;
-  trackingScriptUrl: string;
   themeEmbedUrl: string;
-  themesAdminUrl: string;
-  hasData: boolean;
-  hasRecommendations: boolean;
+  progress: OnboardingProgress;
 };
 
-export function WelcomeScreen({
-  shopDomain,
-  trackingId,
-  trackingScriptUrl,
-  themeEmbedUrl,
-  themesAdminUrl,
-  hasData,
-  hasRecommendations,
-}: WelcomeScreenProps) {
-  const step = hasRecommendations ? 3 : hasData ? 2 : 1;
+export function WelcomeScreen({ themeEmbedUrl, progress }: WelcomeScreenProps) {
+  const step = progress.completedCount === 0 ? 1 : progress.isComplete ? 3 : 2;
 
   return (
     <div className="ms-welcome">
-      <div className="ms-welcome-intro">
+      <div className="ms-welcome-intro ms-welcome-intro-v2">
+        <BrandLogo size={56} className="ms-welcome-logo" />
         <p className="ms-welcome-kicker">Welcome to Solution</p>
         <h1 className="ms-welcome-title">
           {step === 1
-            ? "Connect Solution to your store"
+            ? "Your AI marketing advisor starts here"
             : step === 2
               ? "Almost there — one more step"
-              : "Ready — let's see what to improve"}
+              : "You're set up — let's grow sales"}
         </h1>
         <p className="ms-welcome-lead">
           {step === 1
-            ? "Solution tracks visitors, analyzes behavior, and gives clear recommendations. First, turn on the app embed in your theme — about 30 seconds."
+            ? "Turn on the app embed in your theme, then browse your storefront once. Solution tracks visitors, syncs Shopify orders on Pro, and tells you exactly what to fix."
             : step === 2
-              ? "Tracking is connected. Open your storefront, browse a few pages, then come back so we can collect data."
-              : "You have enough data. Click Get recommendations above to see what to improve."}
+              ? "Tracking is connected. Browse a few product pages on your live store, or upgrade to Pro to sync orders for LTV and RFM insights."
+              : "Generate your first priorities — Solution ranks what will move revenue fastest."}
         </p>
         {step === 1 ? (
           <a
@@ -52,21 +41,12 @@ export function WelcomeScreen({
             Enable {THEME_EMBED_NAME}
           </a>
         ) : null}
+        <div className="ms-welcome-progress-pill" aria-hidden>
+          {progress.progressPct}% complete
+        </div>
       </div>
 
       {step === 1 ? <ProductExplainer /> : null}
-
-      <SetupGuide
-        shopDomain={shopDomain}
-        trackingId={trackingId}
-        trackingScriptUrl={trackingScriptUrl}
-        themeEmbedUrl={themeEmbedUrl}
-        themesAdminUrl={themesAdminUrl}
-        hasData={hasData}
-        hasRecommendations={hasRecommendations}
-        embedded
-      />
-
       <ChatPromo />
     </div>
   );

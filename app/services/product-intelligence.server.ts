@@ -65,14 +65,45 @@ export async function getProductMetrics(
     map.set(row.product_id, existing);
   }
 
+  const returningMap = await getReturningPurchasersByProduct(
+    shopId,
+    since,
+  );
+
   return Array.from(map.values())
     .map((p) => ({
       ...p,
+      returningPurchasers: returningMap.get(p.productId) ?? 0,
       conversionRate:
         p.views > 0 ? Math.round((p.purchases / p.views) * 10000) / 100 : 0,
       revenue: Math.round(p.revenue * 100) / 100,
     }))
     .sort((a, b) => b.views - a.views);
+}
+
+async function getReturningPurchasersByProduct(
+  shopId: string,
+  since: Date,
+): Promise<Map<string, number>> {
+  const supabase = getSupabase();
+  const { data: orders } = await supabase
+    .from("shop_orders")
+    .select("raw_line_items")
+    .eq("shop_id", shopId)
+    .eq("is_returning_customer", true)
+    .gte("ordered_at", since.toISOString());
+
+  const map = new Map<string, number>();
+  for (const order of orders ?? []) {
+    const items = Array.isArray(order.raw_line_items)
+      ? (order.raw_line_items as Array<{ productId?: string }>)
+      : [];
+    for (const item of items) {
+      const pid = String(item.productId ?? "");
+      if (pid) map.set(pid, (map.get(pid) ?? 0) + 1);
+    }
+  }
+  return map;
 }
 
 export function analyzeProducts(metrics: ProductMetrics[]): ProductInsight[] {

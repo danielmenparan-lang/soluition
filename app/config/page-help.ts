@@ -10,7 +10,7 @@ export const PAGE_HELP: Record<string, PageHelp> = {
   overview: {
     title: "Solution — sell more with clear next steps",
     subtitle:
-      "Solution tracks store visitors, analyzes behavior, and gives you a short list of what to fix or promote.",
+      "Store Health Score, revenue trends, and AI priorities — all inside Shopify Admin.",
     tips: [
       "First — turn on tracking in your theme (about one minute)",
       "Then — browse your storefront once or twice",
@@ -85,7 +85,7 @@ export const PAGE_HELP: Record<string, PageHelp> = {
   recommendations: {
     title: "What to do next",
     subtitle:
-      "AI recommendations sorted by impact — what can grow sales and what to fix first.",
+      "AI recommendations ranked by impact — dismiss or mark done as you work through them.",
     tips: [
       "First run uses your free output credit",
       "Need a refresh? Click Generate new recommendations",
@@ -135,7 +135,7 @@ export const PAGE_HELP: Record<string, PageHelp> = {
   chat: {
     title: "Marketing advisor",
     subtitle:
-      "Professional advice in plain English — what to fix and what to do next.",
+      "Ask anything about your store — replies use your tracking and Shopify data when available.",
     tips: [
       "Plain language, no marketing jargon",
       "Replies in English by default",

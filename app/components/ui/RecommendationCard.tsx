@@ -1,8 +1,18 @@
 import { CATEGORY_LABELS, PRIORITY_LABELS, priorityClass } from "./labels";
 import { asStringArray } from "../../utils/safe-json";
+import { SubmitButton } from "../SubmitButton";
+import type { useShopifyFetcher } from "../../hooks/useShopifyFetcher";
 import type { AIRecommendation } from "../../types/database.types";
 
-export function RecommendationCard({ rec }: { rec: AIRecommendation }) {
+type ShopifyFetcher = ReturnType<typeof useShopifyFetcher>;
+
+export function RecommendationCard({
+  rec,
+  fetcher,
+}: {
+  rec: AIRecommendation;
+  fetcher?: ShopifyFetcher;
+}) {
   const actions = asStringArray(rec.action_items);
 
   return (
@@ -29,6 +39,25 @@ export function RecommendationCard({ rec }: { rec: AIRecommendation }) {
                 <s-list-item key={i}>{item}</s-list-item>
               ))}
             </s-unordered-list>
+          </div>
+        ) : null}
+        {fetcher ? (
+          <div className="ms-action-buttons ms-action-buttons-inline">
+            <SubmitButton
+              fetcher={fetcher}
+              variant="secondary"
+              intent="dismiss_recommendation"
+              fields={{ recommendationId: rec.id }}
+            >
+              Dismiss
+            </SubmitButton>
+            <SubmitButton
+              fetcher={fetcher}
+              intent="complete_recommendation"
+              fields={{ recommendationId: rec.id }}
+            >
+              Mark done
+            </SubmitButton>
           </div>
         ) : null}
       </s-stack>

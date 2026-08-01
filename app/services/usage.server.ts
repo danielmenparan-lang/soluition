@@ -1,6 +1,11 @@
 import getSupabase from "../supabase.server";
-import { STARTER_PLAN, UNLIMITED_PLAN } from "../shopify.server";
-import { PLAN_LIMITS, type PlanTier, type UsageSummary } from "../config/plans";
+import { STARTER_PLAN, UNLIMITED_PLAN, PRO_PLAN } from "../shopify.server";
+import {
+  PLAN_LIMITS,
+  normalizePlanTier,
+  type PlanTier,
+  type UsageSummary,
+} from "../config/plans";
 
 export type { PlanTier, UsageSummary };
 
@@ -31,11 +36,11 @@ function parseSettings(raw: unknown): UsageSettings {
     typeof s.usagePeriodStart === "string" ? s.usagePeriodStart : periodStart;
 
   if (storedPeriod !== periodStart) {
-    return { ...base, plan: normalizePlan(s.plan) };
+    return { ...base, plan: normalizePlanTier(s.plan) };
   }
 
   return {
-    plan: normalizePlan(s.plan),
+    plan: normalizePlanTier(s.plan),
     scansUsed: typeof s.scansUsed === "number" ? s.scansUsed : 0,
     outputsUsed: typeof s.outputsUsed === "number" ? s.outputsUsed : 0,
     periodStart: storedPeriod,
@@ -43,14 +48,18 @@ function parseSettings(raw: unknown): UsageSettings {
 }
 
 function normalizePlan(value: unknown): PlanTier {
-  if (value === "starter" || value === "unlimited") return value;
-  return "free";
+  return normalizePlanTier(value);
 }
 
 export function planFromSubscriptionName(name: string | undefined): PlanTier {
   if (!name) return "free";
-  if (name === UNLIMITED_PLAN) return "unlimited";
-  if (name === STARTER_PLAN) return "starter";
+  if (
+    name === PRO_PLAN ||
+    name === UNLIMITED_PLAN ||
+    name === STARTER_PLAN
+  ) {
+    return "pro";
+  }
   return "free";
 }
 

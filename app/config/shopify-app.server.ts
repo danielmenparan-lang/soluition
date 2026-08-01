@@ -1,6 +1,7 @@
 /** Expected Shopify app for this project (solution). */
 export const EXPECTED_SHOPIFY_CLIENT_ID = "00eb38f774ffba914d98a6800f4c5df5";
-export const EXPECTED_APP_URL = "https://shopify-marketing-solution.onrender.com";
+export const EXPECTED_APP_URL = "https://app.solution.com.im";
+export const FALLBACK_APP_URL = "https://shopify-marketing-solution.onrender.com";
 
 export function getShopifyConfigStatus() {
   const apiKey = process.env.SHOPIFY_API_KEY?.trim() ?? "";
@@ -13,7 +14,8 @@ export function getShopifyConfigStatus() {
       apiKey.startsWith(EXPECTED_SHOPIFY_CLIENT_ID.slice(0, 8)),
     expectedApiKeyPrefix: EXPECTED_SHOPIFY_CLIENT_ID.slice(0, 8),
     appUrl,
-    appUrlMatches: appUrl === EXPECTED_APP_URL,
+    appUrlMatches:
+      appUrl === EXPECTED_APP_URL || appUrl === FALLBACK_APP_URL,
     expectedAppUrl: EXPECTED_APP_URL,
   };
 }

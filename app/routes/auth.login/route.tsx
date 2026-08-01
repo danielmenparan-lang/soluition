@@ -19,10 +19,10 @@ export default function Auth() {
   const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [shop, setShop] = useState("");
-  const { errors, apiKey } = actionData || loaderData;
+  const errors = actionData?.errors ?? loaderData.errors;
 
   return (
-    <AppProvider embedded={false} apiKey={apiKey}>
+    <AppProvider embedded={false}>
       <div style={{ maxWidth: "400px", margin: "80px auto", padding: "24px" }}>
         <h1>Marketing Solution</h1>
         <Form method="post">

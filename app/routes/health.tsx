@@ -3,6 +3,7 @@ import {
   checkSupabaseSessionTable,
   isSupabaseSessionStorageConfigured,
 } from "../services/supabase-session-storage.server";
+import { checkStoreIntelligenceTables } from "../services/store-intelligence-table.server";
 
 export const loader = async ({ request }: { request: Request }) => {
   const shopifyConfig = getShopifyConfigStatus();
@@ -11,10 +12,12 @@ export const loader = async ({ request }: { request: Request }) => {
     : "prisma";
   const sessionCheck = await checkSupabaseSessionTable();
   const sessionReady = sessionCheck.ready;
+  const storeIntelCheck = await checkStoreIntelligenceTables();
   const configOk =
     shopifyConfig.apiKeyMatchesApp &&
     shopifyConfig.appUrlMatches &&
-    sessionReady;
+    sessionReady &&
+    storeIntelCheck.ready;
 
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
@@ -30,6 +33,7 @@ export const loader = async ({ request }: { request: Request }) => {
         ok: configOk,
         sessionStorage: sessionStorageMode,
         sessionsReady: sessionReady,
+        storeIntelligenceReady: storeIntelCheck.ready,
         aiReady: Boolean(process.env.ANTHROPIC_API_KEY?.trim()),
       },
       { status: configOk ? 200 : 503 },
@@ -51,6 +55,7 @@ export const loader = async ({ request }: { request: Request }) => {
         tableReady: sessionReady,
         error: sessionCheck.error,
       },
+      storeIntelligence: storeIntelCheck,
       anthropic: {
         apiKeySet: Boolean(process.env.ANTHROPIC_API_KEY?.trim()),
         model: process.env.ANTHROPIC_MODEL?.trim() || "claude-sonnet-4-6",

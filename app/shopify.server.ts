@@ -40,7 +40,7 @@ if (useSupabaseSessions) {
     }
   });
 } else {
-  void (sessionStorageImpl as PrismaSessionStorage).isReady().then((ready) => {
+  void (sessionStorageImpl as PrismaSessionStorage<typeof prisma>).isReady().then((ready: boolean) => {
     if (!ready) {
       console.error(
         "[shopify] Session storage unavailable. Set SUPABASE keys or fix DATABASE_URL",
@@ -49,7 +49,10 @@ if (useSupabaseSessions) {
   });
 }
 
+export const PRO_PLAN = "Pro";
+/** @deprecated Legacy plan name — maps to Pro in usage.server */
 export const STARTER_PLAN = "Starter";
+/** @deprecated Legacy plan name — maps to Pro in usage.server */
 export const UNLIMITED_PLAN = "Unlimited";
 
 // Placeholders allow the server to boot on Render while env vars are being configured.
@@ -63,10 +66,19 @@ const shopify = shopifyApp({
   sessionStorage: sessionStorageImpl,
   distribution: AppDistribution.AppStore,
   billing: {
+    [PRO_PLAN]: {
+      lineItems: [
+        {
+          amount: 29,
+          currencyCode: "USD",
+          interval: BillingInterval.Every30Days,
+        },
+      ],
+    },
     [STARTER_PLAN]: {
       lineItems: [
         {
-          amount: 9,
+          amount: 29,
           currencyCode: "USD",
           interval: BillingInterval.Every30Days,
         },
@@ -75,7 +87,7 @@ const shopify = shopifyApp({
     [UNLIMITED_PLAN]: {
       lineItems: [
         {
-          amount: 19,
+          amount: 29,
           currencyCode: "USD",
           interval: BillingInterval.Every30Days,
         },
