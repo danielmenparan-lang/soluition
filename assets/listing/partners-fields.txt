@@ -18,11 +18,15 @@ conversion, CRO, sales, analytics, AI, Shopify, funnel, bounce, checkout, recomm
 Icon:
 Upload assets/app-icon.png (1200×1200)
 
+Screenshots:
+  Full guide → assets/listing/screenshots-guide.txt
+  Save PNGs → assets/listing/screenshots/ (01-home.png … 05-billing.png)
+
 Screenshots (capture from Shopify Admin → Apps → solution):
 1. Home — Store Health Score + priorities
 2. Analytics — funnel + conversion charts
 3. Fixes — AI action list ranked by impact
-4. Ask — conversion coach chat
+4. Chat — ask why no sales
 
 Support email:
 vonx.support@gmail.com

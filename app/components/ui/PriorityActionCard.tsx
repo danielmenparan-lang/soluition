@@ -32,11 +32,11 @@ export function PriorityActionCard({ rec, fetcher, rank }: PriorityActionCardPro
         <p className="ms-action-desc">{rec.description}</p>
         {firstAction ? (
           <p className="ms-action-next">
-            <strong>Next step:</strong> {firstAction}
+            <strong>Do this:</strong> {firstAction}
           </p>
         ) : null}
         {rec.expected_impact ? (
-          <p className="ms-action-impact">Expected impact: {rec.expected_impact}</p>
+          <p className="ms-action-impact">Why: {rec.expected_impact}</p>
         ) : null}
       </div>
       <div className="ms-action-buttons">
@@ -53,7 +53,7 @@ export function PriorityActionCard({ rec, fetcher, rank }: PriorityActionCardPro
           intent="complete_recommendation"
           fields={{ recommendationId: rec.id }}
         >
-          Mark done
+          Done
         </SubmitButton>
       </div>
     </article>

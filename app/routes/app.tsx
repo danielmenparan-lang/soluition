@@ -75,9 +75,9 @@ export default function App() {
         <AppLink to="/app" rel="home">
           Home
         </AppLink>
-        <AppLink to="/app/chat">Ask</AppLink>
-        <AppLink to="/app/analytics">Analytics</AppLink>
+        <AppLink to="/app/chat">Chat</AppLink>
         <AppLink to="/app/recommendations">Fixes</AppLink>
+        <AppLink to="/app/analytics">Analytics</AppLink>
         <AppLink to="/app/segments">Segments</AppLink>
         <AppLink to="/app/reports">Reports</AppLink>
         <AppLink to="/app/billing">Billing</AppLink>

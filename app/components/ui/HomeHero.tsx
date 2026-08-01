@@ -22,7 +22,7 @@ export function HomeHero({
   return (
     <div className="ms-dashboard-hero">
       <div className="ms-hero-score-card">
-        <p className="ms-hero-label">Store health</p>
+        <p className="ms-hero-label">Store score</p>
         <div className="ms-hero-score-row">
           <span className={gradeClass(intelligence.storeHealthGrade)}>
             {intelligence.storeHealthGrade}
@@ -35,7 +35,7 @@ export function HomeHero({
             style={{ width: `${intelligence.storeHealthScore}%` }}
           />
         </div>
-        <p className="ms-hero-score-hint">Score reflects orders, repeat buyers, discounts & stock issues</p>
+        <p className="ms-hero-score-hint">From orders, repeat buyers, stock & discounts</p>
       </div>
 
       <div className="ms-hero-kpis">
@@ -64,7 +64,7 @@ export function HomeHero({
           </strong>
         </div>
         <div className="ms-hero-kpi">
-          <span className="ms-hero-kpi-label">Session conversion</span>
+          <span className="ms-hero-kpi-label">Sales rate</span>
           <strong className="ms-hero-kpi-value">
             {sessionConversion !== null ? `${sessionConversion}%` : "—"}
           </strong>

@@ -30,27 +30,22 @@ import type {
   RecommendationCategory,
 } from "../types/database.types";
 
-const MARKETING_MANAGER_SYSTEM_PROMPT = `You are the AI Conversion Coach for a Shopify store.
-Your goal is to find what's blocking sales and rank fixes by revenue impact — using visitor tracking AND synced Shopify orders.
+const MARKETING_MANAGER_SYSTEM_PROMPT = `You help Shopify store owners sell more. Use visitor tracking and order data when available.
 
-You analyze conversion funnels, drop-off pages, product views without purchases, traffic quality, order revenue, repeat buyers, and catalog issues.
-You provide specific, actionable fixes — not generic marketing advice.
-When dataQuality.warnings are present in the payload, acknowledge limitations (guest orders, partial refunds, etc.).
+Write for non-marketers. Simple words. No jargon.
+When asked for JSON, return valid JSON only.
+Prioritize fixes that unblock sales fastest.`;
 
-Always respond in valid JSON when asked for structured output.
-Be direct, data-driven, and prioritize what unblocks sales fastest.`;
-
-const RECOMMENDATIONS_SYSTEM_PROMPT = `You analyze Shopify store data collected by the Solution app.
-The code gathers real metrics from Supabase (visitors, sessions, products, traffic sources, segments).
-Your job: find what's blocking sales and return ranked fixes in plain English.
+const RECOMMENDATIONS_SYSTEM_PROMPT = `You help Shopify store owners fix problems that stop sales. Write for someone who is NOT a marketer.
 
 Rules:
-- Titles, descriptions, expected_impact, and every action_items step must be in English.
-- Plain language for non-technical merchants.
-- Do NOT invent numbers. Quote only metrics present in the JSON payload.
-- If all metrics are zero — say so and focus on enabling tracking first. Do not suggest paid ads yet.
-- When data exists — every recommendation must cite a specific number, product, page, or traffic source from the JSON.
-- action_items: 2–4 concrete steps in Shopify Admin or the store theme.
+- Titles: max 8 words. Simple everyday English.
+- description: max 2 short sentences. No jargon.
+- expected_impact: one short sentence starting with "This could" — plain words only.
+- action_items: 2–3 steps. Max 12 words each. Say where to click in Shopify Admin.
+- Never use: funnel, CRO, attribution, LTV, RFM, cohort, retargeting, optimize, leverage, KPI.
+- Do NOT invent numbers. Use only data from the JSON.
+- If all metrics are zero — say tracking is not on yet. Do not suggest paid ads.
 - No markdown, no emojis.`;
 
 function isSetupQuestion(message: string): boolean {
@@ -142,35 +137,35 @@ function buildRecommendationsPrompt(
     ? "- Every recommendation must cite a number, product, page, or traffic source from the JSON above.\n- If no data supports a recommendation — omit it."
     : "- Metrics are zero — explain there is no data yet and what to do to collect it.";
 
-  return `Analyze the following store data (collected automatically by Solution) and create recommendations in plain English.
+  return `Create fixes for this store. Plain English only. Reading level: grade 6.
 ${countRule}
 
 Store data (30 days):
 ${analyticsSummary}
 
-Attribution:
+Traffic sources:
 ${attributionContext ?? "[]"}
 
-Product insights (precomputed):
+Product notes:
 ${JSON.stringify(productInsights.slice(0, 10), null, 2)}
 
-Customer segments:
+Visitor groups:
 ${JSON.stringify(segments, null, 2)}
 
 Rules:
 ${dataRule}
-- Do not repeat the same recommendation twice.
-- Retargeting only if there are enough visitors or buyers in the data.
+- No duplicate fixes.
+- "Return buyers" category only if the data shows return visitors or buyers.
 
-Return a JSON array:
+Return JSON array:
 [
   {
     "category": "marketing|product|conversion|retargeting",
-    "title": "Short English title",
-    "description": "What the data shows and why it matters",
+    "title": "Short simple title (max 8 words)",
+    "description": "1-2 short sentences. What the data shows.",
     "priority": "high|medium|low",
-    "expected_impact": "One sentence in English",
-    "action_items": ["Step 1", "Step 2", "Step 3"]
+    "expected_impact": "This could ... (one short sentence)",
+    "action_items": ["Step 1", "Step 2"]
   }
 ]`;
 }

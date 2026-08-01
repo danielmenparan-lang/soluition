@@ -30,7 +30,7 @@ export function WelcomeScreen({ themeEmbedUrl, progress }: WelcomeScreenProps) {
             ? POSITIONING.welcomeLead
             : step === 2
               ? "Tracking is on. Open your live store, visit 2–3 product pages, then come back for your funnel and fixes."
-              : "Generate priorities — Solution ranks what will unblock sales fastest."}
+              : "Ready — tap Get fixes or open Chat."}
         </p>
         {step === 1 ? (
           <a

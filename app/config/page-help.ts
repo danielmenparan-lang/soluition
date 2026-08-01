@@ -8,153 +8,77 @@ export type PageHelp = {
 
 export const PAGE_HELP: Record<string, PageHelp> = {
   overview: {
-    title: "What's blocking sales?",
-    subtitle:
-      "Store health, conversion funnel, and your top 3 fixes — ranked by revenue impact.",
+    title: "Why no sales?",
+    subtitle: "Your store score and top fixes — simple and clear.",
     tips: [
-      "Enable tracking in your theme (about one minute)",
-      "Browse your storefront — 2–3 product pages",
-      "Generate priorities to see ranked fixes",
+      "Turn on tracking in your theme (1 minute)",
+      "Browse your store — 2–3 product pages",
+      "Open Chat or tap Get fixes",
     ],
-    helpTitle: "How Solution finds blockers",
+    helpTitle: "How it works",
     helpItems: [
-      {
-        label: "1. Track",
-        text: "We see who visits, what they view, and where they leave — no tracking means no diagnosis.",
-      },
-      {
-        label: "2. Diagnose",
-        text: "Funnel drop-offs, high-exit pages, and views-without-sales point to what's broken.",
-      },
-      {
-        label: "3. Fix",
-        text: "AI ranks concrete fixes (copy, product page, pricing signals) — start with High priority.",
-      },
+      { label: "1. Track", text: "We see who visits and what they view." },
+      { label: "2. Find", text: "We spot where people leave without buying." },
+      { label: "3. Fix", text: "You get a short list — start with Do first." },
     ],
   },
   analytics: {
-    title: "Conversion & traffic",
-    subtitle:
-      "Funnel, traffic sources, product views, and exit pages — last 30 days.",
+    title: "Traffic & sales",
+    subtitle: "Who visited, where they came from, and where they left — last 30 days.",
     tips: [
-      "Big drop between product views and cart? Check product pages first",
-      "High traffic + low sales = conversion problem, not a traffic problem",
-      "Exit pages show where buyers give up",
+      "Many views but no sales? Fix the product page first",
+      "Lots of traffic but no sales? It's not an ads problem yet",
+      "Check exit pages — where people give up",
     ],
-    helpTitle: "Reading conversion signals",
+    helpTitle: "How to read this",
     helpItems: [
-      {
-        label: "Funnel",
-        text: "Visitors → product views → add to cart → purchase. The biggest drop is your first fix.",
-      },
-      {
-        label: "Product views",
-        text: "Many views, few purchases = price, images, trust, or description — not 'more ads'.",
-      },
-      {
-        label: "Exit pages",
-        text: "Where people leave without buying — often shipping, pricing, or weak product pages.",
-      },
+      { label: "Visitors", text: "How many people came to your store." },
+      { label: "Product views", text: "Views without sales = something on the page is wrong." },
+      { label: "Exit pages", text: "Pages people leave from — often price or shipping." },
     ],
   },
   segments: {
     title: "Visitor groups",
-    subtitle:
-      "See who converts vs who bounces — by source, device, and country.",
-    tips: [
-      "Refresh after you have traffic",
-      "Compare mobile vs desktop conversion",
-      "Use groups to focus fixes, not just ads",
-    ],
-    helpTitle: "Why segments matter for CRO",
+    subtitle: "Who buys and who leaves — by source, phone vs desktop, country.",
+    tips: ["Tap Refresh after you have traffic", "Compare phone vs desktop", "Fix the group that almost buys"],
+    helpTitle: "Why this helps",
     helpItems: [
-      {
-        label: "Source quality",
-        text: "Facebook mobile traffic that never buys is a different fix than Google desktop that almost converts.",
-      },
-      {
-        label: "Return visitors",
-        text: "People who came back but didn't buy — often price, shipping, or trust.",
-      },
-      {
-        label: "Refresh",
-        text: "Run Refresh groups after new traffic or campaign changes.",
-      },
+      { label: "Traffic source", text: "Facebook that never buys needs a different fix than Google." },
+      { label: "Return visitors", text: "Came back but didn't buy? Often price or shipping." },
+      { label: "Refresh", text: "Tap Refresh groups to update." },
     ],
   },
   recommendations: {
-    title: "Fixes ranked by impact",
-    subtitle:
-      "What to change on your store first — dismiss or mark done as you go.",
-    tips: [
-      "Start with High priority — biggest revenue lift",
-      "Each fix explains why it matters from your data",
-      "Refresh after you ship a change",
-    ],
-    helpTitle: "How to use the fix list",
+    title: "What to fix",
+    subtitle: "A short list — most important first. Tap Done when finished.",
+    tips: ["Start with Do first", "Each item says why", "Tap Get fixes for a fresh list"],
+    helpTitle: "How to use",
     helpItems: [
-      {
-        label: "Priority",
-        text: "High = likely blocking sales now. Medium = next. Low = polish when you have time.",
-      },
-      {
-        label: "Evidence",
-        text: "Each item ties to your funnel, products, or orders — not generic tips.",
-      },
-      {
-        label: "Action steps",
-        text: "Concrete changes in Shopify Admin — product, theme, or checkout.",
-      },
+      { label: "Do first", text: "Fix this before anything else." },
+      { label: "Why", text: "Each item uses your store numbers — not generic tips." },
+      { label: "Steps", text: "Plain steps you can do in Shopify Admin." },
     ],
   },
   reports: {
-    title: "Weekly conversion summary",
-    subtitle:
-      "What changed in traffic and sales — and which fixes to focus on next.",
-    tips: [
-      "Generate once per week",
-      "Read Key takeaways first",
-      "Share with whoever runs the store",
-    ],
-    helpTitle: "What's in the report",
+    title: "Weekly summary",
+    subtitle: "What changed this week and what to fix next.",
+    tips: ["Make one report per week", "Read the summary first", "Share with your team"],
+    helpTitle: "What's inside",
     helpItems: [
-      {
-        label: "What changed",
-        text: "Traffic, conversion, and product shifts in plain language.",
-      },
-      {
-        label: "Fixes",
-        text: "Ranked actions for the week ahead.",
-      },
-      {
-        label: "Waste",
-        text: "Traffic or pages that visit but never buy.",
-      },
+      { label: "Summary", text: "Traffic and sales in plain words." },
+      { label: "Fixes", text: "What to work on next." },
+      { label: "Waste", text: "Traffic that visits but never buys." },
     ],
   },
   chat: {
-    title: "Conversion coach",
-    subtitle:
-      "Ask why visitors aren't buying — answers use your funnel and order data.",
-    tips: [
-      "Try: Why aren't visitors buying?",
-      "Plain English, no jargon",
-      "Private — customers never see this",
-    ],
-    helpTitle: "Example prompts",
+    title: "Chat",
+    subtitle: "Ask anything. Get a clear answer based on your store.",
+    tips: ["Try: Why no sales?", "Short answers, plain English", "Only you see this — not customers"],
+    helpTitle: "Try asking",
     helpItems: [
-      {
-        label: "No sales",
-        text: "Why aren't visitors buying?",
-      },
-      {
-        label: "First fix",
-        text: "What should I fix first this week?",
-      },
-      {
-        label: "Product page",
-        text: "Which product page is hurting conversion?",
-      },
+      { label: "Sales", text: "Why no sales?" },
+      { label: "First fix", text: "What should I fix first?" },
+      { label: "Bad page", text: "Which page loses buyers?" },
     ],
   },
 };

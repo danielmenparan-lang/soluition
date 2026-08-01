@@ -46,8 +46,8 @@ export function buildOnboardingProgress(
     },
     {
       id: "insight",
-      label: "Get ranked fixes",
-      detail: "Generate priorities — what to fix first for more sales.",
+      label: "Get your fix list",
+      detail: "Tap Get fixes — what to change first for more sales.",
       done: input.hasRecommendations,
     },
   ];

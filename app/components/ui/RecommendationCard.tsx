@@ -29,11 +29,11 @@ export function RecommendationCard({
         </s-stack>
         <s-paragraph>{rec.description}</s-paragraph>
         {rec.expected_impact ? (
-          <s-text color="subdued">Why it matters: {rec.expected_impact}</s-text>
+          <s-text color="subdued">Why: {rec.expected_impact}</s-text>
         ) : null}
         {actions.length > 0 ? (
           <div className="ms-rec-actions">
-            <p className="ms-rec-actions-title">What to do:</p>
+            <p className="ms-rec-actions-title">Do this:</p>
             <s-unordered-list>
               {actions.map((item, i) => (
                 <s-list-item key={i}>{item}</s-list-item>
@@ -56,7 +56,7 @@ export function RecommendationCard({
               intent="complete_recommendation"
               fields={{ recommendationId: rec.id }}
             >
-              Mark done
+              Done
             </SubmitButton>
           </div>
         ) : null}

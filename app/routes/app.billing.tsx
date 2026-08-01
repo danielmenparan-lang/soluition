@@ -104,8 +104,8 @@ export default function BillingPage() {
   return (
     <s-page heading="Billing">
       <PageHero
-        title="Plans for stores that want more sales"
-        subtitle="Start free — diagnose blockers. Pro adds order sync, LTV, and unlimited AI fixes."
+        title="Plans"
+        subtitle="Free to start. Pro adds order sync and unlimited chat + fixes."
         variant="default"
         compact
       />
@@ -128,7 +128,7 @@ export default function BillingPage() {
               <div className="ms-metric-value">
                 {usage.outputsUsed} / {usage.outputLimit}
               </div>
-              <s-text color="subdued">Advisor, priorities, reports</s-text>
+              <s-text color="subdued">Chat, fixes, reports</s-text>
             </div>
           </div>
         </SectionBlock>

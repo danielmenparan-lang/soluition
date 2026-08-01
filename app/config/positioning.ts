@@ -1,36 +1,34 @@
 /**
- * Single source of truth for product positioning (CRO / conversion focus).
+ * Simple, clear product copy — one place to edit messaging.
  */
 export const POSITIONING = {
   productName: "Solution",
-  tagline: "Find what's blocking sales on your Shopify store",
-  subtagline: "See why visitors don't buy. Get fixes ranked by impact — not more charts.",
+  tagline: "Find why people visit but don't buy",
+  subtagline: "Simple fixes, ranked by what matters most.",
 
-  homeHeadline: "What's blocking sales?",
-  homeSubheadline:
-    "Your store health score, funnel, and top 3 fixes — updated from real visitor and order data.",
+  homeHeadline: "Why no sales?",
+  homeSubheadline: "Your store score and 3 things to fix — from your real data.",
 
-  brandTagline: "Find what's blocking sales — fixes ranked by impact",
+  brandTagline: "Why no sales? Simple fixes that work.",
 
-  welcomeTitle: "Let's find what's blocking sales",
+  welcomeTitle: "Let's find why sales are stuck",
   welcomeLead:
-    "Turn on tracking, browse your storefront once, and Solution shows where visitors drop off and what to fix first.",
+    "Turn on tracking, browse your store once, and we'll show what's wrong and what to fix.",
 
-  advisorKicker: "Conversion coach",
-  advisorTitle: "Ask why visitors aren't buying",
-  advisorText:
-    "Plain-language answers based on your funnel, products, and orders — not generic marketing tips.",
+  chatKicker: "Chat",
+  chatTitle: "Ask anything about your store",
+  chatText:
+    "Clear answers in plain English. Uses your store data. Customers never see this.",
 
-  proTitle: "See the full picture behind lost sales",
-  proText:
-    "Shopify order sync, customer LTV, repeat-buyer segments, and unlimited AI fixes — $29/mo.",
+  proTitle: "See the full picture",
+  proText: "Sync orders, see repeat buyers, unlimited chat and fixes — $29/mo.",
 
   appStoreName: "Solution — Fix Store Conversion",
-  appStoreSubtitle: "See why visitors don't buy. Get AI fixes ranked by impact.",
+  appStoreSubtitle: "Why no sales? Get simple fixes ranked by impact.",
 } as const;
 
-export const ADVISOR_STARTERS = [
-  "Why aren't visitors buying?",
-  "What should I fix first this week?",
-  "Which page is killing conversion?",
+export const CHAT_STARTERS = [
+  "Why no sales?",
+  "What should I fix first?",
+  "Which page loses buyers?",
 ] as const;

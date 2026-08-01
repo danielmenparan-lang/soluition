@@ -1,0 +1,156 @@
+=== Solution — App Store Screenshots Guide ===
+(Shopify Partners → Apps → solution → Listing → Media)
+
+Save finished files to: assets/listing/screenshots/
+Suggested filenames: 01-home.png … 05-billing.png
+
+────────────────────────────────────────────────────────────
+TECHNICAL SPECS (Shopify App Store)
+────────────────────────────────────────────────────────────
+• Format: PNG or JPG
+• Size: 1600 × 900 px (16:9) — recommended
+• Minimum: 3 screenshots · Maximum: 8
+• Capture the embedded app inside Shopify Admin (not the storefront)
+• Use English UI (app is English by default)
+• Hide personal email in footer if you prefer — zoom/crop is OK
+
+────────────────────────────────────────────────────────────
+BEFORE YOU SHOOT (10 minutes)
+────────────────────────────────────────────────────────────
+1. Open dev store: solution-vyndgruj.myshopify.com
+2. Apps → Solution (wait for deploy after latest push)
+3. Theme → Customize → App embeds → Solution Tracker ON → Save
+4. Storefront (new tab): visit Home → 2 product pages → cart
+5. Back in app → Home → "Generate priorities" (needs 1 AI output)
+6. Optional Pro look: Billing → upgrade test plan, then Home → Sync Shopify
+
+If Home is still empty: browse storefront again, wait 1–2 min, refresh.
+
+────────────────────────────────────────────────────────────
+HOW TO CAPTURE ON WINDOWS
+────────────────────────────────────────────────────────────
+1. Open app full-width in Shopify Admin (collapse left sidebar if needed)
+2. Win + Shift + S → select the app content area
+3. Paste into Paint / Photos → crop to 16:9
+4. Resize to 1600 × 900 (Paint: Resize → Pixels → 1600 × 900)
+   Or use https://www.iloveimg.com/resize-image (free)
+
+Tip: Browser zoom 100%. Hide browser bookmarks bar for cleaner shots.
+
+────────────────────────────────────────────────────────────
+5 SCREENSHOTS — RECOMMENDED ORDER (story: problem → fix)
+────────────────────────────────────────────────────────────
+
+SCREEN 1 — HOME (hero shot) ★ most important
+────────────────────────────────────────────────────────────
+Navigate: Apps → Solution → Home
+
+Must show:
+• Purple "Start here" chat box at top of Home
+• "Why no sales?" headline
+• Store score (A–F) + KPIs below
+
+Partners caption (EN):
+  See your store health score and top fixes ranked by impact
+
+Hebrew note:
+  זה המסך הראשון שmerchants רואים — חייב להיראות “מלא”, לא onboarding
+
+────────────────────────────────────────────────────────────
+
+SCREEN 2 — ANALYTICS (conversion proof)
+────────────────────────────────────────────────────────────
+Navigate: Analytics
+
+Must show:
+• Page hero: "Conversion & traffic"
+• Conversion funnel chart (visitors → purchase steps)
+• Trend chart (visitors or revenue)
+• At least one bar chart (traffic sources or countries)
+
+Scroll so funnel + one chart are visible in one frame.
+If funnel is empty, capture "Overview" metrics + trend chart instead.
+
+Partners caption (EN):
+  Map your funnel and spot where visitors drop off
+
+────────────────────────────────────────────────────────────
+
+SCREEN 3 — FIXES (action list)
+────────────────────────────────────────────────────────────
+Navigate: Fixes (Recommendations)
+
+Must show:
+• "Fixes ranked by impact" title
+• At least 2 recommendation cards with High / Medium priority
+• Dismiss + Mark done buttons visible on one card
+
+If list is empty: run "Generate new set" first, wait ~15 sec.
+
+Partners caption (EN):
+  AI-ranked fixes — what to change first on your store
+
+────────────────────────────────────────────────────────────
+
+SCREEN 4 — CHAT ★ important
+────────────────────────────────────────────────────────────
+Navigate: Chat
+
+Must show:
+• "Chat" title
+• One user question (e.g. "Why no sales?")
+• One reply with: In short / What it means / Do this
+
+Caption: Ask why no sales — get clear steps in plain English
+
+────────────────────────────────────────────────────────────
+
+SCREEN 5 — BILLING (optional but helps conversion)
+────────────────────────────────────────────────────────────
+Navigate: Billing
+
+Must show:
+• Free vs Pro $29 cards side by side
+• "Most popular" badge on Pro
+• Compare plans table (partial scroll OK)
+
+Partners caption (EN):
+  Start free — upgrade to Pro for order sync and unlimited AI
+
+────────────────────────────────────────────────────────────
+OPTIONAL SCREEN 6 — REPORTS
+────────────────────────────────────────────────────────────
+Navigate: Reports → Generate report (uses 1 AI output)
+
+Shows weekly summary — good for "serious product" signal.
+
+Caption: Weekly conversion summary — what changed and what to fix
+
+────────────────────────────────────────────────────────────
+UPLOAD IN PARTNERS
+────────────────────────────────────────────────────────────
+Partners → Apps → solution → Listing → App store listing content
+→ Media → Add screenshots in order 1 → 5
+→ App name: Solution — Fix Store Conversion
+→ Tagline: See why visitors don't buy. Get AI fixes ranked by impact.
+
+────────────────────────────────────────────────────────────
+QUICK CHECKLIST
+────────────────────────────────────────────────────────────
+[ ] 1600×900 PNG, 3–5 files
+[ ] No empty states in screenshots 1–4
+[ ] English UI throughout
+[ ] App icon 1200×1200 uploaded (assets/app-icon.png)
+[ ] description-en.txt pasted in listing
+[ ] Privacy URL live
+[ ] Testing instructions from submission-checklist.txt
+
+────────────────────────────────────────────────────────────
+IF YOU’RE STUCK ON EMPTY DATA
+────────────────────────────────────────────────────────────
+A) Browse storefront 3–4 pages, refresh app (real data — best)
+B) npm run db:seed — seeds demo-store.myshopify.com only (not your dev store)
+C) For screenshots only: use dev store after steps in "BEFORE YOU SHOOT"
+
+Install link (fresh test):
+https://admin.shopify.com/store/solution-vyndgruj/oauth/install?client_id=00eb38f774ffba914d98a6800f4c5df5

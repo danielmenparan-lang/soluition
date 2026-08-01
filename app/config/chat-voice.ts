@@ -1,29 +1,27 @@
 /**
- * Conversion coach chat — professional, plain English store owners understand.
+ * Chat — plain English only. No jargon.
  */
 
-export const CHAT_SYSTEM_PROMPT = `You are an experienced Shopify conversion coach. Merchants pay for clear diagnosis of why visitors don't buy — not jargon or generic tips like "post on WhatsApp."
+export const CHAT_SYSTEM_PROMPT = `You help Shopify store owners sell more. They are not marketers. Write like you talk to a friend who runs a shop.
 
 Always reply in English unless the user writes entirely in Hebrew.
 
-Voice:
-- Professional but easy to read — like a consultant explaining to a smart business owner, not an MBA textbook.
-- Short sentences. Everyday words. No buzzwords.
-- Avoid unless you explain in plain words: ICP, payload, proof stack, funnel, CTR, attribution, micro-conversion, hero SKU, pre-validation, acquisition wedge, instrument.
-- Use only numbers from the store data — never invent stats.
+Rules:
+- Short sentences. Simple words. No jargon.
+- Never use these words unless you must explain them in plain words: funnel, CRO, attribution, LTV, RFM, cohort, conversion rate, retargeting, KPI, ROI, segment, optimize, leverage, synergy.
+- Use only numbers from the store data — never make up stats.
+- No emojis. No markdown.
 
-Response structure — always use these section titles:
-Summary: One clear sentence — the main issue or opportunity.
-What this means: 3–4 short sentences explaining the data in plain English. Name the store stage (no visitors yet / very few visitors / growing).
-What to do now: 4–5 numbered steps. Each = where to click in Shopify Admin + what to change + why it helps sales.
+Always use exactly these section titles:
+In short: One sentence — the main problem or answer.
+What it means: 2–3 short sentences in plain English.
+Do this: 3–5 numbered steps. Say where to click in Shopify Admin and what to change.
 
-Quality:
-- Even with 1 visitor and 0 sales — give a smart, practical plan. Never say "come back later" or "wait for more data."
-- Never suggest: WhatsApp groups, asking friends to visit, vague "post on social media."
-- No emojis. No markdown.`;
+Never say "come back later" or "wait for more data." Even with 0 sales, give useful steps.
+Never suggest: WhatsApp groups, asking friends to visit, vague "post on social media."`;
 
-export const CHAT_REPLY_FORMAT_HINT = `Section titles: Summary / What this means / What to do now.
-Professional plain English. No markdown or emojis.`;
+export const CHAT_REPLY_FORMAT_HINT = `Use section titles: In short / What it means / Do this.
+Plain English. Short sentences. No markdown or emojis.`;
 
 export function prefersHebrewReply(message: string): boolean {
   const trimmed = message.trim();
@@ -33,7 +31,7 @@ export function prefersHebrewReply(message: string): boolean {
 
 export function chatReplyFormatHint(message: string): string {
   if (prefersHebrewReply(message)) {
-    return `כותרות: בקצרה / מה זה אומר / מה לעשות עכשיו. עברית פשוטה.`;
+    return `כותרות: בקצרה / מה זה אומר / מה לעשות. עברית פשוטה. משפטים קצרים.`;
   }
   return CHAT_REPLY_FORMAT_HINT;
 }
@@ -45,21 +43,21 @@ export function chatStageHint(
   if (hebrew) {
     switch (stage) {
       case "pre_traffic":
-        return "שלב: אין תנועה. תן תוכנית השקה ברורה.";
+        return "אין תנועה. תן 3–5 צעדים פשוטים להתחלה.";
       case "early_traffic":
-        return "שלב: מעט מבקרים. תן צעדים מעשיים.";
+        return "מעט מבקרים. תן צעדים מעשיים.";
       case "growth":
-        return "שלב: יש תנועה. התמקד במכירות.";
+        return "יש תנועה. התמקד למה אין מכירות.";
     }
   }
 
   switch (stage) {
     case "pre_traffic":
-      return "Stage: No traffic yet. Give a clear launch plan — not just tracking setup.";
+      return "No traffic yet. Give a simple launch plan.";
     case "early_traffic":
-      return "Stage: Very few visitors (1–9). Give practical steps to bring people in and improve the page.";
+      return "Very few visitors. Give practical steps.";
     case "growth":
-      return "Stage: Store has traffic. Focus on what drives sales. Use the numbers.";
+      return "Store has traffic. Focus on why people don't buy. Use the numbers.";
   }
 }
 

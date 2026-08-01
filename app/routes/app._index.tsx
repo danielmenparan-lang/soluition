@@ -429,7 +429,7 @@ export default function Overview() {
 
       >
 
-        {isBusy ? "Analyzing…" : "Refresh priorities"}
+        {isBusy ? "Working…" : "Get fixes"}
 
       </SubmitButton>
 
@@ -472,6 +472,14 @@ export default function Overview() {
         </s-section>
 
       ) : null}
+
+
+
+      <s-section>
+
+        <AdvisorQuickAsk featured />
+
+      </s-section>
 
 
 
@@ -545,7 +553,7 @@ export default function Overview() {
 
 
 
-      <s-section heading="Top fixes this week">
+      <s-section heading="What to fix first">
 
         {priorityActions.length > 0 ? (
 
@@ -577,13 +585,13 @@ export default function Overview() {
 
             title="No fixes yet"
 
-            description="Solution will diagnose your funnel and rank what's blocking sales here."
+            description="Tap Get fixes below — we'll list what to change first."
 
             action={
 
               <SubmitButton fetcher={fetcher} intent="generate_recommendations">
 
-                {isBusy ? "Analyzing…" : "Generate priorities"}
+                {isBusy ? "Working…" : "Get fixes"}
 
               </SubmitButton>
 
@@ -592,14 +600,6 @@ export default function Overview() {
           />
 
         )}
-
-      </s-section>
-
-
-
-      <s-section>
-
-        <AdvisorQuickAsk />
 
       </s-section>
 
@@ -621,11 +621,19 @@ export default function Overview() {
 
         <div className="ms-home-footer-links">
 
+          <AppLink to="/app/chat" className="ms-home-link-card ms-home-link-card-chat">
+
+            <strong>Chat</strong>
+
+            <span>Ask anything — get a clear answer</span>
+
+          </AppLink>
+
           <AppLink to="/app/analytics" className="ms-home-link-card">
 
-            <strong>Conversion analytics</strong>
+            <strong>Traffic & sales</strong>
 
-            <span>Funnel, exit pages, traffic sources</span>
+            <span>Who visited and where they left</span>
 
           </AppLink>
 

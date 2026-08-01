@@ -109,13 +109,13 @@ export default function Recommendations() {
         enabled={false}
       />
       <SubmitButton fetcher={fetcher} slot="primary-action" intent="generate_recommendations">
-        {isGenerating ? "Analyzing…" : "Generate new set"}
+        {isGenerating ? "Working…" : "Get fixes"}
       </SubmitButton>
 
       {isGenerating && (
         <s-section>
           <s-banner tone="info">
-            <s-paragraph>Analyzing your data — one moment...</s-paragraph>
+            <s-paragraph>Working on your fixes…</s-paragraph>
           </s-banner>
         </s-section>
       )}
@@ -123,11 +123,11 @@ export default function Recommendations() {
       {recommendations.length === 0 ? (
         <s-section>
           <EmptyState
-            title="No recommendations yet"
-            description="Run a scan from Home or click below — Solution ranks actions by revenue impact."
+            title="No fixes yet"
+            description="Tap Get fixes — we'll list what to change first, most important on top."
             action={
               <SubmitButton fetcher={fetcher} intent="generate_recommendations">
-                {isGenerating ? "Analyzing…" : "Generate recommendations"}
+                {isGenerating ? "Working…" : "Get fixes"}
               </SubmitButton>
             }
           />

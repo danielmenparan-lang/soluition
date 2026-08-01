@@ -9,7 +9,7 @@ Before Submit for review:
 [ ] Privacy policy live: https://shopify-marketing-solution.onrender.com/privacy
 [ ] Support email in Partners: vonx.support@gmail.com
 [ ] App icon 1200×1200: assets/app-icon.png
-[ ] 4 screenshots from Shopify Admin (Home, Analytics, Fixes, Ask)
+[ ] 4–5 screenshots — see assets/listing/screenshots-guide.txt
 [ ] Paste EN description from assets/listing/description-en.txt
 [ ] Demo store with tracking enabled + visitor data
 

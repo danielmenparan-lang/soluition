@@ -1996,6 +1996,68 @@
   padding: 22px;
 }
 
+/* Featured chat block — top of Home */
+.ms-chat-featured {
+  position: relative;
+  background: linear-gradient(135deg, #6d5ef7 0%, #0a9b7a 100%);
+  border-radius: var(--ms-radius);
+  padding: 28px 24px;
+  color: #fff;
+  box-shadow: 0 12px 40px rgba(109, 94, 247, 0.35);
+}
+
+.ms-chat-featured-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(255, 255, 255, 0.22);
+  padding: 5px 10px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.ms-chat-featured .ms-advisor-quick-kicker {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ms-chat-featured .ms-advisor-quick-title {
+  color: #fff;
+  font-size: 24px;
+}
+
+.ms-chat-featured .ms-advisor-quick-text {
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 520px;
+}
+
+.ms-chat-featured-cta {
+  background: #fff !important;
+  color: #4a3fd9 !important;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.ms-chat-featured-cta:hover {
+  background: #f5f3ff !important;
+}
+
+.ms-btn-chip-light {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+
+.ms-btn-chip-light:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+}
+
+.ms-home-link-card-chat {
+  border-color: var(--ms-ai);
+  background: linear-gradient(180deg, var(--ms-ai-light) 0%, #fff 100%);
+}
+
 .ms-advisor-quick-kicker {
   font-size: 12px;
   font-weight: 700;
