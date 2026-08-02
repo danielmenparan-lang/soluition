@@ -1,5 +1,6 @@
-import { CATEGORY_LABELS, PRIORITY_LABELS, priorityClass } from "./labels";
+import { useState } from "react";
 import { asStringArray } from "../../utils/safe-json";
+import { POSITIONING } from "../../config/positioning";
 import { SubmitButton } from "../SubmitButton";
 import type { useShopifyFetcher } from "../../hooks/useShopifyFetcher";
 import type { AIRecommendation } from "../../types/database.types";
@@ -13,54 +14,60 @@ export function RecommendationCard({
   rec: AIRecommendation;
   fetcher?: ShopifyFetcher;
 }) {
+  const [acknowledged, setAcknowledged] = useState(false);
   const actions = asStringArray(rec.action_items);
 
   return (
-    <div className="ms-card ms-card-ai">
-      <s-stack direction="block" gap="small">
-        <s-stack direction="inline" gap="small">
-          <s-text type="strong">{rec.title}</s-text>
-          <span className={priorityClass(rec.priority)}>
-            {PRIORITY_LABELS[rec.priority] ?? rec.priority}
-          </span>
-          <span className="ms-badge ms-badge-category">
-            {CATEGORY_LABELS[rec.category] ?? rec.category}
-          </span>
-        </s-stack>
-        <s-paragraph>{rec.description}</s-paragraph>
-        {rec.expected_impact ? (
-          <s-text color="subdued">Why: {rec.expected_impact}</s-text>
-        ) : null}
-        {actions.length > 0 ? (
-          <div className="ms-rec-actions">
-            <p className="ms-rec-actions-title">Do this:</p>
-            <s-unordered-list>
-              {actions.map((item, i) => (
-                <s-list-item key={i}>{item}</s-list-item>
-              ))}
-            </s-unordered-list>
-          </div>
-        ) : null}
-        {fetcher ? (
-          <div className="ms-action-buttons ms-action-buttons-inline">
+    <div className="ms-fix-item ms-fix-item-flat ms-marketing-card">
+      <div className="ms-fix-item-head">
+        {rec.priority === "high" ? <span className="ms-fix-flag">Start here</span> : null}
+        <span className="ms-marketing-tag">Marketing action</span>
+        <h3 className="ms-fix-title">{rec.title}</h3>
+      </div>
+      <p className="ms-fix-desc">{rec.description}</p>
+      {rec.expected_impact ? <p className="ms-fix-why">{rec.expected_impact}</p> : null}
+      {actions.length > 0 ? (
+        <ul className="ms-fix-steps">
+          {actions.map((item, i) => (
+            <li key={i}>{item}</li>
+          ))}
+        </ul>
+      ) : null}
+      {fetcher ? (
+        <>
+          <label className="ms-responsibility-check">
+            <input
+              type="checkbox"
+              checked={acknowledged}
+              onChange={(e) => setAcknowledged(e.target.checked)}
+            />
+            {POSITIONING.responsibilityAck}
+          </label>
+          <div className="ms-fix-actions">
             <SubmitButton
               fetcher={fetcher}
               variant="secondary"
               intent="dismiss_recommendation"
               fields={{ recommendationId: rec.id }}
             >
-              Dismiss
+              Skip
             </SubmitButton>
-            <SubmitButton
-              fetcher={fetcher}
-              intent="complete_recommendation"
-              fields={{ recommendationId: rec.id }}
-            >
-              Done
-            </SubmitButton>
+            {acknowledged ? (
+              <SubmitButton
+                fetcher={fetcher}
+                intent="complete_recommendation"
+                fields={{ recommendationId: rec.id }}
+              >
+                I applied it
+              </SubmitButton>
+            ) : (
+              <button type="button" className="ms-btn ms-btn-primary" disabled>
+                I applied it
+              </button>
+            )}
           </div>
-        ) : null}
-      </s-stack>
+        </>
+      ) : null}
     </div>
   );
 }

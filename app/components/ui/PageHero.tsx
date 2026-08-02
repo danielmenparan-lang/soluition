@@ -6,34 +6,18 @@ type PageHeroProps = {
   compact?: boolean;
 };
 
-const variantClass: Record<NonNullable<PageHeroProps["variant"]>, string> = {
-  default: "ms-hero-default",
-  ai: "ms-hero-ai",
-  analytics: "ms-hero-analytics",
-  reports: "ms-hero-reports",
-};
-
-export function PageHero({
-  title,
-  subtitle,
-  tips,
-  variant = "default",
-  compact = false,
-}: PageHeroProps) {
+export function PageHero({ title, subtitle, tips, compact = false }: PageHeroProps) {
   return (
-    <div className={`ms-hero ${variantClass[variant]} ${compact ? "ms-hero-compact" : ""}`}>
-      <div className="ms-hero-glow" aria-hidden />
-      <div className="ms-hero-content">
-        <h1 className="ms-hero-title">{title}</h1>
-        <p className="ms-hero-subtitle">{subtitle}</p>
-        {!compact && tips && tips.length > 0 ? (
-          <ul className="ms-hero-tips">
-            {tips.map((tip) => (
-              <li key={tip}>{tip}</li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
-    </div>
+    <header className={`ms-page-header ${compact ? "ms-page-header-compact" : ""}`}>
+      <h1 className="ms-page-header-title">{title}</h1>
+      <p className="ms-page-header-sub">{subtitle}</p>
+      {!compact && tips && tips.length > 0 ? (
+        <ul className="ms-page-header-tips">
+          {tips.map((tip) => (
+            <li key={tip}>{tip}</li>
+          ))}
+        </ul>
+      ) : null}
+    </header>
   );
 }

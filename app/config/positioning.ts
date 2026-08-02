@@ -1,30 +1,50 @@
-/**
- * Simple, clear product copy — one place to edit messaging.
- */
+/** Marketing product positioning — store data → marketing actions */
 export const POSITIONING = {
   productName: "Solution",
-  tagline: "Find why people visit but don't buy",
-  homePitch: "Solution checks your store and tells you what to fix — in plain English.",
 
-  brandTagline: "Check your store. Fix what's wrong. Sell more.",
+  tagline: "Your store data, turned into marketing actions.",
 
-  welcomeTitle: "Let's find why sales are stuck",
+  welcomeTitle: "Connect your store data",
   welcomeLead:
-    "Turn on tracking, browse your store once, and we'll show what to fix.",
+    "Enable tracking, browse your store once, then get marketing actions based on real visitors.",
 
-  chatKicker: "Start here",
-  chatTitle: "Chat — ask why no sales",
-  chatText: "Clear answers from your store data. Only you see this.",
+  diagnosticTitle: "Store snapshot",
+  diagnosticPending:
+    "Need a few visitors first. Enable tracking and browse your storefront once.",
 
-  proTitle: "Unlock full store data",
-  proText: "Order sync, repeat buyers, unlimited chat & fixes — $29/mo.",
+  dropOffTitle: "Where buyers drop off",
+  dropOffLead: "Use this in ads, email, and product pages.",
 
-  appStoreName: "Solution — Fix Store Conversion",
-  appStoreSubtitle: "Why no sales? Simple fixes ranked by impact.",
+  chatTitle: "Marketing chat",
+  chatLead:
+    "Ask anything about your store. We read your data and suggest marketing actions — you decide what to run.",
+
+  actionsTitle: "Marketing actions",
+  actionsLead:
+    "Ranked ideas from your data. You approve and run each one — results are your responsibility.",
+
+  responsibilityNotice:
+    "Suggestions only. You approve every action — outcomes are your responsibility.",
+
+  responsibilityAck:
+    "I approve this action and accept that results are my responsibility.",
+
+  proTitle: "Pro — $19.99/month",
+  proText: "Unlimited scans, chat, and order sync.",
+
+  starterTitle: "Starter — $9.99/month",
+  starterText: "10 scans and 5 chat messages per day.",
 } as const;
 
 export const CHAT_STARTERS = [
-  "Why no sales?",
-  "What to fix first?",
-  "Bad product page?",
+  "What should I market first?",
+  "Which product to push in ads?",
+  "Why no sales from my traffic?",
 ] as const;
+
+export const APP_STORE = {
+  name: "Solution — Marketing Actions for Shopify",
+  subtitle: "Store data → marketing actions. Chat + ranked steps in Admin.",
+  keywords:
+    "marketing, shopify, ads, conversion, traffic, chat, recommendations, store data, sales",
+} as const;

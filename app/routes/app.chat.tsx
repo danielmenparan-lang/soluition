@@ -11,9 +11,7 @@ import { authenticate } from "../shopify.server";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { useFetcherToast } from "../hooks/useFetcherToast";
 import { AppLink } from "../components/AppLink";
-import { ChatNotice } from "../components/ui/ChatNotice";
 import { ChatMessageBody } from "../components/ui/ChatMessageBody";
-import { PageHero } from "../components/ui/PageHero";
 import { getOrCreateShop } from "../services/shop.server";
 import {
   chatWithAI,
@@ -21,9 +19,12 @@ import {
   getChatMessages,
 } from "../services/ai.server";
 import { getStoreHealthSummary } from "../services/analytics.server";
+import { MarketingResponsibilityNotice } from "../components/ui/MarketingResponsibilityNotice";
 import {
   assertCanOutput,
+  getUsage,
   recordOutput,
+  usageSummary,
   UsageLimitError,
 } from "../services/usage.server";
 import { PAGE_HELP } from "../config/page-help";
@@ -36,10 +37,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const conversationId = url.searchParams.get("c");
   const prefilledQuestion = url.searchParams.get("q")?.trim() ?? "";
 
-  const [conversations, health] = await Promise.all([
+  const [conversations, health, usageRaw] = await Promise.all([
     getChatConversations(shop.id).catch(() => []),
     getStoreHealthSummary(shop.id).catch(() => null),
+    getUsage(shop.id),
   ]);
+  const usage = usageSummary(usageRaw);
 
   const hasVisitorData = Boolean(health?.metrics && health.metrics.totalVisitors > 0);
   const hasShopifyData = Boolean(health?.intelligence?.hasShopifyOrders);
@@ -65,6 +68,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     conversationId: conversationId && initialMessages.length > 0 ? conversationId : null,
     initialMessages,
     prefilledQuestion,
+    usage,
   };
 };
 
@@ -110,10 +114,10 @@ export function shouldRevalidate({
 }
 
 const SUGGESTED_WITH_DATA = [
-  "Why no sales?",
-  "What should I fix first?",
-  "Which page loses buyers?",
-  "What product should I push?",
+  "What should I market first?",
+  "Which product to push in ads?",
+  "Why no sales from my traffic?",
+  "Am I ready to run ads?",
 ];
 
 const SUGGESTED_NO_DATA = [
@@ -130,6 +134,7 @@ export default function Chat() {
     conversationId: loadedConversationId,
     initialMessages,
     prefilledQuestion,
+    usage,
   } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
   const { Form, actionUrl } = fetcher;
@@ -190,12 +195,14 @@ export default function Chat() {
   };
 
   return (
-    <s-page heading="Chat">
-      <PageHero title={help.title} subtitle={help.subtitle} variant="ai" compact />
+    <s-page heading="Marketing chat">
 
       <s-section>
-        <ChatNotice variant="owner" />
-        <ChatNotice variant="not-for-customers" />
+        <p className="ms-section-lead">{help.subtitle}</p>
+        <MarketingResponsibilityNotice compact />
+        <p className="ms-usage-hint">
+          Chat {usage.outputsUsed}/{usage.outputLimit} {usage.periodLabel}
+        </p>
       </s-section>
 
       <s-section>
@@ -224,16 +231,10 @@ export default function Chat() {
               ))}
             </div>
 
-            <div className="ms-chat-panel ms-chat-panel-premium">
+            <div className="ms-chat-panel">
               {messages.length === 0 && (
                 <div className="ms-advisor-empty">
-                  <p className="ms-advisor-empty-kicker">{POSITIONING.chatKicker}</p>
-                  <h3>{POSITIONING.chatTitle}</h3>
-                  <p>
-                    {hasData
-                      ? "Pick a question below or type your own."
-                      : "Not much data yet — I can still help with setup and first steps."}
-                  </p>
+                  <p>{POSITIONING.chatLead}</p>
                 </div>
               )}
               {messages.map((msg, i) => (
@@ -252,7 +253,7 @@ export default function Chat() {
                   <span className="ms-advisor-dot" />
                   <span className="ms-advisor-dot" />
                   <span className="ms-advisor-dot" />
-                  Analyzing…
+                  Analyzing your store…
                 </div>
               )}
               <div ref={bottomRef} />
@@ -267,14 +268,14 @@ export default function Chat() {
               }}
             >
               <input type="hidden" name="conversationId" value={conversationId ?? ""} />
-              <div className="ms-input-row ms-input-row-premium">
+              <div className="ms-input-row">
                 <input
                   type="text"
                   name="message"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about sales, products, or setup…"
-                  className="ms-input ms-input-premium"
+                  placeholder="Ask about marketing, products, ads…"
+                  className="ms-input"
                   disabled={fetcher.state !== "idle"}
                 />
                 <button

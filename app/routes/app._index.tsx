@@ -32,14 +32,19 @@ import { OnboardingChecklist } from "../components/ui/OnboardingChecklist";
 
 import { HomeHero } from "../components/ui/HomeHero";
 
+import { StoreDiagnosticPanel } from "../components/ui/StoreDiagnosticPanel";
+
 import { TrendChart } from "../components/ui/TrendChart";
 
 import { PriorityActionCard } from "../components/ui/PriorityActionCard";
 
 import { AdvisorQuickAsk } from "../components/ui/AdvisorQuickAsk";
-import { HomePitch } from "../components/ui/HomePitch";
 
 import { ProUpgradeCard } from "../components/ui/ProUpgradeCard";
+
+import { MarketingResponsibilityNotice } from "../components/ui/MarketingResponsibilityNotice";
+
+import { POSITIONING } from "../config/positioning";
 
 import { getOrCreateShop } from "../services/shop.server";
 
@@ -63,28 +68,25 @@ import { syncShopifyData } from "../services/shopify-sync.server";
 
 import { getSyncStatus } from "../services/sync-status.server";
 
-import {
+import { getStoreDiagnostic } from "../services/store-diagnostic.server";
 
-  assertCanOutput,
+import {
 
   assertCanScan,
 
   getUsage,
 
-  recordOutput,
-
   recordScan,
+
+  usageSummary,
 
   UsageLimitError,
 
 } from "../services/usage.server";
 
 import {
-
   buildThemeEmbedActivateUrl,
-
   buildThemesAdminUrl,
-
 } from "../config/theme-embed";
 
 
@@ -149,7 +151,20 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 
 
-  const priorityActions = sortByPriority(recommendations).slice(0, 3);
+  const usageRaw = usage;
+
+  const usageInfo = usageSummary(usageRaw);
+
+  const homeActionLimit =
+    usageInfo.visibleRecommendations === Number.POSITIVE_INFINITY
+      ? 3
+      : Math.min(usageInfo.visibleRecommendations, 3);
+
+  const priorityActions = sortByPriority(recommendations).slice(0, homeActionLimit);
+
+  const storeDiagnostic = hasData
+    ? await getStoreDiagnostic(shop.id, session.shop, 30).catch(() => null)
+    : null;
 
 
 
@@ -173,13 +188,19 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     recommendationCount: recommendations.length,
 
+    storeDiagnostic,
+
     revenueTimeline,
 
     visitorTimeline,
 
     syncStatus,
 
-    plan: usage.plan,
+    plan: usageRaw.plan,
+
+    usage: usageInfo,
+
+    homeActionLimit,
 
     themeEmbedUrl: buildThemeEmbedActivateUrl(
 
@@ -221,7 +242,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
       const usage = await getUsage(shop.id);
 
-      if (usage.plan !== "pro") {
+      if (usage.plan !== "pro" && usage.plan !== "starter") {
 
         return {
 
@@ -259,17 +280,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     if (intent === "generate_recommendations") {
 
-      await assertCanOutput(shop.id);
+      await assertCanScan(shop.id);
 
       await generateRecommendations(shop.id);
 
-      await recordOutput(shop.id);
+      await recordScan(shop.id);
 
       return {
 
         success: true,
 
-        message: "Your priority actions are ready below.",
+        message: "Your marketing actions are ready below.",
 
       };
 
@@ -351,11 +372,17 @@ export default function Overview() {
 
     recommendationCount,
 
+    storeDiagnostic,
+
     revenueTimeline,
 
     visitorTimeline,
 
     plan,
+
+    usage,
+
+    homeActionLimit,
 
     themeEmbedUrl,
 
@@ -414,7 +441,7 @@ export default function Overview() {
 
   return (
 
-    <s-page heading="Home">
+    <s-page heading="Marketing">
 
       <SubmitButton
 
@@ -426,13 +453,13 @@ export default function Overview() {
 
       >
 
-        {isBusy ? "Working…" : "Get fixes"}
+        {isBusy ? "Scanning…" : "Scan for actions"}
 
       </SubmitButton>
 
 
 
-      {plan === "pro" ? (
+      {(plan === "pro" || plan === "starter") ? (
 
         <SubmitButton fetcher={fetcher} slot="secondary-actions" intent="sync_shopify">
 
@@ -472,21 +499,11 @@ export default function Overview() {
 
 
 
-      {hasData ? (
-
-        <s-section>
-
-          <HomePitch />
-
-        </s-section>
-
-      ) : null}
-
-
-
       <s-section>
 
-        <AdvisorQuickAsk featured />
+        {storeDiagnostic ? (
+          <StoreDiagnosticPanel diagnostic={storeDiagnostic} />
+        ) : null}
 
       </s-section>
 
@@ -512,7 +529,19 @@ export default function Overview() {
 
 
 
-      <s-section heading="What to fix first">
+      <s-section>
+
+        <AdvisorQuickAsk />
+
+      </s-section>
+
+
+
+      <s-section heading={POSITIONING.actionsTitle}>
+
+        <MarketingResponsibilityNotice compact />
+
+        <p className="ms-section-lead">{POSITIONING.actionsLead}</p>
 
         {priorityActions.length > 0 ? (
 
@@ -524,11 +553,11 @@ export default function Overview() {
 
             ))}
 
-            {recommendationCount > 3 ? (
+            {recommendationCount > homeActionLimit ? (
 
               <AppLink to="/app/recommendations" className="ms-text-link">
 
-                View all {recommendationCount} fixes →
+                View all {recommendationCount} actions →
 
               </AppLink>
 
@@ -540,17 +569,17 @@ export default function Overview() {
 
           <EmptyState
 
-            icon="spark"
+            icon="box"
 
-            title="No fixes yet"
+            title="No marketing actions yet"
 
-            description="Tap Get fixes below — we'll list what to change first."
+            description="Scan your store data — we'll suggest what to market and fix first."
 
             action={
 
               <SubmitButton fetcher={fetcher} intent="generate_recommendations">
 
-                {isBusy ? "Working…" : "Get fixes"}
+                {isBusy ? "Scanning…" : "Scan for actions"}
 
               </SubmitButton>
 
@@ -600,11 +629,11 @@ export default function Overview() {
 
 
 
-      {plan === "free" ? (
+      {plan !== "pro" ? (
 
         <s-section>
 
-          <ProUpgradeCard intelligence={intelligence} />
+          <ProUpgradeCard plan={plan} />
 
         </s-section>
 
@@ -614,41 +643,17 @@ export default function Overview() {
 
       <s-section>
 
-        <div className="ms-home-footer-links">
+        <nav className="ms-footer-nav" aria-label="More pages">
 
-          <AppLink to="/app/chat" className="ms-home-link-card ms-home-link-card-chat">
+          <AppLink to="/app/analytics">Traffic & sales</AppLink>
 
-            <strong>Chat</strong>
+          <AppLink to="/app/segments">Segments</AppLink>
 
-            <span>Ask anything — get a clear answer</span>
+          <AppLink to="/app/reports">Reports</AppLink>
 
-          </AppLink>
+          <AppLink to="/app/settings">Settings</AppLink>
 
-          <AppLink to="/app/analytics" className="ms-home-link-card">
-
-            <strong>Traffic & sales</strong>
-
-            <span>Who visited and where they left</span>
-
-          </AppLink>
-
-          <AppLink to="/app/segments" className="ms-home-link-card">
-
-            <strong>Segments</strong>
-
-            <span>Visitor groups by source & device</span>
-
-          </AppLink>
-
-          <AppLink to="/app/reports" className="ms-home-link-card">
-
-            <strong>Reports</strong>
-
-            <span>Weekly AI summaries</span>
-
-          </AppLink>
-
-        </div>
+        </nav>
 
       </s-section>
 

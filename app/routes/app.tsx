@@ -32,7 +32,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const shop = await getOrCreateShop(session.shop);
 
   const usage = await getUsage(shop.id);
-  if (usage.plan === "pro") {
+  if (usage.plan === "pro" || usage.plan === "starter") {
     void maybeSyncShopifyData(admin, shop.id);
   }
 
@@ -76,8 +76,8 @@ export default function App() {
           Home
         </AppLink>
         <AppLink to="/app/chat">Chat</AppLink>
-        <AppLink to="/app/recommendations">Fixes</AppLink>
-        <AppLink to="/app/analytics">Analytics</AppLink>
+        <AppLink to="/app/recommendations">Marketing</AppLink>
+        <AppLink to="/app/analytics">Funnel</AppLink>
         <AppLink to="/app/segments">Segments</AppLink>
         <AppLink to="/app/reports">Reports</AppLink>
         <AppLink to="/app/billing">Billing</AppLink>

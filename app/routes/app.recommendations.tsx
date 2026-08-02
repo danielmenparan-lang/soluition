@@ -15,6 +15,7 @@ import { RecommendationCard } from "../components/ui/RecommendationCard";
 import { EmptyState } from "../components/ui/EmptyState";
 import { PageHero } from "../components/ui/PageHero";
 import { HelpPanel } from "../components/ui/HelpPanel";
+import { MarketingResponsibilityNotice } from "../components/ui/MarketingResponsibilityNotice";
 import { PAGE_HELP } from "../config/page-help";
 import { CATEGORY_LABELS } from "../components/ui/labels";
 import { getOrCreateShop } from "../services/shop.server";
@@ -24,16 +25,25 @@ import {
 } from "../services/ai.server";
 import { updateRecommendationStatus } from "../services/recommendations.server";
 import {
-  assertCanOutput,
-  recordOutput,
+  assertCanScan,
+  getUsage,
+  recordScan,
+  usageSummary,
   UsageLimitError,
 } from "../services/usage.server";
+import { PLAN_LIMITS } from "../config/plans";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
   const recommendations = await getRecommendations(shop.id).catch(() => []);
-  return { shop, recommendations };
+  const usage = usageSummary(await getUsage(shop.id));
+  const visibleLimit =
+    usage.visibleRecommendations === Number.POSITIVE_INFINITY
+      ? recommendations.length
+      : usage.visibleRecommendations;
+
+  return { shop, recommendations, usage, visibleLimit };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -47,21 +57,21 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       const id = formData.get("recommendationId");
       if (typeof id === "string" && id) {
         await updateRecommendationStatus(shop.id, id, "dismissed");
-        return { success: true, message: "Dismissed." };
+        return { success: true, message: "Skipped." };
       }
     }
     if (intent === "complete_recommendation") {
       const id = formData.get("recommendationId");
       if (typeof id === "string" && id) {
         await updateRecommendationStatus(shop.id, id, "completed");
-        return { success: true, message: "Marked as done." };
+        return { success: true, message: "Marked as applied." };
       }
     }
     if (intent === "generate_recommendations" || !intent) {
-      await assertCanOutput(shop.id);
+      await assertCanScan(shop.id);
       await generateRecommendations(shop.id);
-      await recordOutput(shop.id);
-      return { success: true, message: "Recommendations are ready" };
+      await recordScan(shop.id);
+      return { success: true, message: "Marketing actions are ready" };
     }
     return { success: false, message: "Unknown action" };
   } catch (error) {
@@ -75,14 +85,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 export default function Recommendations() {
-  const { shop, recommendations } = useLoaderData<typeof loader>();
+  const { shop, recommendations, usage, visibleLimit } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
   const isGenerating = fetcher.state !== "idle";
+  const visibleRecs = recommendations.slice(0, visibleLimit);
+  const hiddenCount = Math.max(0, recommendations.length - visibleRecs.length);
 
   useFetcherToast(fetcher);
   const help = PAGE_HELP.recommendations;
 
-  const grouped = recommendations.reduce(
+  const grouped = visibleRecs.reduce(
     (acc, rec) => {
       const cat = rec.category;
       if (!acc[cat]) acc[cat] = [];
@@ -102,6 +114,10 @@ export default function Recommendations() {
       />
       <HelpPanel title={help.helpTitle} items={help.helpItems} />
 
+      <s-section>
+        <MarketingResponsibilityNotice />
+      </s-section>
+
       <AutoGenerateRecommendations
         shopId={shop.id}
         fetcher={fetcher}
@@ -109,13 +125,13 @@ export default function Recommendations() {
         enabled={false}
       />
       <SubmitButton fetcher={fetcher} slot="primary-action" intent="generate_recommendations">
-        {isGenerating ? "Working…" : "Get fixes"}
+        {isGenerating ? "Scanning…" : "Scan for actions"}
       </SubmitButton>
 
       {isGenerating && (
         <s-section>
           <s-banner tone="info">
-            <s-paragraph>Working on your fixes…</s-paragraph>
+            <s-paragraph>Reading your store data…</s-paragraph>
           </s-banner>
         </s-section>
       )}
@@ -123,28 +139,40 @@ export default function Recommendations() {
       {recommendations.length === 0 ? (
         <s-section>
           <EmptyState
-            title="No fixes yet"
-            description="Tap Get fixes — we'll list what to change first, most important on top."
+            title="No marketing actions yet"
+            description="Scan your store — we'll turn your data into ranked marketing steps."
             action={
               <SubmitButton fetcher={fetcher} intent="generate_recommendations">
-                {isGenerating ? "Working…" : "Get fixes"}
+                {isGenerating ? "Scanning…" : "Scan for actions"}
               </SubmitButton>
             }
           />
         </s-section>
       ) : (
-        Object.entries(grouped).map(([category, recs]) => (
-          <s-section
-            key={category}
-            heading={`${CATEGORY_LABELS[category] ?? category} (${recs.length})`}
-          >
-            <s-stack direction="block" gap="base">
-              {recs.map((rec) => (
-                <RecommendationCard key={rec.id} rec={rec} fetcher={fetcher} />
-              ))}
-            </s-stack>
-          </s-section>
-        ))
+        <>
+          {hiddenCount > 0 ? (
+            <s-section>
+              <s-banner tone="warning">
+                <s-paragraph>
+                  Free plan shows {PLAN_LIMITS.free.visibleRecommendations} actions.{" "}
+                  {hiddenCount} more locked — upgrade on Billing.
+                </s-paragraph>
+              </s-banner>
+            </s-section>
+          ) : null}
+          {Object.entries(grouped).map(([category, recs]) => (
+            <s-section
+              key={category}
+              heading={`${CATEGORY_LABELS[category] ?? category} (${recs.length})`}
+            >
+              <s-stack direction="block" gap="base">
+                {recs.map((rec) => (
+                  <RecommendationCard key={rec.id} rec={rec} fetcher={fetcher} />
+                ))}
+              </s-stack>
+            </s-section>
+          ))}
+        </>
       )}
     </s-page>
   );

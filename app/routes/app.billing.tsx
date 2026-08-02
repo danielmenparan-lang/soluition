@@ -19,6 +19,7 @@ import { SubmitButton } from "../components/SubmitButton";
 import { useShopifyFetcher } from "../hooks/useShopifyFetcher";
 import { SectionBlock } from "../components/ui/SectionBlock";
 import { PageHero } from "../components/ui/PageHero";
+import { MarketingResponsibilityNotice } from "../components/ui/MarketingResponsibilityNotice";
 
 const BILLABLE_PLANS: ("Pro" | "Starter" | "Unlimited")[] = [
   PRO_PLAN,
@@ -26,15 +27,19 @@ const BILLABLE_PLANS: ("Pro" | "Starter" | "Unlimited")[] = [
   UNLIMITED_PLAN,
 ];
 
-const COMPARE_ROWS = [
-  { feature: "Storefront visitor tracking", free: true, pro: true },
-  { feature: "Store Health Score", free: true, pro: true },
-  { feature: "Analytics & funnel charts", free: true, pro: true },
-  { feature: "Shopify order sync", free: false, pro: true },
-  { feature: "LTV, RFM & cohorts", free: false, pro: true },
-  { feature: "AI outputs / month", free: "3", pro: "Unlimited" },
-  { feature: "Scans / month", free: "2", pro: "Unlimited" },
-  { feature: "Weekly AI reports", free: "Limited", pro: "Unlimited" },
+const COMPARE_ROWS: Array<{
+  feature: string;
+  free: string | boolean;
+  starter: string | boolean;
+  pro: string | boolean;
+}> = [
+  { feature: "Marketing action cards", free: "2", starter: "10 / scan", pro: "Unlimited" },
+  { feature: "Marketing scans", free: "1 / mo", starter: "10 / day", pro: "Unlimited" },
+  { feature: "Chat messages", free: "1 / mo", starter: "5 / day", pro: "Unlimited" },
+  { feature: "Store data → suggestions", free: true, starter: true, pro: true },
+  { feature: "Ad readiness score", free: true, starter: true, pro: true },
+  { feature: "Shopify order sync", free: false, starter: true, pro: true },
+  { feature: "LTV & repeat buyers", free: false, starter: false, pro: true },
 ];
 
 async function resolveActivePlan(
@@ -73,6 +78,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const returnUrl = `${appUrl}/app/billing`;
   const isTest = process.env.NODE_ENV !== "production";
 
+  if (plan === "starter") {
+    return billing.request({
+      plan: STARTER_PLAN,
+      isTest,
+      returnUrl,
+    });
+  }
+
   if (plan === "pro") {
     return billing.request({
       plan: PRO_PLAN,
@@ -84,11 +97,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return redirect("/app/billing");
 };
 
+function cellValue(value: string | boolean): string {
+  if (typeof value === "boolean") return value ? "✓" : "—";
+  return value;
+}
+
 export default function BillingPage() {
   const { usage } = useLoaderData<typeof loader>();
   const fetcher = useShopifyFetcher<typeof action>();
 
-  const tiers = (["free", "pro"] as const).map((id) => {
+  const tiers = (["free", "starter", "pro"] as const).map((id) => {
     const plan = PLAN_LIMITS[id];
     return {
       id,
@@ -104,45 +122,49 @@ export default function BillingPage() {
   return (
     <s-page heading="Billing">
       <PageHero
-        title="Plans"
-        subtitle="Free to start. Pro adds order sync and unlimited chat + fixes."
+        title="Marketing plans"
+        subtitle="Store data → marketing actions. You approve every step."
         variant="default"
         compact
       />
 
       <s-section>
+        <MarketingResponsibilityNotice />
+      </s-section>
+
+      <s-section>
         <SectionBlock
-          title="Your usage this month"
+          title={`Usage ${usage.periodLabel}`}
           subtitle={`${usage.planLabel} · ${usage.planPrice}`}
         >
           <div className="ms-metric-grid">
             <div className="ms-card ms-card-soft">
-              <s-text type="strong">Scans</s-text>
+              <s-text type="strong">Marketing scans</s-text>
               <div className="ms-metric-value">
                 {usage.scansUsed} / {usage.scanLimit}
               </div>
-              <s-text color="subdued">Segments & Shopify sync</s-text>
+              <s-text color="subdued">Generate action cards from your data</s-text>
             </div>
             <div className="ms-card ms-card-soft">
-              <s-text type="strong">AI outputs</s-text>
+              <s-text type="strong">Chat messages</s-text>
               <div className="ms-metric-value">
                 {usage.outputsUsed} / {usage.outputLimit}
               </div>
-              <s-text color="subdued">Chat, fixes, reports</s-text>
+              <s-text color="subdued">Ask → marketing suggestions</s-text>
             </div>
           </div>
         </SectionBlock>
       </s-section>
 
       <s-section>
-        <div className="ms-plan-grid">
+        <div className="ms-plan-grid ms-plan-grid-3">
           {tiers.map((tier) => (
             <div
               key={tier.id}
               className={`ms-card ms-plan-card ${tier.current ? "ms-plan-current" : ""} ${tier.id === "pro" ? "ms-plan-featured" : ""}`}
             >
               {tier.id === "pro" ? (
-                <span className="ms-plan-badge">Most popular</span>
+                <span className="ms-plan-badge">Best value</span>
               ) : null}
               <s-text type="strong">{tier.name}</s-text>
               <div className="ms-plan-price">{tier.price}</div>
@@ -159,7 +181,7 @@ export default function BillingPage() {
                 <s-text color="subdued">Included for all stores</s-text>
               ) : (
                 <SubmitButton fetcher={fetcher} fields={{ plan: tier.id }}>
-                  Upgrade to Pro
+                  Upgrade to {tier.name}
                 </SubmitButton>
               )}
             </div>
@@ -174,6 +196,7 @@ export default function BillingPage() {
               <tr>
                 <th>Feature</th>
                 <th>Free</th>
+                <th>Starter</th>
                 <th>Pro</th>
               </tr>
             </thead>
@@ -181,20 +204,9 @@ export default function BillingPage() {
               {COMPARE_ROWS.map((row) => (
                 <tr key={row.feature}>
                   <td>{row.feature}</td>
-                  <td>
-                    {typeof row.free === "boolean"
-                      ? row.free
-                        ? "✓"
-                        : "—"
-                      : row.free}
-                  </td>
-                  <td>
-                    {typeof row.pro === "boolean"
-                      ? row.pro
-                        ? "✓"
-                        : "—"
-                      : row.pro}
-                  </td>
+                  <td>{cellValue(row.free)}</td>
+                  <td>{cellValue(row.starter)}</td>
+                  <td>{cellValue(row.pro)}</td>
                 </tr>
               ))}
             </tbody>

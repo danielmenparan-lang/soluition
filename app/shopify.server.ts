@@ -50,7 +50,6 @@ if (useSupabaseSessions) {
 }
 
 export const PRO_PLAN = "Pro";
-/** @deprecated Legacy plan name — maps to Pro in usage.server */
 export const STARTER_PLAN = "Starter";
 /** @deprecated Legacy plan name — maps to Pro in usage.server */
 export const UNLIMITED_PLAN = "Unlimited";
@@ -69,7 +68,7 @@ const shopify = shopifyApp({
     [PRO_PLAN]: {
       lineItems: [
         {
-          amount: 29,
+          amount: 19.99,
           currencyCode: "USD",
           interval: BillingInterval.Every30Days,
         },
@@ -78,7 +77,7 @@ const shopify = shopifyApp({
     [STARTER_PLAN]: {
       lineItems: [
         {
-          amount: 29,
+          amount: 9.99,
           currencyCode: "USD",
           interval: BillingInterval.Every30Days,
         },
@@ -87,7 +86,7 @@ const shopify = shopifyApp({
     [UNLIMITED_PLAN]: {
       lineItems: [
         {
-          amount: 29,
+          amount: 19.99,
           currencyCode: "USD",
           interval: BillingInterval.Every30Days,
         },

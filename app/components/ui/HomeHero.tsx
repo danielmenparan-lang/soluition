@@ -14,62 +14,42 @@ export function HomeHero({
   sessionConversion,
 }: HomeHeroProps) {
   const currency = intelligence.primaryCurrency;
-  const { storeHealthGrade, storeHealthScore } = intelligence;
-  const copy = getStoreScoreCopy(storeHealthGrade, storeHealthScore);
+  const { storeHealthScore } = intelligence;
+  const copy = getStoreScoreCopy(intelligence.storeHealthGrade, storeHealthScore);
 
   return (
-    <div className={`ms-store-snapshot ms-store-snapshot-${copy.tone}`}>
-      <div className="ms-store-snapshot-top">
-        <div className="ms-store-snapshot-copy">
-          <p className="ms-store-snapshot-label">Your store today</p>
-          <h2 className="ms-store-snapshot-verdict">{copy.verdict}</h2>
-          <p className="ms-store-snapshot-explain">{copy.explain}</p>
-        </div>
-        <div
-          className={`ms-store-snapshot-score ms-store-snapshot-grade-${storeHealthGrade.toLowerCase()}`}
-          aria-label={`Store score ${storeHealthScore} out of 100`}
-        >
-          <span className="ms-store-snapshot-number">{storeHealthScore}</span>
-          <span className="ms-store-snapshot-outof">/ 100</span>
-          <span className="ms-store-snapshot-hint">{getScoreHint(storeHealthScore)}</span>
-        </div>
+    <section className="ms-store-status">
+      <div className="ms-store-status-main">
+        <h2 className="ms-store-status-headline">{copy.verdict}</h2>
+        <p className="ms-store-status-note">{copy.explain}</p>
+      </div>
+      <div className="ms-store-status-score" title={getScoreHint(storeHealthScore)}>
+        <span className="ms-store-status-value">{storeHealthScore}</span>
+        <span className="ms-store-status-max">/100</span>
       </div>
 
-      <div
-        className="ms-store-snapshot-bar"
-        role="progressbar"
-        aria-valuenow={storeHealthScore}
-        aria-valuemin={0}
-        aria-valuemax={100}
-      >
-        <div
-          className="ms-store-snapshot-bar-fill"
-          style={{ width: `${storeHealthScore}%` }}
-        />
-      </div>
-
-      <div className="ms-store-snapshot-kpis">
-        <div className="ms-store-snapshot-kpi">
-          <span className="ms-store-snapshot-kpi-label">Visitors</span>
-          <strong>{visitorCount !== null ? visitorCount : "—"}</strong>
+      <dl className="ms-store-stats">
+        <div>
+          <dt>Visitors</dt>
+          <dd>{visitorCount !== null ? visitorCount : "—"}</dd>
         </div>
-        <div className="ms-store-snapshot-kpi">
-          <span className="ms-store-snapshot-kpi-label">Sales rate</span>
-          <strong>{sessionConversion !== null ? `${sessionConversion}%` : "—"}</strong>
+        <div>
+          <dt>Sales rate</dt>
+          <dd>{sessionConversion !== null ? `${sessionConversion}%` : "—"}</dd>
         </div>
-        <div className="ms-store-snapshot-kpi">
-          <span className="ms-store-snapshot-kpi-label">Orders</span>
-          <strong>{intelligence.orders.totalOrders}</strong>
+        <div>
+          <dt>Orders</dt>
+          <dd>{intelligence.orders.totalOrders}</dd>
         </div>
-        <div className="ms-store-snapshot-kpi">
-          <span className="ms-store-snapshot-kpi-label">Revenue</span>
-          <strong>
+        <div>
+          <dt>Revenue</dt>
+          <dd>
             {intelligence.hasShopifyOrders
               ? formatMoney(intelligence.revenue.totalRevenue, currency)
               : "—"}
-          </strong>
+          </dd>
         </div>
-      </div>
-    </div>
+      </dl>
+    </section>
   );
 }

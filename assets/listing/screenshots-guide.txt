@@ -12,7 +12,6 @@ TECHNICAL SPECS (Shopify App Store)
 • Minimum: 3 screenshots · Maximum: 8
 • Capture the embedded app inside Shopify Admin (not the storefront)
 • Use English UI (app is English by default)
-• Hide personal email in footer if you prefer — zoom/crop is OK
 
 ────────────────────────────────────────────────────────────
 BEFORE YOU SHOOT (10 minutes)
@@ -21,136 +20,60 @@ BEFORE YOU SHOOT (10 minutes)
 2. Apps → Solution (wait for deploy after latest push)
 3. Theme → Customize → App embeds → Solution Tracker ON → Save
 4. Storefront (new tab): visit Home → 2 product pages → cart
-5. Back in app → Home → "Generate priorities" (needs 1 AI output)
-6. Optional Pro look: Billing → upgrade test plan, then Home → Sync Shopify
-
-If Home is still empty: browse storefront again, wait 1–2 min, refresh.
+5. Back in app → Home → "Get fixes" (needs 1 AI output)
 
 ────────────────────────────────────────────────────────────
-HOW TO CAPTURE ON WINDOWS
-────────────────────────────────────────────────────────────
-1. Open app full-width in Shopify Admin (collapse left sidebar if needed)
-2. Win + Shift + S → select the app content area
-3. Paste into Paint / Photos → crop to 16:9
-4. Resize to 1600 × 900 (Paint: Resize → Pixels → 1600 × 900)
-   Or use https://www.iloveimg.com/resize-image (free)
-
-Tip: Browser zoom 100%. Hide browser bookmarks bar for cleaner shots.
-
-────────────────────────────────────────────────────────────
-5 SCREENSHOTS — RECOMMENDED ORDER (story: problem → fix)
+5 SCREENSHOTS — STORY: traffic → diagnose → fix
 ────────────────────────────────────────────────────────────
 
-SCREEN 1 — HOME (hero shot) ★ most important
+SCREEN 1 — HOME (hero) ★ most important
 ────────────────────────────────────────────────────────────
-Navigate: Apps → Solution → Home
-
 Must show:
-• Purple "Start here" chat box at top of Home
-• "Why no sales?" headline
-• Store score (A–F) + KPIs below
+• "Ad readiness" score + verdict (Ready / Fix before ads)
+• "Fix before ads" blockers OR "Where buyers drop off"
 
 Partners caption (EN):
-  See your store health score and top fixes ranked by impact
-
-Hebrew note:
-  זה המסך הראשון שmerchants רואים — חייב להיראות “מלא”, לא onboarding
+  Traffic but no sales? See if you're ready for ads — and where buyers drop off
 
 ────────────────────────────────────────────────────────────
 
-SCREEN 2 — ANALYTICS (conversion proof)
+SCREEN 2 — HOME (fixes section) or FIXES page
 ────────────────────────────────────────────────────────────
-Navigate: Analytics
-
 Must show:
-• Page hero: "Conversion & traffic"
-• Conversion funnel chart (visitors → purchase steps)
-• Trend chart (visitors or revenue)
-• At least one bar chart (traffic sources or countries)
-
-Scroll so funnel + one chart are visible in one frame.
-If funnel is empty, capture "Overview" metrics + trend chart instead.
+• Ranked fix list with "Fix first"
+• Dismiss + Done buttons
 
 Partners caption (EN):
-  Map your funnel and spot where visitors drop off
+  Get a short fix list ranked by impact — start at the top
 
 ────────────────────────────────────────────────────────────
 
-SCREEN 3 — FIXES (action list)
+SCREEN 3 — FUNNEL (Analytics page)
 ────────────────────────────────────────────────────────────
-Navigate: Fixes (Recommendations)
-
 Must show:
-• "Fixes ranked by impact" title
-• At least 2 recommendation cards with High / Medium priority
-• Dismiss + Mark done buttons visible on one card
-
-If list is empty: run "Generate new set" first, wait ~15 sec.
+• Conversion funnel chart
+• Visitors → product → cart → checkout → purchase
 
 Partners caption (EN):
-  AI-ranked fixes — what to change first on your store
+  Map your funnel and see where visitors leave
 
 ────────────────────────────────────────────────────────────
 
-SCREEN 4 — CHAT ★ important
+SCREEN 4 — CHAT
 ────────────────────────────────────────────────────────────
-Navigate: Chat
-
 Must show:
-• "Chat" title
-• One user question (e.g. "Why no sales?")
-• One reply with: In short / What it means / Do this
-
-Caption: Ask why no sales — get clear steps in plain English
-
-────────────────────────────────────────────────────────────
-
-SCREEN 5 — BILLING (optional but helps conversion)
-────────────────────────────────────────────────────────────
-Navigate: Billing
-
-Must show:
-• Free vs Pro $29 cards side by side
-• "Most popular" badge on Pro
-• Compare plans table (partial scroll OK)
+• Question: "Ready for ads?" or "Why no sales?"
+• Clear answer with steps
 
 Partners caption (EN):
-  Start free — upgrade to Pro for order sync and unlimited AI
+  Ask anything — get plain-English answers from your store data
 
 ────────────────────────────────────────────────────────────
-OPTIONAL SCREEN 6 — REPORTS
-────────────────────────────────────────────────────────────
-Navigate: Reports → Generate report (uses 1 AI output)
 
-Shows weekly summary — good for "serious product" signal.
+SCREEN 5 — BILLING
+────────────────────────────────────────────────────────────
+Must show:
+• Free vs Pro $29/mo
 
-Caption: Weekly conversion summary — what changed and what to fix
-
-────────────────────────────────────────────────────────────
-UPLOAD IN PARTNERS
-────────────────────────────────────────────────────────────
-Partners → Apps → solution → Listing → App store listing content
-→ Media → Add screenshots in order 1 → 5
-→ App name: Solution — Fix Store Conversion
-→ Tagline: See why visitors don't buy. Get AI fixes ranked by impact.
-
-────────────────────────────────────────────────────────────
-QUICK CHECKLIST
-────────────────────────────────────────────────────────────
-[ ] 1600×900 PNG, 3–5 files
-[ ] No empty states in screenshots 1–4
-[ ] English UI throughout
-[ ] App icon 1200×1200 uploaded (assets/app-icon.png)
-[ ] description-en.txt pasted in listing
-[ ] Privacy URL live
-[ ] Testing instructions from submission-checklist.txt
-
-────────────────────────────────────────────────────────────
-IF YOU’RE STUCK ON EMPTY DATA
-────────────────────────────────────────────────────────────
-A) Browse storefront 3–4 pages, refresh app (real data — best)
-B) npm run db:seed — seeds demo-store.myshopify.com only (not your dev store)
-C) For screenshots only: use dev store after steps in "BEFORE YOU SHOOT"
-
-Install link (fresh test):
-https://admin.shopify.com/store/solution-vyndgruj/oauth/install?client_id=00eb38f774ffba914d98a6800f4c5df5
+Partners caption (EN):
+  Free to diagnose. Pro for order sync and unlimited fixes.

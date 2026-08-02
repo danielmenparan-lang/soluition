@@ -1,13 +1,17 @@
-Solution — find what's blocking sales on your Shopify store.
-
-Solution tracks visitors, maps your conversion funnel, and shows where people drop off. AI ranks the highest-impact fixes — product pages, pricing signals, traffic quality — in plain English inside Shopify Admin.
-
-• Conversion funnel — visitors → product views → checkout → purchase
-• Store Health Score (A–F) from orders, repeat rate, and catalog
-• Top fixes ranked by impact — dismiss or mark done as you work
-• Conversion coach — ask "why no sales?" and get steps in Admin
-• Weekly summary — what changed and what to fix next
-
-Pricing: Free — 2 scans + 3 AI outputs. Pro $29/mo — Shopify order sync, LTV & RFM, unlimited AI.
-
-Setup (2 minutes): Home → enable the Solution Tracker app embed in your theme → browse your storefront once → Generate priorities.
+Solution — Traffic but no sales? Find where buyers drop off.
+
+You have visitors. You don't have sales. Solution tells you why — before you waste money on ads.
+
+WHAT IT DOES
+• Ad readiness score — are you ready to run ads, or will you burn budget?
+• Store diagnostic — checks funnel, checkout, product pages, traffic quality
+• Drop-off map — see exactly where buyers leave (checkout, product page, bad traffic)
+• Fix list — ranked steps with links to Shopify Admin
+• Chat — ask "why no sales?" or "ready for ads?"
+
+WHO IT'S FOR
+Shopify stores with traffic but low conversion. Not for stores with zero visitors — turn on tracking first, browse your store, then diagnose.
+
+Pricing: Free — 2 scans + 3 AI outputs. Pro $29/mo — order sync, repeat buyers, unlimited fixes.
+
+Setup (2 min): Home → enable Solution Tracker app embed → browse storefront → see your diagnostic.

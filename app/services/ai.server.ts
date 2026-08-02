@@ -24,6 +24,16 @@ import {
   prefersHebrewReply,
 } from "../config/chat-voice";
 import { prepareChatContext } from "./chat-context.server";
+import {
+  formatDiagnosticForAi,
+  getStoreDiagnostic,
+} from "./store-diagnostic.server";
+import {
+  formatLeaksForAi,
+  getRevenueLeakReport,
+} from "./revenue-leak.server";
+import { getRecommendationCap } from "../config/plans";
+import { getUsage } from "./usage.server";
 import { rejectLowValueReply } from "../utils/chat-quality";
 import type {
   AIRecommendation,
@@ -36,16 +46,17 @@ Write for non-marketers. Simple words. No jargon.
 When asked for JSON, return valid JSON only.
 Prioritize fixes that unblock sales fastest.`;
 
-const RECOMMENDATIONS_SYSTEM_PROMPT = `You help Shopify store owners fix problems that stop sales. Write for someone who is NOT a marketer.
+const RECOMMENDATIONS_SYSTEM_PROMPT = `You are a Shopify marketing advisor. Turn store data into clear marketing actions — ads, product focus, email angles, page fixes.
 
 Rules:
-- Titles: max 8 words. Simple everyday English.
-- description: max 2 short sentences. No jargon.
-- expected_impact: one short sentence starting with "This could" — plain words only.
-- action_items: 2–3 steps. Max 12 words each. Say where to click in Shopify Admin.
-- Never use: funnel, CRO, attribution, LTV, RFM, cohort, retargeting, optimize, leverage, KPI.
+- Titles: max 8 words. Marketing-focused (what to promote, fix, or test).
+- description: max 2 short sentences. Tie to store data.
+- expected_impact: one short sentence — "This could help you ..." in plain words.
+- action_items: 2–3 steps the merchant runs themselves in Shopify Admin or ad platforms.
+- Never use jargon: funnel, CRO, attribution, LTV, RFM, cohort, retargeting, leverage, KPI.
 - Do NOT invent numbers. Use only data from the JSON.
-- If all metrics are zero — say tracking is not on yet. Do not suggest paid ads.
+- Never suggest paid ads if ad readiness is low or readyForAds is false.
+- Remind implicitly that the merchant chooses whether to act.
 - No markdown, no emojis.`;
 
 function isSetupQuestion(message: string): boolean {
@@ -127,18 +138,27 @@ function buildRecommendationsPrompt(
   productInsights: unknown[],
   segments: Array<{ name: string; members: number }>,
   attributionContext: string | null,
+  revenueLeaksJson: string,
+  storeDiagnosticJson: string,
   hasData: boolean,
+  maxCount: number,
 ): string {
   const countRule = hasData
-    ? "Create 6–10 recommendations."
-    : "Data is empty (0 visitors). Create only 3–4 recommendations — focus on enabling tracking first. Do not suggest paid ads.";
+    ? `Create exactly ${maxCount} marketing actions. Prioritize ad readiness blockers, then drop-offs, then growth.`
+    : `Data is empty (0 visitors). Create only ${Math.min(maxCount, 3)} actions — focus on enabling tracking and first marketing steps. Do not suggest paid ads.`;
 
   const dataRule = hasData
-    ? "- Every recommendation must cite a number, product, page, or traffic source from the JSON above.\n- If no data supports a recommendation — omit it."
+    ? "- Every recommendation must cite a number, product, page, or traffic source from the JSON.\n- If readyForAds is false — do NOT suggest increasing ad spend.\n- Prefer fixes for blockers and dropOffs first.\n- If no data supports a recommendation — omit it."
     : "- Metrics are zero — explain there is no data yet and what to do to collect it.";
 
-  return `Create fixes for this store. Plain English only. Reading level: grade 6.
+  return `Create marketing actions for this store. Plain English. Reading level: grade 6.
 ${countRule}
+
+Store diagnostic (ad readiness + blockers):
+${storeDiagnosticJson}
+
+Drop-off estimates ($/month — use in expected_impact when relevant):
+${revenueLeaksJson}
 
 Store data (30 days):
 ${analyticsSummary}
@@ -173,8 +193,19 @@ Return JSON array:
 export async function generateRecommendations(
   shopId: string,
 ): Promise<AIRecommendation[]> {
+  const supabase = getSupabase();
+  const usage = await getUsage(shopId);
+  const maxCount = getRecommendationCap(usage.plan);
   const metrics = await getDashboardMetrics(shopId);
   const hasData = metrics.totalVisitors > 0;
+
+  const { data: shopRow } = await supabase
+    .from("shops")
+    .select("shop_domain")
+    .eq("id", shopId)
+    .maybeSingle();
+
+  const shopDomain = shopRow?.shop_domain ?? "";
 
   const analyticsSummary = await prepareAnalyticsSummary(shopId);
   const productMetrics = await getProductMetrics(shopId);
@@ -187,18 +218,35 @@ export async function generateRecommendations(
     ? await buildAttributionContext(shopId)
     : null;
 
+  const storeDiagnostic = shopDomain
+    ? await getStoreDiagnostic(shopId, shopDomain, 30).catch(() => null)
+    : null;
+  const storeDiagnosticJson = storeDiagnostic
+    ? formatDiagnosticForAi(storeDiagnostic)
+    : JSON.stringify({ note: "No diagnostic data" });
+
+  const revenueLeaks = shopDomain
+    ? await getRevenueLeakReport(shopId, shopDomain, 30).catch(() => null)
+    : null;
+  const revenueLeaksJson = revenueLeaks
+    ? formatLeaksForAi(revenueLeaks)
+    : JSON.stringify({ revenueLeaks: [] });
+
   const prompt = buildRecommendationsPrompt(
     analyticsSummary,
     productInsights,
     segments.map((s) => ({ name: s.name, members: s.member_count })),
     attributionContext,
+    revenueLeaksJson,
+    storeDiagnosticJson,
     hasData,
+    maxCount,
   );
 
   const response = await callClaude(RECOMMENDATIONS_SYSTEM_PROMPT, prompt);
   const recommendations = sortRecommendations(
     parseJsonResponse<GeneratedRecommendation[]>(response),
-  );
+  ).slice(0, maxCount);
 
   if (!Array.isArray(recommendations) || recommendations.length === 0) {
     throw new Error("Claude returned no recommendations");
@@ -320,6 +368,14 @@ export async function chatWithAI(
     .eq("id", shopId)
     .single();
 
+  const storeDiagnostic =
+    shop?.shop_domain && hasData
+      ? await getStoreDiagnostic(shopId, shop.shop_domain, 30).catch(() => null)
+      : null;
+  const diagnosticJson = storeDiagnostic
+    ? formatDiagnosticForAi(storeDiagnostic)
+    : "{}";
+
   let convId = conversationId;
   if (convId) {
     const { data: ownedConversation } = await supabase
@@ -367,6 +423,9 @@ export async function chatWithAI(
     const contextPrompt = `${chatStageHint(stage, hebrew)}
 
 Shop: ${shop?.shop_domain ?? "unknown"}
+
+Store diagnostic (ad readiness):
+${diagnosticJson}
 
 Analytics:
 ${analyticsSummary}

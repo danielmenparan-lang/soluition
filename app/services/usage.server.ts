@@ -16,50 +16,44 @@ type UsageSettings = {
   periodStart: string;
 };
 
-function currentPeriodStart(): string {
+function currentPeriodStart(plan: PlanTier): string {
   const now = new Date();
+  if (PLAN_LIMITS[plan].usagePeriod === "daily") {
+    return now.toISOString().slice(0, 10);
+  }
   return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-01`;
 }
 
 function parseSettings(raw: unknown): UsageSettings {
-  const periodStart = currentPeriodStart();
+  const s = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const plan = normalizePlanTier(s.plan);
+  const periodStart = currentPeriodStart(plan);
   const base: UsageSettings = {
-    plan: "free",
+    plan,
     scansUsed: 0,
     outputsUsed: 0,
     periodStart,
   };
 
-  if (!raw || typeof raw !== "object") return base;
-  const s = raw as Record<string, unknown>;
   const storedPeriod =
     typeof s.usagePeriodStart === "string" ? s.usagePeriodStart : periodStart;
 
   if (storedPeriod !== periodStart) {
-    return { ...base, plan: normalizePlanTier(s.plan) };
+    return base;
   }
 
   return {
-    plan: normalizePlanTier(s.plan),
+    plan,
     scansUsed: typeof s.scansUsed === "number" ? s.scansUsed : 0,
     outputsUsed: typeof s.outputsUsed === "number" ? s.outputsUsed : 0,
     periodStart: storedPeriod,
   };
 }
 
-function normalizePlan(value: unknown): PlanTier {
-  return normalizePlanTier(value);
-}
-
 export function planFromSubscriptionName(name: string | undefined): PlanTier {
   if (!name) return "free";
-  if (
-    name === PRO_PLAN ||
-    name === UNLIMITED_PLAN ||
-    name === STARTER_PLAN
-  ) {
-    return "pro";
-  }
+  if (name === STARTER_PLAN) return "starter";
+  if (name === PRO_PLAN || name === UNLIMITED_PLAN) return "pro";
   return "free";
 }
 
@@ -102,43 +96,54 @@ export async function syncPlanFromBilling(
 ): Promise<UsageSettings> {
   const usage = await getUsage(shopId);
   if (usage.plan === plan) return usage;
-  const updated = { ...usage, plan };
+  const updated = {
+    ...usage,
+    plan,
+    scansUsed: 0,
+    outputsUsed: 0,
+    periodStart: currentPeriodStart(plan),
+  };
   await saveUsage(shopId, updated);
   return updated;
 }
 
-export function usageSummary(usage: UsageSettings) {
+export function usageSummary(usage: UsageSettings): UsageSummary {
   const limits = PLAN_LIMITS[usage.plan];
-  const scanLimit =
-    limits.scans === Number.POSITIVE_INFINITY ? "Unlimited" : String(limits.scans);
-  const outputLimit =
-    limits.outputs === Number.POSITIVE_INFINITY
-      ? "Unlimited"
-      : String(limits.outputs);
+  const scanLimit = formatLimit(limits.scans);
+  const outputLimit = formatLimit(limits.outputs);
+  const periodLabel =
+    limits.usagePeriod === "daily" ? "today" : "this month";
+
   return {
     ...usage,
     scanLimit,
     outputLimit,
-    scansRemaining:
-      limits.scans === Number.POSITIVE_INFINITY
-        ? Number.POSITIVE_INFINITY
-        : Math.max(0, limits.scans - usage.scansUsed),
-    outputsRemaining:
-      limits.outputs === Number.POSITIVE_INFINITY
-        ? Number.POSITIVE_INFINITY
-        : Math.max(0, limits.outputs - usage.outputsUsed),
+    scansRemaining: remaining(limits.scans, usage.scansUsed),
+    outputsRemaining: remaining(limits.outputs, usage.outputsUsed),
     planLabel: limits.label,
     planPrice: limits.price,
+    periodLabel,
+    visibleRecommendations: limits.visibleRecommendations,
   };
+}
+
+function formatLimit(value: number): string {
+  return value === Number.POSITIVE_INFINITY ? "Unlimited" : String(value);
+}
+
+function remaining(limit: number, used: number): number {
+  if (limit === Number.POSITIVE_INFINITY) return Number.POSITIVE_INFINITY;
+  return Math.max(0, limit - used);
 }
 
 export class UsageLimitError extends Error {
   kind: "scan" | "output";
-  constructor(kind: "scan" | "output") {
+  constructor(kind: "scan" | "output", plan: PlanTier) {
+    const period = PLAN_LIMITS[plan].usagePeriod === "daily" ? "today" : "this month";
     super(
       kind === "scan"
-        ? "Scan limit reached. Upgrade your plan on the Billing page."
-        : "Output limit reached. Upgrade your plan on the Billing page.",
+        ? `Marketing scan limit reached for ${period}. Upgrade on Billing.`
+        : `Chat limit reached for ${period}. Upgrade on Billing.`,
     );
     this.name = "UsageLimitError";
     this.kind = kind;
@@ -153,14 +158,14 @@ function canUse(used: number, limit: number): boolean {
 export async function assertCanScan(shopId: string): Promise<UsageSettings> {
   const usage = await getUsage(shopId);
   const limit = PLAN_LIMITS[usage.plan].scans;
-  if (!canUse(usage.scansUsed, limit)) throw new UsageLimitError("scan");
+  if (!canUse(usage.scansUsed, limit)) throw new UsageLimitError("scan", usage.plan);
   return usage;
 }
 
 export async function assertCanOutput(shopId: string): Promise<UsageSettings> {
   const usage = await getUsage(shopId);
   const limit = PLAN_LIMITS[usage.plan].outputs;
-  if (!canUse(usage.outputsUsed, limit)) throw new UsageLimitError("output");
+  if (!canUse(usage.outputsUsed, limit)) throw new UsageLimitError("output", usage.plan);
   return usage;
 }
 

@@ -1,47 +1,34 @@
-import { AppLink } from "../AppLink";
-import { formatMoney } from "../../utils/format-currency";
+import type { PlanTier } from "../../config/plans";
+import { PLAN_LIMITS, isPaidPlan } from "../../config/plans";
 import { POSITIONING } from "../../config/positioning";
-import type { StoreIntelligence } from "../../types/store-intelligence.types";
+import { AppLink } from "../AppLink";
 
 type ProUpgradeCardProps = {
-  intelligence: StoreIntelligence | null;
+  plan: PlanTier;
 };
 
-export function ProUpgradeCard({ intelligence }: ProUpgradeCardProps) {
-  const currency = intelligence?.primaryCurrency ?? "USD";
-  const hasTeaser = Boolean(intelligence?.hasShopifyOrders);
+export function ProUpgradeCard({ plan }: ProUpgradeCardProps) {
+  if (plan === "pro") return null;
+
+  const isFree = plan === "free";
+  const title = isFree ? POSITIONING.starterTitle : POSITIONING.proTitle;
+  const text = isFree ? POSITIONING.starterText : POSITIONING.proText;
+  const upgradePlan = isFree ? "starter" : "pro";
+  const cta = isFree ? "Upgrade to Starter" : "Upgrade to Pro";
 
   return (
-    <div className="ms-pro-card">
-      <div className="ms-pro-card-glow" aria-hidden />
-      <div className="ms-pro-card-inner">
-        <p className="ms-pro-kicker">Pro — $29/mo</p>
-        <h3 className="ms-pro-title">{POSITIONING.proTitle}</h3>
-        <p className="ms-pro-text">{POSITIONING.proText}</p>
-        {hasTeaser && intelligence ? (
-          <div className="ms-pro-teaser">
-            <div>
-              <span className="ms-pro-teaser-label">Avg LTV</span>
-              <strong>{formatMoney(intelligence.customers.avgLifetimeValue, currency)}</strong>
-            </div>
-            <div>
-              <span className="ms-pro-teaser-label">Repeat rate</span>
-              <strong>{intelligence.customers.repeatBuyerRatePct}%</strong>
-            </div>
-            <div>
-              <span className="ms-pro-teaser-label">Customers</span>
-              <strong>{intelligence.customers.uniqueCustomers}</strong>
-            </div>
-          </div>
-        ) : (
-          <p className="ms-pro-text ms-pro-text-muted">
-            Sync orders to see why repeat buyers matter — included in Pro.
-          </p>
-        )}
-        <AppLink to="/app/billing" className="ms-btn ms-btn-primary ms-pro-cta">
-          Upgrade to Pro
-        </AppLink>
-      </div>
-    </div>
+    <section className="ms-pro-panel">
+      <h3 className="ms-section-title">{title}</h3>
+      <p className="ms-section-lead">{text}</p>
+      {!isPaidPlan(plan) ? (
+        <p className="ms-pro-stats">
+          Free: {PLAN_LIMITS.free.visibleRecommendations} actions +{" "}
+          {PLAN_LIMITS.free.outputs} chat / month
+        </p>
+      ) : null}
+      <AppLink to={`/app/billing?plan=${upgradePlan}`} className="ms-btn ms-btn-secondary">
+        {cta}
+      </AppLink>
+    </section>
   );
 }
