@@ -39,6 +39,8 @@ export const POSITIONING = {
   responsibilityAck:
     "I approve this action and accept that results are my responsibility.",
 
+  responsibilityAckShort: "I approve this action.",
+
   proTitle: "Pro — $19.99/month",
   proText: "Unlimited scans, chat, and order sync.",
 

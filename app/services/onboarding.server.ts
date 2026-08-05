@@ -1,3 +1,5 @@
+import { hasWorkingTracking } from "../utils/store-readiness";
+
 export type OnboardingStep = {
   id: "embed" | "data" | "insight";
   label: string;
@@ -16,8 +18,8 @@ export type OnboardingProgress = {
 };
 
 type BuildOnboardingInput = {
-  hasVisitorData: boolean;
-  hasShopifyData: boolean;
+  totalVisitors: number;
+  hasShopifyOrders: boolean;
   hasRecommendations: boolean;
   themeEmbedUrl: string;
 };
@@ -25,13 +27,16 @@ type BuildOnboardingInput = {
 export function buildOnboardingProgress(
   input: BuildOnboardingInput,
 ): OnboardingProgress {
-  const trackingDone = input.hasVisitorData || input.hasShopifyData;
+  const trackingWorking = hasWorkingTracking(
+    input.totalVisitors,
+    input.hasShopifyOrders,
+  );
   const steps: OnboardingStep[] = [
     {
       id: "embed",
       label: "Turn on tracking",
       detail: "Open your theme editor and enable the Solution app embed — about 2 minutes.",
-      done: input.hasVisitorData,
+      done: trackingWorking,
       href: input.themeEmbedUrl,
       external: true,
     },
@@ -39,14 +44,14 @@ export function buildOnboardingProgress(
       id: "data",
       label: "Visit your store once",
       detail: "Open your live storefront and browse 2–3 pages so we can read your funnel.",
-      done: trackingDone,
+      done: trackingWorking,
       href: "/app/analytics",
     },
     {
       id: "insight",
       label: "Get your first action",
-      detail: "Tap Scan for actions — you'll see one clear marketing move ranked first.",
-      done: input.hasRecommendations,
+      detail: "Scan your store — one clear marketing move appears here on Home.",
+      done: input.hasRecommendations && trackingWorking,
     },
   ];
 

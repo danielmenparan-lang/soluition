@@ -12,9 +12,15 @@ type PriorityActionCardProps = {
   fetcher: ShopifyFetcher;
   rank: number;
   spotlight?: boolean;
+  compact?: boolean;
 };
 
-export function PriorityActionCard({ rec, fetcher, rank, spotlight = false }: PriorityActionCardProps) {
+export function PriorityActionCard({
+  rec,
+  fetcher,
+  spotlight = false,
+  compact = false,
+}: PriorityActionCardProps) {
   const [acknowledged, setAcknowledged] = useState(false);
   const actions = asStringArray(rec.action_items);
   const firstAction = actions[0];
@@ -23,9 +29,21 @@ export function PriorityActionCard({ rec, fetcher, rank, spotlight = false }: Pr
     <article className={`ms-action-card ${spotlight ? "ms-action-card-spotlight" : ""}`}>
       {spotlight ? <span className="ms-action-card-badge">{POSITIONING.todayLabel}</span> : null}
       <h3 className="ms-action-card-title">{rec.title}</h3>
-      <p className="ms-action-card-desc">{rec.description}</p>
-      {rec.expected_impact ? <p className="ms-action-card-impact">{rec.expected_impact}</p> : null}
-      {firstAction ? <p className="ms-action-card-step">{firstAction}</p> : null}
+
+      {!compact && rec.description ? (
+        <p className="ms-action-card-desc">{rec.description}</p>
+      ) : null}
+
+      {!compact && rec.expected_impact ? (
+        <p className="ms-action-card-impact">{rec.expected_impact}</p>
+      ) : null}
+
+      {firstAction ? (
+        <p className="ms-action-card-step">
+          {compact ? <strong>Next step: </strong> : null}
+          {firstAction}
+        </p>
+      ) : null}
 
       <label className="ms-responsibility-check">
         <input
@@ -33,7 +51,7 @@ export function PriorityActionCard({ rec, fetcher, rank, spotlight = false }: Pr
           checked={acknowledged}
           onChange={(e) => setAcknowledged(e.target.checked)}
         />
-        {POSITIONING.responsibilityAck}
+        {compact ? POSITIONING.responsibilityAckShort : POSITIONING.responsibilityAck}
       </label>
 
       {acknowledged ? (
@@ -42,11 +60,11 @@ export function PriorityActionCard({ rec, fetcher, rank, spotlight = false }: Pr
           intent="complete_recommendation"
           fields={{ recommendationId: rec.id }}
         >
-          I applied it
+          Mark as done
         </SubmitButton>
       ) : (
         <button type="button" className="ms-btn ms-btn-primary" disabled>
-          I applied it
+          Mark as done
         </button>
       )}
     </article>

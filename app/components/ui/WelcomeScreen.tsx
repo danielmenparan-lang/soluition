@@ -1,19 +1,27 @@
 import { AppLink } from "../AppLink";
 import { BrandLogo } from "./BrandLogo";
+import { SubmitButton } from "../SubmitButton";
 import { THEME_EMBED_NAME } from "../../config/theme-embed";
 import { LANDING_BENEFITS, POSITIONING } from "../../config/positioning";
 import type { OnboardingProgress } from "../../services/onboarding.server";
+import type { useShopifyFetcher } from "../../hooks/useShopifyFetcher";
+
+type ShopifyFetcher = ReturnType<typeof useShopifyFetcher>;
 
 type WelcomeScreenProps = {
   themeEmbedUrl: string;
   storefrontUrl: string;
   progress: OnboardingProgress;
+  fetcher?: ShopifyFetcher;
+  isScanning?: boolean;
 };
 
 export function WelcomeScreen({
   themeEmbedUrl,
   storefrontUrl,
   progress,
+  fetcher,
+  isScanning = false,
 }: WelcomeScreenProps) {
   const nextStep = progress.steps.find((step) => !step.done);
   const currentIndex = nextStep
@@ -88,10 +96,17 @@ export function WelcomeScreen({
           </a>
         ) : null}
 
-        {nextStep?.id === "insight" ? (
+        {nextStep?.id === "insight" && fetcher ? (
+          <div className="ms-landing-cta-wrap">
+            <SubmitButton fetcher={fetcher} intent="generate_recommendations">
+              {isScanning ? "Scanning…" : "Scan for my first action"}
+            </SubmitButton>
+          </div>
+        ) : null}
+
+        {nextStep?.id === "insight" && !fetcher ? (
           <p className="ms-landing-wait">
-            Refresh this page after browsing your store — then tap{" "}
-            <strong>Scan for actions</strong> in the top right.
+            Finish the steps above, then tap <strong>Scan for actions</strong>.
           </p>
         ) : null}
 

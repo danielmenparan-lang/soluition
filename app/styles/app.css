@@ -3868,6 +3868,13 @@
   color: var(--ms-brand-dark);
 }
 
+.ms-landing-cta-wrap .ms-btn {
+  width: 100%;
+  text-align: center;
+  padding: 12px 20px;
+  font-size: 15px;
+}
+
 .ms-landing-cta {
   display: inline-block;
   width: 100%;

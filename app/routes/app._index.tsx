@@ -14,7 +14,6 @@ import { AppLink } from "../components/AppLink";
 import { EmptyState } from "../components/ui/EmptyState";
 import { WelcomeScreen } from "../components/ui/WelcomeScreen";
 import { HomeMetricsStrip } from "../components/ui/HomeMetricsStrip";
-import { HomePageIntro } from "../components/ui/HomePageIntro";
 import { TrendChart } from "../components/ui/TrendChart";
 import { PriorityActionCard } from "../components/ui/PriorityActionCard";
 import { ProUpgradeCard } from "../components/ui/ProUpgradeCard";
@@ -39,6 +38,7 @@ import {
   usageSummary,
   UsageLimitError,
 } from "../services/usage.server";
+import { isMarketingHomeReady } from "../utils/store-readiness";
 import {
   buildThemeEmbedActivateUrl,
   buildThemesAdminUrl,
@@ -64,9 +64,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const metrics = health?.metrics ?? null;
   const intelligence = health?.intelligence ?? null;
-  const hasVisitorData = Boolean(metrics && metrics.totalVisitors > 0);
+  const totalVisitors = metrics?.totalVisitors ?? 0;
   const hasShopifyData = Boolean(intelligence?.hasShopifyOrders);
-  const hasData = hasVisitorData || hasShopifyData;
+  const marketingReady = isMarketingHomeReady(totalVisitors, hasShopifyData);
 
   const themeEmbedUrl = buildThemeEmbedActivateUrl(
     session.shop,
@@ -74,20 +74,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   );
 
   const onboarding = buildOnboardingProgress({
-    hasVisitorData,
-    hasShopifyData,
+    totalVisitors,
+    hasShopifyOrders: hasShopifyData,
     hasRecommendations: recommendations.length > 0,
     themeEmbedUrl,
   });
 
-  const usageRaw = usage;
-  const usageInfo = usageSummary(usageRaw);
-  const homeActionLimit =
-    usageInfo.visibleRecommendations === Number.POSITIVE_INFINITY
-      ? 3
-      : Math.min(usageInfo.visibleRecommendations, 3);
-  const priorityActions = sortByPriority(recommendations).slice(0, homeActionLimit);
-  const storeDiagnostic = hasData
+  const usageInfo = usageSummary(usage);
+  const topAction = sortByPriority(recommendations)[0] ?? null;
+  const storeDiagnostic = marketingReady
     ? await getStoreDiagnostic(shop.id, session.shop, 30).catch(() => null)
     : null;
 
@@ -95,19 +90,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     shop,
     metrics,
     intelligence,
-    hasData,
-    hasVisitorData,
+    totalVisitors,
+    marketingReady,
     hasShopifyData,
     onboarding,
-    priorityActions,
+    topAction,
     recommendationCount: recommendations.length,
     storeDiagnostic,
     revenueTimeline,
     visitorTimeline,
     syncStatus,
-    plan: usageRaw.plan,
+    plan: usage.plan,
     usage: usageInfo,
-    homeActionLimit,
     themeEmbedUrl,
     storefrontUrl: storefrontUrl(session.shop),
     themesAdminUrl: buildThemesAdminUrl(session.shop),
@@ -150,7 +144,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       await recordScan(shop.id);
       return {
         success: true,
-        message: "Your marketing actions are ready below.",
+        message: "Your marketing action is ready on Home.",
       };
     }
 
@@ -184,17 +178,16 @@ export default function Overview() {
   const {
     metrics,
     intelligence,
-    hasData,
-    hasVisitorData,
+    totalVisitors,
+    marketingReady,
     hasShopifyData,
     onboarding,
-    priorityActions,
+    topAction,
     recommendationCount,
     storeDiagnostic,
     revenueTimeline,
     visitorTimeline,
     plan,
-    homeActionLimit,
     themeEmbedUrl,
     storefrontUrl,
   } = useLoaderData<typeof loader>();
@@ -203,7 +196,7 @@ export default function Overview() {
   const isBusy = fetcher.state !== "idle";
   useFetcherToast(fetcher);
 
-  if (!hasData) {
+  if (!marketingReady) {
     return (
       <s-page heading="Home">
         <s-section>
@@ -211,6 +204,8 @@ export default function Overview() {
             themeEmbedUrl={themeEmbedUrl}
             storefrontUrl={storefrontUrl}
             progress={onboarding}
+            fetcher={fetcher}
+            isScanning={isBusy}
           />
         </s-section>
       </s-page>
@@ -249,35 +244,30 @@ export default function Overview() {
 
       <s-section>
         <div className="ms-home-stack">
-          <HomePageIntro hasActions={priorityActions.length > 0} />
+          <header className="ms-home-intro">
+            <p className="ms-home-intro-tagline">{POSITIONING.tagline}</p>
+          </header>
 
-          {priorityActions.length > 0 ? (
+          {topAction ? (
             <section className="ms-home-primary" aria-labelledby="today-heading">
-              <h2 id="today-heading" className="ms-home-section-title">
-                {POSITIONING.actionsTitle}
-              </h2>
-              <div className="ms-home-actions">
-                {priorityActions.map((rec, i) => (
-                  <PriorityActionCard
-                    key={rec.id}
-                    rec={rec}
-                    fetcher={fetcher}
-                    rank={i + 1}
-                    spotlight={i === 0}
-                  />
-                ))}
-                {recommendationCount > homeActionLimit ? (
-                  <AppLink to="/app/recommendations" className="ms-text-link ms-home-more">
-                    View all {recommendationCount} actions →
-                  </AppLink>
-                ) : null}
-              </div>
+              <PriorityActionCard
+                rec={topAction}
+                fetcher={fetcher}
+                rank={1}
+                spotlight
+                compact
+              />
+              {recommendationCount > 1 ? (
+                <AppLink to="/app/recommendations" className="ms-text-link ms-home-more">
+                  {recommendationCount - 1} more action{recommendationCount > 2 ? "s" : ""} →
+                </AppLink>
+              ) : null}
             </section>
           ) : (
             <EmptyState
               icon="box"
-              title="Your first action is one scan away"
-              description="We read your visitors, funnel, and orders — then tell you what to market or fix first."
+              title="Scan for today's action"
+              description="One marketing move, ranked from your store data."
               action={
                 <SubmitButton fetcher={fetcher} intent="generate_recommendations">
                   {isBusy ? "Scanning…" : "Scan for actions"}
@@ -289,8 +279,8 @@ export default function Overview() {
           {intelligence ? (
             <HomeMetricsStrip
               intelligence={intelligence}
-              visitorCount={hasVisitorData ? metrics!.totalVisitors : null}
-              sessionConversion={hasVisitorData ? metrics!.conversionRate : null}
+              visitorCount={totalVisitors}
+              sessionConversion={metrics?.conversionRate ?? null}
               healthScore={healthScore}
             />
           ) : null}
@@ -305,11 +295,7 @@ export default function Overview() {
               points={chartPoints}
               currency={hasShopifyData ? intelligence?.primaryCurrency : undefined}
               valueLabel="Total"
-              emptyMessage={
-                hasShopifyData
-                  ? "Sync orders to see revenue."
-                  : "Browse your store to collect visitor data."
-              }
+              emptyMessage="Not enough data yet."
               accent="#0d9488"
             />
           </details>
