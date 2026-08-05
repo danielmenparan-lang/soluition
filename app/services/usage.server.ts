@@ -3,6 +3,7 @@ import { STARTER_PLAN, UNLIMITED_PLAN, PRO_PLAN } from "../shopify.server";
 import {
   PLAN_LIMITS,
   normalizePlanTier,
+  periodLabelFor,
   type PlanTier,
   type UsageSummary,
 } from "../config/plans";
@@ -16,12 +17,23 @@ type UsageSettings = {
   periodStart: string;
 };
 
-function currentPeriodStart(plan: PlanTier): string {
+const LIFETIME_PERIOD = "lifetime";
+
+function currentWeekStartUtc(): string {
   const now = new Date();
-  if (PLAN_LIMITS[plan].usagePeriod === "daily") {
-    return now.toISOString().slice(0, 10);
-  }
-  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-01`;
+  const weekday = now.getUTCDay();
+  const daysFromMonday = weekday === 0 ? 6 : weekday - 1;
+  const monday = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - daysFromMonday),
+  );
+  return monday.toISOString().slice(0, 10);
+}
+
+function currentPeriodStart(plan: PlanTier): string {
+  const period = PLAN_LIMITS[plan].usagePeriod;
+  if (period === "lifetime") return LIFETIME_PERIOD;
+  if (period === "weekly") return currentWeekStartUtc();
+  return "unlimited";
 }
 
 function parseSettings(raw: unknown): UsageSettings {
@@ -37,6 +49,17 @@ function parseSettings(raw: unknown): UsageSettings {
 
   const storedPeriod =
     typeof s.usagePeriodStart === "string" ? s.usagePeriodStart : periodStart;
+
+  if (plan === "free") {
+    const scansUsed = typeof s.scansUsed === "number" ? s.scansUsed : 0;
+    const outputsUsed = typeof s.outputsUsed === "number" ? s.outputsUsed : 0;
+    return {
+      plan,
+      scansUsed,
+      outputsUsed,
+      periodStart: LIFETIME_PERIOD,
+    };
+  }
 
   if (storedPeriod !== periodStart) {
     return base;
@@ -111,8 +134,6 @@ export function usageSummary(usage: UsageSettings): UsageSummary {
   const limits = PLAN_LIMITS[usage.plan];
   const scanLimit = formatLimit(limits.scans);
   const outputLimit = formatLimit(limits.outputs);
-  const periodLabel =
-    limits.usagePeriod === "daily" ? "today" : "this month";
 
   return {
     ...usage,
@@ -122,7 +143,7 @@ export function usageSummary(usage: UsageSettings): UsageSummary {
     outputsRemaining: remaining(limits.outputs, usage.outputsUsed),
     planLabel: limits.label,
     planPrice: limits.price,
-    periodLabel,
+    periodLabel: periodLabelFor(usage.plan),
     visibleRecommendations: limits.visibleRecommendations,
   };
 }
@@ -139,11 +160,11 @@ function remaining(limit: number, used: number): number {
 export class UsageLimitError extends Error {
   kind: "scan" | "output";
   constructor(kind: "scan" | "output", plan: PlanTier) {
-    const period = PLAN_LIMITS[plan].usagePeriod === "daily" ? "today" : "this month";
+    const period = periodLabelFor(plan);
     super(
       kind === "scan"
-        ? `Marketing scan limit reached for ${period}. Upgrade on Billing.`
-        : `Chat limit reached for ${period}. Upgrade on Billing.`,
+        ? `Marketing scan limit reached (${period}). Upgrade on Billing.`
+        : `Chat limit reached (${period}). Upgrade on Billing.`,
     );
     this.name = "UsageLimitError";
     this.kind = kind;

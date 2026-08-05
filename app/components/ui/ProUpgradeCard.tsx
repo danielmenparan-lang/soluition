@@ -22,8 +22,7 @@ export function ProUpgradeCard({ plan }: ProUpgradeCardProps) {
       <p className="ms-section-lead">{text}</p>
       {!isPaidPlan(plan) ? (
         <p className="ms-pro-stats">
-          Free: {PLAN_LIMITS.free.visibleRecommendations} actions +{" "}
-          {PLAN_LIMITS.free.outputs} chat / month
+          Free: {PLAN_LIMITS.free.scans} scans + {PLAN_LIMITS.free.outputs} chat — one-time
         </p>
       ) : null}
       <AppLink to={`/app/billing?plan=${upgradePlan}`} className="ms-btn ms-btn-secondary">

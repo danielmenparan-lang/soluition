@@ -1,5 +1,5 @@
 /**
- * Reset monthly usage counters for a shop (support / dev).
+ * Reset usage counters for a shop (support / dev).
  * Run: npx tsx scripts/reset-usage.ts [shop-domain]
  */
 import { readFileSync, existsSync } from "node:fs";
@@ -42,7 +42,7 @@ const next = {
   plan: "free",
   scansUsed: 0,
   outputsUsed: 0,
-  usagePeriodStart: periodStart,
+  usagePeriodStart: "lifetime",
 };
 
 const supabase = getSupabase();

@@ -154,7 +154,7 @@ export default function Recommendations() {
             <s-section>
               <s-banner tone="warning">
                 <s-paragraph>
-                  Free plan shows {PLAN_LIMITS.free.visibleRecommendations} actions.{" "}
+                  Free plan shows {PLAN_LIMITS.free.visibleRecommendations} actions per scan.{" "}
                   {hiddenCount} more locked — upgrade on Billing.
                 </s-paragraph>
               </s-banner>

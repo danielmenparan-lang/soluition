@@ -33,11 +33,11 @@ const COMPARE_ROWS: Array<{
   starter: string | boolean;
   pro: string | boolean;
 }> = [
-  { feature: "Marketing action cards", free: "2", starter: "10 / scan", pro: "Unlimited" },
-  { feature: "Marketing scans", free: "1 / mo", starter: "10 / day", pro: "Unlimited" },
-  { feature: "Chat messages", free: "1 / mo", starter: "5 / day", pro: "Unlimited" },
-  { feature: "Store data → suggestions", free: true, starter: true, pro: true },
+  { feature: "Marketing scans", free: "3 (once ever)", starter: "10 / week", pro: "Unlimited" },
+  { feature: "Chat messages", free: "2 (once ever)", starter: "10 / week", pro: "Unlimited" },
+  { feature: "Action cards per scan", free: "3", starter: "10", pro: "Unlimited" },
   { feature: "Ad readiness score", free: true, starter: true, pro: true },
+  { feature: "Resets", free: "Never", starter: "Every Monday", pro: "—" },
   { feature: "Shopify order sync", free: false, starter: true, pro: true },
   { feature: "LTV & repeat buyers", free: false, starter: false, pro: true },
 ];

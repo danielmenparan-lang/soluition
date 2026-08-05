@@ -3515,6 +3515,305 @@
   margin-bottom: 6px;
 }
 
+.ms-marketing-card-spotlight {
+  padding: 16px;
+  margin-bottom: 4px;
+  border: 1px solid var(--ms-brand);
+  border-radius: var(--ms-radius);
+  background: #fff;
+  border-bottom: 1px solid var(--ms-brand);
+}
+
+.ms-marketing-card-spotlight:last-child {
+  border-bottom: 1px solid var(--ms-brand);
+}
+
+.ms-store-status.ms-card {
+  padding: 16px;
+  border-bottom: none;
+}
+
+.ms-welcome.ms-card {
+  padding: 20px;
+}
+
+.ms-action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Home — clean stack layout */
+.ms-home-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.ms-home-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ms-home-more {
+  margin-top: 4px;
+}
+
+.ms-home-summary {
+  padding: 18px 20px;
+}
+
+.ms-home-summary-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.ms-home-summary-label {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ms-text-subdued);
+}
+
+.ms-home-summary-headline {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ms-home-summary-score {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ms-home-summary-value {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.ms-home-summary-max {
+  font-size: 14px;
+  color: var(--ms-text-subdued);
+}
+
+.ms-home-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--ms-border);
+}
+
+@media (max-width: 640px) {
+  .ms-home-summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ms-home-summary-stats dt {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ms-text-subdued);
+}
+
+.ms-home-summary-stats dd {
+  margin: 2px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ms-action-card {
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--ms-border);
+  border-radius: var(--ms-radius);
+  box-shadow: var(--ms-shadow);
+}
+
+.ms-action-card-spotlight {
+  border-color: var(--ms-brand);
+  box-shadow: var(--ms-shadow-brand);
+}
+
+.ms-action-card-badge {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ms-brand-dark);
+  background: var(--ms-brand-light);
+  border-radius: 999px;
+}
+
+.ms-action-card-title {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ms-action-card-desc {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ms-action-card-impact,
+.ms-action-card-step {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--ms-text-subdued);
+  line-height: 1.45;
+}
+
+.ms-readiness-compact {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 16px;
+  padding: 16px 18px;
+  align-items: start;
+}
+
+.ms-readiness-compact-main {
+  grid-column: 1;
+}
+
+.ms-readiness-compact-label {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ms-text-subdued);
+}
+
+.ms-readiness-compact-verdict {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ms-readiness-compact-verdict.is-ready {
+  color: var(--ms-brand-dark);
+}
+
+.ms-readiness-compact-verdict.is-not-ready {
+  color: var(--ms-warning);
+}
+
+.ms-readiness-compact-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ms-text-subdued);
+  line-height: 1.45;
+}
+
+.ms-readiness-compact-score {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.ms-readiness-compact-value {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.ms-readiness-compact-max {
+  font-size: 13px;
+  color: var(--ms-text-subdued);
+}
+
+.ms-readiness-compact-link {
+  grid-column: 1 / -1;
+  font-size: 13px;
+}
+
+.ms-welcome {
+  max-width: 520px;
+  padding: 24px;
+}
+
+.ms-welcome-title {
+  margin: 12px 0 8px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.ms-welcome-lead {
+  margin: 0 0 20px;
+  font-size: 15px;
+  color: var(--ms-text-subdued);
+  line-height: 1.5;
+}
+
+.ms-welcome-steps {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ms-welcome-steps li {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--ms-border);
+  border-radius: var(--ms-radius-sm);
+  background: var(--ms-surface);
+}
+
+.ms-welcome-steps li.is-done {
+  opacity: 0.7;
+}
+
+.ms-welcome-steps li.is-current {
+  border-color: var(--ms-brand);
+  background: var(--ms-brand-soft);
+}
+
+.ms-welcome-steps strong {
+  display: block;
+  font-size: 14px;
+}
+
+.ms-welcome-steps p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ms-text-subdued);
+}
+
+.ms-welcome-step-icon {
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+  color: var(--ms-brand-dark);
+  font-weight: 600;
+}
+
+.ms-welcome-cta {
+  display: inline-block;
+}
+
+.ms-welcome-note,
+.ms-welcome-progress {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--ms-text-subdued);
+}
+
 .ms-usage-hint {
   margin: 8px 0 0;
   font-size: 13px;

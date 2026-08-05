@@ -8,18 +8,18 @@ export type PageHelp = {
 
 export const PAGE_HELP: Record<string, PageHelp> = {
   overview: {
-    title: "One brain, all your skills",
-    subtitle: "Signals flow in → Solution brain → one verdict and one action for today.",
+    title: "Your marketing dashboard",
+    subtitle: "Store health at a glance, then one clear action to take today.",
     tips: [
-      "Green signals = data the brain is using",
-      "Do today = the brain's top marketing move",
-      "Every page feeds the same brain",
+      "Scan for actions after you have visitor or order data",
+      "Start with the top card marked Do today",
+      "Ad readiness shows when it's safe to spend on ads",
     ],
-    helpTitle: "How the brain works",
+    helpTitle: "How to use Home",
     helpItems: [
-      { label: "Signals", text: "Visitors, orders, funnel, products, traffic." },
-      { label: "Skills", text: "Diagnostic, drop-offs, segments, actions, chat — connected." },
-      { label: "Output", text: "One sharp verdict + Do today. You approve before acting." },
+      { label: "Store health", text: "Score and key metrics from the last 30 days." },
+      { label: "Actions", text: "Ranked marketing steps — approve before you apply." },
+      { label: "Ad readiness", text: "Fix blockers before you turn on paid traffic." },
     ],
   },
   analytics: {
@@ -51,7 +51,7 @@ export const PAGE_HELP: Record<string, PageHelp> = {
   recommendations: {
     title: "Marketing actions",
     subtitle: "Ranked from your data. Check the box to approve — then apply.",
-    tips: ["Start with Start here", "Each item uses your numbers", "Scan again for fresh ideas"],
+    tips: ["Start with Do today", "Each item uses your numbers", "Scan again for fresh ideas"],
     helpTitle: "How to use",
     helpItems: [
       { label: "Approve", text: "Check the responsibility box before you act." },

@@ -11,24 +11,22 @@ type PriorityActionCardProps = {
   rec: AIRecommendation;
   fetcher: ShopifyFetcher;
   rank: number;
+  spotlight?: boolean;
 };
 
-export function PriorityActionCard({ rec, fetcher, rank }: PriorityActionCardProps) {
+export function PriorityActionCard({ rec, fetcher, rank, spotlight = false }: PriorityActionCardProps) {
   const [acknowledged, setAcknowledged] = useState(false);
   const actions = asStringArray(rec.action_items);
   const firstAction = actions[0];
-  const isFirst = rank === 1 || rec.priority === "high";
 
   return (
-    <article className="ms-fix-item ms-marketing-card">
-      <div className="ms-fix-item-head">
-        {isFirst ? <span className="ms-fix-flag">{rank === 1 ? "Do today" : "Start here"}</span> : null}
-        <span className="ms-marketing-tag">Marketing action</span>
-        <h3 className="ms-fix-title">{rec.title}</h3>
-      </div>
-      <p className="ms-fix-desc">{rec.description}</p>
-      {rec.expected_impact ? <p className="ms-fix-why">{rec.expected_impact}</p> : null}
-      {firstAction ? <p className="ms-fix-step">{firstAction}</p> : null}
+    <article className={`ms-action-card ${spotlight ? "ms-action-card-spotlight" : ""}`}>
+      {spotlight ? <span className="ms-action-card-badge">{POSITIONING.todayLabel}</span> : null}
+      <h3 className="ms-action-card-title">{rec.title}</h3>
+      <p className="ms-action-card-desc">{rec.description}</p>
+      {rec.expected_impact ? <p className="ms-action-card-impact">{rec.expected_impact}</p> : null}
+      {firstAction ? <p className="ms-action-card-step">{firstAction}</p> : null}
+
       <label className="ms-responsibility-check">
         <input
           type="checkbox"
@@ -37,29 +35,20 @@ export function PriorityActionCard({ rec, fetcher, rank }: PriorityActionCardPro
         />
         {POSITIONING.responsibilityAck}
       </label>
-      <div className="ms-fix-actions">
+
+      {acknowledged ? (
         <SubmitButton
           fetcher={fetcher}
-          variant="secondary"
-          intent="dismiss_recommendation"
+          intent="complete_recommendation"
           fields={{ recommendationId: rec.id }}
         >
-          Skip
+          I applied it
         </SubmitButton>
-        {acknowledged ? (
-          <SubmitButton
-            fetcher={fetcher}
-            intent="complete_recommendation"
-            fields={{ recommendationId: rec.id }}
-          >
-            I applied it
-          </SubmitButton>
-        ) : (
-          <button type="button" className="ms-btn ms-btn-primary" disabled>
-            I applied it
-          </button>
-        )}
-      </div>
+      ) : (
+        <button type="button" className="ms-btn ms-btn-primary" disabled>
+          I applied it
+        </button>
+      )}
     </article>
   );
 }

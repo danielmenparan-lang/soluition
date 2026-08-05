@@ -44,14 +44,6 @@ export function RecommendationCard({
             {POSITIONING.responsibilityAck}
           </label>
           <div className="ms-fix-actions">
-            <SubmitButton
-              fetcher={fetcher}
-              variant="secondary"
-              intent="dismiss_recommendation"
-              fields={{ recommendationId: rec.id }}
-            >
-              Skip
-            </SubmitButton>
             {acknowledged ? (
               <SubmitButton
                 fetcher={fetcher}

@@ -1,7 +1,5 @@
 import { BrandLogo } from "./BrandLogo";
-import { ChatPromo } from "./ChatPromo";
 import { THEME_EMBED_NAME } from "../../config/theme-embed";
-import { POSITIONING } from "../../config/positioning";
 import type { OnboardingProgress } from "../../services/onboarding.server";
 
 type WelcomeScreenProps = {
@@ -10,20 +8,31 @@ type WelcomeScreenProps = {
 };
 
 export function WelcomeScreen({ themeEmbedUrl, progress }: WelcomeScreenProps) {
-  const step = progress.completedCount === 0 ? 1 : progress.isComplete ? 3 : 2;
+  const nextStep = progress.steps.find((step) => !step.done);
 
   return (
-    <div className="ms-welcome">
-      <BrandLogo size={48} className="ms-welcome-logo" />
-      <h1 className="ms-welcome-title">
-        {step === 1 ? POSITIONING.welcomeTitle : "Browse your store once"}
-      </h1>
+    <div className="ms-welcome ms-card">
+      <BrandLogo size={40} className="ms-welcome-logo" />
+      <h2 className="ms-welcome-title">Get your first marketing action</h2>
       <p className="ms-welcome-lead">
-        {step === 1
-          ? POSITIONING.welcomeLead
-          : "Open your live store, visit a few pages, then come back for fixes."}
+        Enable tracking, browse your store once, then scan for clear next steps.
       </p>
-      {step === 1 ? (
+
+      <ol className="ms-welcome-steps">
+        {progress.steps.map((step) => (
+          <li key={step.id} className={step.done ? "is-done" : step.id === nextStep?.id ? "is-current" : ""}>
+            <span className="ms-welcome-step-icon" aria-hidden>
+              {step.done ? "✓" : "○"}
+            </span>
+            <div>
+              <strong>{step.label}</strong>
+              {!step.done && step.detail ? <p>{step.detail}</p> : null}
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      {nextStep?.href && nextStep.external ? (
         <a
           href={themeEmbedUrl}
           target="_blank"
@@ -32,8 +41,13 @@ export function WelcomeScreen({ themeEmbedUrl, progress }: WelcomeScreenProps) {
         >
           Enable {THEME_EMBED_NAME}
         </a>
-      ) : null}
-      <ChatPromo />
+      ) : (
+        <p className="ms-welcome-note">Open your storefront in a new tab and visit a few pages.</p>
+      )}
+
+      <p className="ms-welcome-progress">
+        {progress.completedCount} of {progress.totalSteps} setup steps done
+      </p>
     </div>
   );
 }

@@ -1,17 +1,19 @@
-/** Marketing product — one sharp brain, all skills connected */
+/** Customer-facing product copy */
 export const POSITIONING = {
   productName: "Solution",
 
   tagline: "Your data says one thing to do today.",
 
-  brainTitle: "Store brain",
   todayLabel: "Do today",
 
-  welcomeTitle: "Wake up the store brain",
+  welcomeTitle: "Connect your store data",
   welcomeLead:
-    "Enable tracking, browse your store once — every skill connects into one verdict and one action.",
+    "Enable visitor tracking, browse your storefront once — then get clear marketing actions.",
 
-  diagnosticTitle: "Detail view",
+  homeTitle: "Home",
+  homeSubtitle: "Store health, today's action, and what to fix next.",
+
+  diagnosticTitle: "Ad readiness",
   diagnosticPending:
     "Need a few visitors first. Enable tracking and browse your storefront once.",
 
@@ -19,12 +21,10 @@ export const POSITIONING = {
   dropOffLead: "Use this in ads, email, and product pages.",
 
   chatTitle: "Marketing chat",
-  chatLead:
-    "Ask about your store. The brain reads the same data as Home — you approve every action.",
+  chatLead: "Ask about your store — answers use the same data as Home.",
 
-  actionsTitle: "More marketing actions",
-  actionsLead:
-    "Ranked ideas from the same brain. Check the box before you run anything.",
+  actionsTitle: "Marketing actions",
+  actionsLead: "Ranked from your store data. Check the box to approve, then apply.",
 
   responsibilityNotice:
     "Suggestions only. You approve every action — outcomes are your responsibility.",
@@ -36,7 +36,7 @@ export const POSITIONING = {
   proText: "Unlimited scans, chat, and order sync.",
 
   starterTitle: "Starter — $9.99/month",
-  starterText: "10 scans and 5 chat messages per day.",
+  starterText: "10 scans and 10 chat messages per week.",
 } as const;
 
 export const CHAT_STARTERS = [
@@ -46,8 +46,8 @@ export const CHAT_STARTERS = [
 ] as const;
 
 export const APP_STORE = {
-  name: "Solution — Marketing Brain for Shopify",
-  subtitle: "One brain from your data — verdict, today's action, chat.",
+  name: "Solution — Marketing for Shopify",
+  subtitle: "Store data → one clear action today.",
   keywords:
-    "marketing, shopify, ads, conversion, traffic, chat, store brain, actions, sales",
+    "marketing, shopify, ads, conversion, traffic, chat, actions, sales",
 } as const;
