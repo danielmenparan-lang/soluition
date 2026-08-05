@@ -1,6 +1,7 @@
 import { AppLink } from "../AppLink";
 import { BrandLogo } from "./BrandLogo";
 import { SubmitButton } from "../SubmitButton";
+import { StoreConnectionGuide } from "./StoreConnectionGuide";
 import { THEME_EMBED_NAME } from "../../config/theme-embed";
 import { LANDING_BENEFITS, POSITIONING } from "../../config/positioning";
 import type { OnboardingProgress } from "../../services/onboarding.server";
@@ -11,6 +12,7 @@ type ShopifyFetcher = ReturnType<typeof useShopifyFetcher>;
 type WelcomeScreenProps = {
   themeEmbedUrl: string;
   storefrontUrl: string;
+  themesAdminUrl: string;
   progress: OnboardingProgress;
   fetcher?: ShopifyFetcher;
   isScanning?: boolean;
@@ -19,6 +21,7 @@ type WelcomeScreenProps = {
 export function WelcomeScreen({
   themeEmbedUrl,
   storefrontUrl,
+  themesAdminUrl,
   progress,
   fetcher,
   isScanning = false,
@@ -27,6 +30,9 @@ export function WelcomeScreen({
   const currentIndex = nextStep
     ? progress.steps.findIndex((s) => s.id === nextStep.id) + 1
     : progress.totalSteps;
+
+  const guideStep =
+    nextStep?.id === "data" ? "data" : nextStep?.id === "insight" ? "insight" : "embed";
 
   return (
     <div className="ms-landing">
@@ -104,16 +110,19 @@ export function WelcomeScreen({
           </div>
         ) : null}
 
-        {nextStep?.id === "insight" && !fetcher ? (
-          <p className="ms-landing-wait">
-            Finish the steps above, then tap <strong>Scan for actions</strong>.
-          </p>
-        ) : null}
-
         {!nextStep ? (
           <AppLink to="/app" className="ms-btn ms-btn-primary ms-landing-cta">
             Go to Home
           </AppLink>
+        ) : null}
+
+        {nextStep ? (
+          <StoreConnectionGuide
+            themeEmbedUrl={themeEmbedUrl}
+            themesAdminUrl={themesAdminUrl}
+            storefrontUrl={storefrontUrl}
+            step={guideStep}
+          />
         ) : null}
       </section>
 

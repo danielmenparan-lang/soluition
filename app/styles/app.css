@@ -3894,6 +3894,59 @@
   border: 1px solid var(--ms-border);
 }
 
+.ms-connect-guide {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--ms-border);
+}
+
+.ms-connect-steps {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ms-text);
+}
+
+.ms-connect-steps-continue {
+  margin-top: 12px;
+}
+
+.ms-connect-warning {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: var(--ms-radius-sm);
+}
+
+.ms-connect-note {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ms-text-subdued);
+}
+
+.ms-connect-details {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ms-text-subdued);
+}
+
+.ms-connect-details summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--ms-text);
+}
+
+.ms-connect-details ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  line-height: 1.5;
+}
+
 .ms-landing-benefits-title {
   margin: 0 0 12px;
   font-size: 13px;

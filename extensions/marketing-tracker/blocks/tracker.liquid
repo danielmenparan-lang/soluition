@@ -4,7 +4,7 @@
 {% endcomment %}
 
 {% assign tracking_key = block.settings.tracking_id | default: shop.permanent_domain %}
-{% assign tracker_base = block.settings.tracker_url | default: 'https://app.solution.com.im' %}
+{% assign tracker_base = block.settings.tracker_url | default: 'https://shopify-marketing-solution.onrender.com' %}
 
 <script
   src="{{ tracker_base }}/tracker.js"
@@ -27,7 +27,7 @@
       "type": "text",
       "id": "tracker_url",
       "label": "App server URL",
-      "default": "https://app.solution.com.im",
+      "default": "https://shopify-marketing-solution.onrender.com",
       "info": "Leave the default unless support gave you a different URL"
     }
   ]

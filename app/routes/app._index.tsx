@@ -190,6 +190,7 @@ export default function Overview() {
     plan,
     themeEmbedUrl,
     storefrontUrl,
+    themesAdminUrl,
   } = useLoaderData<typeof loader>();
 
   const fetcher = useShopifyFetcher<typeof action>();
@@ -203,6 +204,7 @@ export default function Overview() {
           <WelcomeScreen
             themeEmbedUrl={themeEmbedUrl}
             storefrontUrl={storefrontUrl}
+            themesAdminUrl={themesAdminUrl}
             progress={onboarding}
             fetcher={fetcher}
             isScanning={isBusy}
