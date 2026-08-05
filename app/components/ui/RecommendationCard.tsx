@@ -20,7 +20,7 @@ export function RecommendationCard({
   return (
     <div className="ms-fix-item ms-fix-item-flat ms-marketing-card">
       <div className="ms-fix-item-head">
-        {rec.priority === "high" ? <span className="ms-fix-flag">Start here</span> : null}
+        {rec.priority === "high" ? <span className="ms-fix-flag">Do today</span> : null}
         <span className="ms-marketing-tag">Marketing action</span>
         <h3 className="ms-fix-title">{rec.title}</h3>
       </div>

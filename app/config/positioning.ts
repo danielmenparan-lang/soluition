@@ -1,14 +1,17 @@
-/** Marketing product positioning — store data → marketing actions */
+/** Marketing product — one sharp brain, all skills connected */
 export const POSITIONING = {
   productName: "Solution",
 
-  tagline: "Your store data, turned into marketing actions.",
+  tagline: "Your data says one thing to do today.",
 
-  welcomeTitle: "Connect your store data",
+  brainTitle: "Store brain",
+  todayLabel: "Do today",
+
+  welcomeTitle: "Wake up the store brain",
   welcomeLead:
-    "Enable tracking, browse your store once, then get marketing actions based on real visitors.",
+    "Enable tracking, browse your store once — every skill connects into one verdict and one action.",
 
-  diagnosticTitle: "Store snapshot",
+  diagnosticTitle: "Detail view",
   diagnosticPending:
     "Need a few visitors first. Enable tracking and browse your storefront once.",
 
@@ -17,11 +20,11 @@ export const POSITIONING = {
 
   chatTitle: "Marketing chat",
   chatLead:
-    "Ask anything about your store. We read your data and suggest marketing actions — you decide what to run.",
+    "Ask about your store. The brain reads the same data as Home — you approve every action.",
 
-  actionsTitle: "Marketing actions",
+  actionsTitle: "More marketing actions",
   actionsLead:
-    "Ranked ideas from your data. You approve and run each one — results are your responsibility.",
+    "Ranked ideas from the same brain. Check the box before you run anything.",
 
   responsibilityNotice:
     "Suggestions only. You approve every action — outcomes are your responsibility.",
@@ -43,8 +46,8 @@ export const CHAT_STARTERS = [
 ] as const;
 
 export const APP_STORE = {
-  name: "Solution — Marketing Actions for Shopify",
-  subtitle: "Store data → marketing actions. Chat + ranked steps in Admin.",
+  name: "Solution — Marketing Brain for Shopify",
+  subtitle: "One brain from your data — verdict, today's action, chat.",
   keywords:
-    "marketing, shopify, ads, conversion, traffic, chat, recommendations, store data, sales",
+    "marketing, shopify, ads, conversion, traffic, chat, store brain, actions, sales",
 } as const;

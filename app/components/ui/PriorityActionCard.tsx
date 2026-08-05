@@ -22,7 +22,7 @@ export function PriorityActionCard({ rec, fetcher, rank }: PriorityActionCardPro
   return (
     <article className="ms-fix-item ms-marketing-card">
       <div className="ms-fix-item-head">
-        {isFirst ? <span className="ms-fix-flag">Start here</span> : null}
+        {isFirst ? <span className="ms-fix-flag">{rank === 1 ? "Do today" : "Start here"}</span> : null}
         <span className="ms-marketing-tag">Marketing action</span>
         <h3 className="ms-fix-title">{rec.title}</h3>
       </div>

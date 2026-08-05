@@ -34,6 +34,8 @@ import { HomeHero } from "../components/ui/HomeHero";
 
 import { StoreDiagnosticPanel } from "../components/ui/StoreDiagnosticPanel";
 
+import { StoreBrainVisual } from "../components/ui/StoreBrainVisual";
+
 import { TrendChart } from "../components/ui/TrendChart";
 
 import { PriorityActionCard } from "../components/ui/PriorityActionCard";
@@ -69,6 +71,8 @@ import { syncShopifyData } from "../services/shopify-sync.server";
 import { getSyncStatus } from "../services/sync-status.server";
 
 import { getStoreDiagnostic } from "../services/store-diagnostic.server";
+
+import { getStoreBrain } from "../services/store-brain.server";
 
 import {
 
@@ -166,6 +170,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     ? await getStoreDiagnostic(shop.id, session.shop, 30).catch(() => null)
     : null;
 
+  const storeBrain = await getStoreBrain(shop.id, session.shop, 30).catch(() => null);
+
 
 
   return {
@@ -189,6 +195,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     recommendationCount: recommendations.length,
 
     storeDiagnostic,
+
+    storeBrain,
 
     revenueTimeline,
 
@@ -374,6 +382,8 @@ export default function Overview() {
 
     storeDiagnostic,
 
+    storeBrain,
+
     revenueTimeline,
 
     visitorTimeline,
@@ -416,6 +426,14 @@ export default function Overview() {
           />
 
         </s-section>
+
+        <s-section>
+
+          {storeBrain ? <StoreBrainVisual brain={storeBrain} /> : null}
+
+        </s-section>
+
+
 
         <s-section>
 
@@ -501,9 +519,7 @@ export default function Overview() {
 
       <s-section>
 
-        {storeDiagnostic ? (
-          <StoreDiagnosticPanel diagnostic={storeDiagnostic} />
-        ) : null}
+        {storeBrain ? <StoreBrainVisual brain={storeBrain} /> : null}
 
       </s-section>
 
@@ -534,6 +550,18 @@ export default function Overview() {
         <AdvisorQuickAsk />
 
       </s-section>
+
+
+
+      {storeDiagnostic ? (
+
+        <s-section heading={POSITIONING.diagnosticTitle}>
+
+          <StoreDiagnosticPanel diagnostic={storeDiagnostic} />
+
+        </s-section>
+
+      ) : null}
 
 
 

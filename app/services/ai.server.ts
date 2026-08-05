@@ -24,6 +24,7 @@ import {
   prefersHebrewReply,
 } from "../config/chat-voice";
 import { prepareChatContext } from "./chat-context.server";
+import { formatBrainForAi, getStoreBrain } from "./store-brain.server";
 import {
   formatDiagnosticForAi,
   getStoreDiagnostic,
@@ -32,6 +33,7 @@ import {
   formatLeaksForAi,
   getRevenueLeakReport,
 } from "./revenue-leak.server";
+import { CMO_PERSONA_PROMPT } from "../config/marketing-skills";
 import { getRecommendationCap } from "../config/plans";
 import { getUsage } from "./usage.server";
 import { rejectLowValueReply } from "../utils/chat-quality";
@@ -46,17 +48,17 @@ Write for non-marketers. Simple words. No jargon.
 When asked for JSON, return valid JSON only.
 Prioritize fixes that unblock sales fastest.`;
 
-const RECOMMENDATIONS_SYSTEM_PROMPT = `You are a Shopify marketing advisor. Turn store data into clear marketing actions — ads, product focus, email angles, page fixes.
+const RECOMMENDATIONS_SYSTEM_PROMPT = `${CMO_PERSONA_PROMPT}
+
+You are the marketing brain for a Shopify store. Ten CMO skill domains (100 skills) feed one sharp output.
 
 Rules:
-- Titles: max 8 words. Marketing-focused (what to promote, fix, or test).
-- description: max 2 short sentences. Tie to store data.
-- expected_impact: one short sentence — "This could help you ..." in plain words.
-- action_items: 2–3 steps the merchant runs themselves in Shopify Admin or ad platforms.
-- Never use jargon: funnel, CRO, attribution, LTV, RFM, cohort, retargeting, leverage, KPI.
-- Do NOT invent numbers. Use only data from the JSON.
-- Never suggest paid ads if ad readiness is low or readyForAds is false.
-- Remind implicitly that the merchant chooses whether to act.
+- Titles: max 6 words. One clear marketing move.
+- description: max 2 sentences. Must cite one number or fact from the JSON.
+- expected_impact: one sentence — "This could help you …"
+- action_items: 2–3 steps the merchant runs themselves.
+- Recommendation #1 MUST align with todayAction in the store brain JSON.
+- Never suggest paid ads if readyForAds is false.
 - No markdown, no emojis.`;
 
 function isSetupQuestion(message: string): boolean {
@@ -140,6 +142,7 @@ function buildRecommendationsPrompt(
   attributionContext: string | null,
   revenueLeaksJson: string,
   storeDiagnosticJson: string,
+  brainJson: string,
   hasData: boolean,
   maxCount: number,
 ): string {
@@ -154,7 +157,10 @@ function buildRecommendationsPrompt(
   return `Create marketing actions for this store. Plain English. Reading level: grade 6.
 ${countRule}
 
-Store diagnostic (ad readiness + blockers):
+Store brain (verdict + today's action — recommendation #1 must match):
+${brainJson}
+
+Store diagnostic (detail):
 ${storeDiagnosticJson}
 
 Drop-off estimates ($/month — use in expected_impact when relevant):
@@ -218,6 +224,13 @@ export async function generateRecommendations(
     ? await buildAttributionContext(shopId)
     : null;
 
+  const storeBrain = shopDomain
+    ? await getStoreBrain(shopId, shopDomain, 30).catch(() => null)
+    : null;
+  const brainJson = storeBrain
+    ? formatBrainForAi(storeBrain)
+    : JSON.stringify({ note: "No brain data" });
+
   const storeDiagnostic = shopDomain
     ? await getStoreDiagnostic(shopId, shopDomain, 30).catch(() => null)
     : null;
@@ -239,6 +252,7 @@ export async function generateRecommendations(
     attributionContext,
     revenueLeaksJson,
     storeDiagnosticJson,
+    brainJson,
     hasData,
     maxCount,
   );
@@ -368,13 +382,13 @@ export async function chatWithAI(
     .eq("id", shopId)
     .single();
 
-  const storeDiagnostic =
+  const storeBrain =
     shop?.shop_domain && hasData
-      ? await getStoreDiagnostic(shopId, shop.shop_domain, 30).catch(() => null)
-      : null;
-  const diagnosticJson = storeDiagnostic
-    ? formatDiagnosticForAi(storeDiagnostic)
-    : "{}";
+      ? await getStoreBrain(shopId, shop.shop_domain, 30).catch(() => null)
+      : shop?.shop_domain
+        ? await getStoreBrain(shopId, shop.shop_domain, 30).catch(() => null)
+        : null;
+  const brainJson = storeBrain ? formatBrainForAi(storeBrain) : "{}";
 
   let convId = conversationId;
   if (convId) {
@@ -424,8 +438,8 @@ export async function chatWithAI(
 
 Shop: ${shop?.shop_domain ?? "unknown"}
 
-Store diagnostic (ad readiness):
-${diagnosticJson}
+Store brain JSON includes skillTraining — execute every LIVE skill listed; use AI skills as drafts; never fake BLOCKED skills:
+${brainJson}
 
 Analytics:
 ${analyticsSummary}
