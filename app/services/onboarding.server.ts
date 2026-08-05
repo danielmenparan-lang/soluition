@@ -29,25 +29,23 @@ export function buildOnboardingProgress(
   const steps: OnboardingStep[] = [
     {
       id: "embed",
-      label: "Enable store tracking",
-      detail: "Required to see your funnel and where visitors drop off.",
+      label: "Turn on tracking",
+      detail: "Open your theme editor and enable the Solution app embed — about 2 minutes.",
       done: input.hasVisitorData,
       href: input.themeEmbedUrl,
       external: true,
     },
     {
       id: "data",
-      label: "Collect conversion data",
-      detail: input.hasShopifyData
-        ? "Orders synced — funnel + revenue active."
-        : "Browse your storefront or sync orders (Pro) to diagnose blockers.",
+      label: "Visit your store once",
+      detail: "Open your live storefront and browse 2–3 pages so we can read your funnel.",
       done: trackingDone,
       href: "/app/analytics",
     },
     {
       id: "insight",
-      label: "Get marketing actions",
-      detail: "Scan your store data — ranked marketing steps appear on Home.",
+      label: "Get your first action",
+      detail: "Tap Scan for actions — you'll see one clear marketing move ranked first.",
       done: input.hasRecommendations,
     },
   ];

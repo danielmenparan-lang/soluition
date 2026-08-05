@@ -2,16 +2,23 @@
 export const POSITIONING = {
   productName: "Solution",
 
-  tagline: "Your data says one thing to do today.",
+  tagline: "One marketing move for today — from your store data.",
 
   todayLabel: "Do today",
+
+  /** Answers in 5 sec: what / first action / time */
+  landingHeadline: "Know what to market today",
+  landingSubhead:
+    "Solution reads your Shopify store and gives you one clear action — not a dashboard to figure out.",
+  landingTime: "About 3 minutes to set up",
+  landingOutcome: "You'll get a ranked marketing action you can apply today.",
 
   welcomeTitle: "Connect your store data",
   welcomeLead:
     "Enable visitor tracking, browse your storefront once — then get clear marketing actions.",
 
   homeTitle: "Home",
-  homeSubtitle: "Store health, today's action, and what to fix next.",
+  homeActiveLead: "Your store data is connected. Scan anytime for fresh actions.",
 
   diagnosticTitle: "Ad readiness",
   diagnosticPending:
@@ -23,8 +30,8 @@ export const POSITIONING = {
   chatTitle: "Marketing chat",
   chatLead: "Ask about your store — answers use the same data as Home.",
 
-  actionsTitle: "Marketing actions",
-  actionsLead: "Ranked from your store data. Check the box to approve, then apply.",
+  actionsTitle: "Today's move",
+  actionsLead: "Based on your last 30 days. Approve, then apply in Shopify or your ad account.",
 
   responsibilityNotice:
     "Suggestions only. You approve every action — outcomes are your responsibility.",
@@ -38,6 +45,24 @@ export const POSITIONING = {
   starterTitle: "Starter — $9.99/month",
   starterText: "10 scans and 10 chat messages per week.",
 } as const;
+
+export const LANDING_BENEFITS = [
+  {
+    id: "actions",
+    title: "Daily actions",
+    text: "Ranked steps — what to fix or market first.",
+  },
+  {
+    id: "ads",
+    title: "Ad readiness",
+    text: "A score that tells you when paid traffic is safe.",
+  },
+  {
+    id: "chat",
+    title: "Marketing chat",
+    text: "Ask anything — answers use your store numbers.",
+  },
+] as const;
 
 export const CHAT_STARTERS = [
   "What should I market first?",
