@@ -3739,6 +3739,43 @@
   font-size: 13px;
 }
 
+.ms-btn-secondary {
+  background: #fff;
+  color: var(--ms-text);
+  border: 1px solid var(--ms-border);
+}
+
+.ms-btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.ms-setup-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--ms-brand-soft);
+  border: 1px solid #99f6e4;
+  border-radius: var(--ms-radius-sm);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.ms-setup-banner p {
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+}
+
+.ms-setup-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 /* Landing — first visit (Shopify setup-guide pattern) */
 .ms-landing {
   max-width: 640px;

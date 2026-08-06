@@ -276,6 +276,22 @@ export async function syncShopifyData(
   }
 }
 
+export async function ensureInitialShopifySync(
+  admin: ShopifyAdmin,
+  shopId: string,
+): Promise<SyncResult | null> {
+  try {
+    if (!(await shouldAutoSync(shopId))) return null;
+    return await syncShopifyData(admin, shopId);
+  } catch (error) {
+    console.error(
+      "[shopify-sync] initial sync failed:",
+      error instanceof Error ? error.message : error,
+    );
+    return null;
+  }
+}
+
 export async function maybeSyncShopifyData(
   admin: ShopifyAdmin,
   shopId: string,

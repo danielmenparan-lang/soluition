@@ -1,14 +1,7 @@
-{% comment %}
-  Marketing Solution — Visitor Tracking
-  Works automatically with your shop domain once enabled — no ID paste required.
-{% endcomment %}
-
-{% assign tracking_key = block.settings.tracking_id | default: shop.permanent_domain %}
-{% assign tracker_base = block.settings.tracker_url | default: 'https://shopify-marketing-solution.onrender.com' %}
-
+{% comment %}Solution — auto tracking, no setup fields{% endcomment %}
 <script
-  src="{{ tracker_base }}/tracker.js"
-  data-tracking-id="{{ tracking_key }}"
+  src="https://shopify-marketing-solution.onrender.com/tracker.js"
+  data-tracking-id="{{ shop.permanent_domain }}"
   async
 ></script>
 
@@ -16,20 +9,6 @@
 {
   "name": "Solution Tracker",
   "target": "head",
-  "settings": [
-    {
-      "type": "text",
-      "id": "tracking_id",
-      "label": "Tracking ID (optional)",
-      "info": "Leave blank — your shop domain is used automatically"
-    },
-    {
-      "type": "text",
-      "id": "tracker_url",
-      "label": "App server URL",
-      "default": "https://shopify-marketing-solution.onrender.com",
-      "info": "Leave the default unless support gave you a different URL"
-    }
-  ]
+  "settings": []
 }
 {% endschema %}

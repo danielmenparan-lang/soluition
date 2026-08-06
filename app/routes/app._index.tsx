@@ -12,7 +12,7 @@ import { useFetcherToast } from "../hooks/useFetcherToast";
 import { SubmitButton } from "../components/SubmitButton";
 import { AppLink } from "../components/AppLink";
 import { EmptyState } from "../components/ui/EmptyState";
-import { WelcomeScreen } from "../components/ui/WelcomeScreen";
+import { SetupBanner } from "../components/ui/SetupBanner";
 import { HomeMetricsStrip } from "../components/ui/HomeMetricsStrip";
 import { TrendChart } from "../components/ui/TrendChart";
 import { PriorityActionCard } from "../components/ui/PriorityActionCard";
@@ -25,11 +25,12 @@ import {
   generateRecommendations,
   getRecommendations,
 } from "../services/ai.server";
-import { buildOnboardingProgress } from "../services/onboarding.server";
 import { getRevenueTimeline, getVisitorTimeline } from "../services/revenue-timeline.server";
 import { updateRecommendationStatus, sortByPriority } from "../services/recommendations.server";
-import { syncShopifyData } from "../services/shopify-sync.server";
-import { getSyncStatus } from "../services/sync-status.server";
+import {
+  ensureInitialShopifySync,
+  syncShopifyData,
+} from "../services/shopify-sync.server";
 import { getStoreDiagnostic } from "../services/store-diagnostic.server";
 import {
   assertCanScan,
@@ -38,27 +39,24 @@ import {
   usageSummary,
   UsageLimitError,
 } from "../services/usage.server";
-import { isMarketingHomeReady } from "../utils/store-readiness";
-import {
-  buildThemeEmbedActivateUrl,
-  buildThemesAdminUrl,
-} from "../config/theme-embed";
+import { buildThemeEmbedActivateUrl } from "../config/theme-embed";
 
 function storefrontUrl(shopDomain: string): string {
   return `https://${shopDomain}`;
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const { session, admin } = await authenticate.admin(request);
   const shop = await getOrCreateShop(session.shop);
 
-  const [health, recommendations, revenueTimeline, visitorTimeline, syncStatus, usage] =
+  await ensureInitialShopifySync(admin, shop.id);
+
+  const [health, recommendations, revenueTimeline, visitorTimeline, usage] =
     await Promise.all([
       getStoreHealthSummary(shop.id).catch(() => null),
       getRecommendations(shop.id).catch(() => []),
       getRevenueTimeline(shop.id, 30).catch(() => []),
       getVisitorTimeline(shop.id, 30).catch(() => []),
-      getSyncStatus(shop.id).catch(() => null),
       getUsage(shop.id),
     ]);
 
@@ -66,48 +64,32 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const intelligence = health?.intelligence ?? null;
   const totalVisitors = metrics?.totalVisitors ?? 0;
   const hasShopifyData = Boolean(intelligence?.hasShopifyOrders);
-  const marketingReady = isMarketingHomeReady(totalVisitors, hasShopifyData);
-
   const themeEmbedUrl = buildThemeEmbedActivateUrl(
     session.shop,
     process.env.SHOPIFY_API_KEY ?? "00eb38f774ffba914d98a6800f4c5df5",
   );
 
-  const onboarding = buildOnboardingProgress({
-    totalVisitors,
-    hasShopifyOrders: hasShopifyData,
-    hasRecommendations: recommendations.length > 0,
-    themeEmbedUrl,
-  });
-
   const usageInfo = usageSummary(usage);
   const topAction = sortByPriority(recommendations)[0] ?? null;
-  const storeDiagnostic = marketingReady
-    ? await getStoreDiagnostic(shop.id, session.shop, 30).catch(() => null)
-    : null;
+  const storeDiagnostic = await getStoreDiagnostic(shop.id, session.shop, 30).catch(
+    () => null,
+  );
 
   return {
-    shop,
     metrics,
     intelligence,
     totalVisitors,
-    marketingReady,
     hasShopifyData,
-    onboarding,
     topAction,
     recommendationCount: recommendations.length,
     storeDiagnostic,
     revenueTimeline,
     visitorTimeline,
-    syncStatus,
     plan: usage.plan,
     usage: usageInfo,
     themeEmbedUrl,
     storefrontUrl: storefrontUrl(session.shop),
-    themesAdminUrl: buildThemesAdminUrl(session.shop),
-    trackingScriptUrl: process.env.SHOPIFY_APP_URL
-      ? `${process.env.SHOPIFY_APP_URL}/tracker.js`
-      : "/tracker.js",
+    showTrackingBanner: totalVisitors === 0,
   };
 };
 
@@ -123,7 +105,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       if (usage.plan !== "pro" && usage.plan !== "starter") {
         return {
           success: false,
-          message: "Shopify sync is included with Starter or Pro — upgrade on Billing.",
+          message: "Order sync on Starter or Pro — upgrade on Billing.",
         };
       }
       await assertCanScan(shop.id);
@@ -142,18 +124,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       await assertCanScan(shop.id);
       await generateRecommendations(shop.id);
       await recordScan(shop.id);
-      return {
-        success: true,
-        message: "Your marketing action is ready on Home.",
-      };
-    }
-
-    if (intent === "dismiss_recommendation") {
-      const id = formData.get("recommendationId");
-      if (typeof id === "string" && id) {
-        await updateRecommendationStatus(shop.id, id, "dismissed");
-        return { success: true, message: "Dismissed." };
-      }
+      return { success: true, message: "Your action is ready below." };
     }
 
     if (intent === "complete_recommendation") {
@@ -179,9 +150,7 @@ export default function Overview() {
     metrics,
     intelligence,
     totalVisitors,
-    marketingReady,
     hasShopifyData,
-    onboarding,
     topAction,
     recommendationCount,
     storeDiagnostic,
@@ -190,29 +159,12 @@ export default function Overview() {
     plan,
     themeEmbedUrl,
     storefrontUrl,
-    themesAdminUrl,
+    showTrackingBanner,
   } = useLoaderData<typeof loader>();
 
   const fetcher = useShopifyFetcher<typeof action>();
   const isBusy = fetcher.state !== "idle";
   useFetcherToast(fetcher);
-
-  if (!marketingReady) {
-    return (
-      <s-page heading="Home">
-        <s-section>
-          <WelcomeScreen
-            themeEmbedUrl={themeEmbedUrl}
-            storefrontUrl={storefrontUrl}
-            themesAdminUrl={themesAdminUrl}
-            progress={onboarding}
-            fetcher={fetcher}
-            isScanning={isBusy}
-          />
-        </s-section>
-      </s-page>
-    );
-  }
 
   const chartPoints = hasShopifyData
     ? revenueTimeline.map((p) => ({ date: p.date, value: p.revenue }))
@@ -232,26 +184,23 @@ export default function Overview() {
 
       {(plan === "pro" || plan === "starter") ? (
         <SubmitButton fetcher={fetcher} slot="secondary-actions" intent="sync_shopify">
-          {isBusy ? "Syncing…" : "Sync Shopify"}
+          {isBusy ? "Syncing…" : "Sync orders"}
         </SubmitButton>
-      ) : null}
-
-      {isBusy ? (
-        <s-section>
-          <div className="ms-status-banner ms-status-banner-animate">
-            <span className="ms-loading">Scanning your store…</span>
-          </div>
-        </s-section>
       ) : null}
 
       <s-section>
         <div className="ms-home-stack">
-          <header className="ms-home-intro">
-            <p className="ms-home-intro-tagline">{POSITIONING.tagline}</p>
-          </header>
+          <SetupBanner
+            show={showTrackingBanner}
+            themeEmbedUrl={themeEmbedUrl}
+            storefrontUrl={storefrontUrl}
+          />
 
           {topAction ? (
-            <section className="ms-home-primary" aria-labelledby="today-heading">
+            <section aria-labelledby="today-heading">
+              <h2 id="today-heading" className="ms-home-section-title">
+                {POSITIONING.actionsTitle}
+              </h2>
               <PriorityActionCard
                 rec={topAction}
                 fetcher={fetcher}
@@ -261,15 +210,15 @@ export default function Overview() {
               />
               {recommendationCount > 1 ? (
                 <AppLink to="/app/recommendations" className="ms-text-link ms-home-more">
-                  {recommendationCount - 1} more action{recommendationCount > 2 ? "s" : ""} →
+                  {recommendationCount - 1} more →
                 </AppLink>
               ) : null}
             </section>
           ) : (
             <EmptyState
               icon="box"
-              title="Scan for today's action"
-              description="One marketing move, ranked from your store data."
+              title="Ready when you are"
+              description="We sync your Shopify catalog and orders automatically. Tap Scan for your first marketing action."
               action={
                 <SubmitButton fetcher={fetcher} intent="generate_recommendations">
                   {isBusy ? "Scanning…" : "Scan for actions"}
@@ -287,17 +236,19 @@ export default function Overview() {
             />
           ) : null}
 
-          {storeDiagnostic ? <AdReadinessCompact diagnostic={storeDiagnostic} /> : null}
+          {storeDiagnostic?.hasEnoughData ? (
+            <AdReadinessCompact diagnostic={storeDiagnostic} />
+          ) : null}
 
           <details className="ms-home-details">
-            <summary>Last 30 days trend</summary>
+            <summary>Last 30 days</summary>
             <TrendChart
               title={hasShopifyData ? "Revenue" : "Visitors"}
               subtitle="Daily"
               points={chartPoints}
               currency={hasShopifyData ? intelligence?.primaryCurrency : undefined}
               valueLabel="Total"
-              emptyMessage="Not enough data yet."
+              emptyMessage="Data appears after orders or store visits."
               accent="#0d9488"
             />
           </details>

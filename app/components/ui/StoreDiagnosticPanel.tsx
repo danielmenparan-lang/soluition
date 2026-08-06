@@ -10,7 +10,7 @@ export function StoreDiagnosticPanel({ diagnostic }: StoreDiagnosticPanelProps) 
     return (
       <section className="ms-diagnostic ms-diagnostic-pending">
         <h2 className="ms-diagnostic-title">{POSITIONING.diagnosticTitle}</h2>
-        <p className="ms-section-lead">{POSITIONING.diagnosticPending}</p>
+        <p className="ms-section-lead">Need more store visits for ad readiness.</p>
       </section>
     );
   }
