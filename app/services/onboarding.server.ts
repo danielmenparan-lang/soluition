@@ -1,5 +1,3 @@
-import { hasWorkingTracking } from "../utils/store-readiness";
-
 export type OnboardingStep = {
   id: "embed" | "data" | "insight";
   label: string;
@@ -18,8 +16,8 @@ export type OnboardingProgress = {
 };
 
 type BuildOnboardingInput = {
-  totalVisitors: number;
-  hasShopifyOrders: boolean;
+  hasVisitorData: boolean;
+  hasShopifyData: boolean;
   hasRecommendations: boolean;
   themeEmbedUrl: string;
 };
@@ -27,31 +25,30 @@ type BuildOnboardingInput = {
 export function buildOnboardingProgress(
   input: BuildOnboardingInput,
 ): OnboardingProgress {
-  const trackingWorking = hasWorkingTracking(
-    input.totalVisitors,
-    input.hasShopifyOrders,
-  );
+  const trackingDone = input.hasVisitorData || input.hasShopifyData;
   const steps: OnboardingStep[] = [
     {
       id: "embed",
-      label: "Turn on tracking",
-      detail: "Open your theme editor and enable the Solution app embed — about 2 minutes.",
-      done: trackingWorking,
+      label: "Enable store tracking",
+      detail: "Required to see your funnel and where visitors drop off.",
+      done: input.hasVisitorData,
       href: input.themeEmbedUrl,
       external: true,
     },
     {
       id: "data",
-      label: "Visit your store once",
-      detail: "Open your live storefront and browse 2–3 pages so we can read your funnel.",
-      done: trackingWorking,
+      label: "Collect conversion data",
+      detail: input.hasShopifyData
+        ? "Orders synced — funnel + revenue active."
+        : "Browse your storefront or sync orders (Starter+) to diagnose blockers.",
+      done: trackingDone,
       href: "/app/analytics",
     },
     {
       id: "insight",
-      label: "Get your first action",
-      detail: "Scan your store — one clear marketing move appears here on Home.",
-      done: input.hasRecommendations && trackingWorking,
+      label: "Get marketing actions",
+      detail: "Scan your store data — ranked marketing steps appear on Home.",
+      done: input.hasRecommendations,
     },
   ];
 

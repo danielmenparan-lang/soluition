@@ -1,5 +1,5 @@
 import { formatMoney } from "../../utils/format-currency";
-import { getStoreScoreCopy } from "../../utils/store-score-copy";
+import { getStoreScoreCopy, getScoreHint } from "../../utils/store-score-copy";
 import type { StoreIntelligence } from "../../types/store-intelligence.types";
 
 type HomeHeroProps = {
@@ -18,25 +18,23 @@ export function HomeHero({
   const copy = getStoreScoreCopy(intelligence.storeHealthGrade, storeHealthScore);
 
   return (
-    <section className="ms-home-summary ms-card">
-      <div className="ms-home-summary-top">
-        <div>
-          <p className="ms-home-summary-label">Store health</p>
-          <h2 className="ms-home-summary-headline">{copy.verdict}</h2>
-        </div>
-        <div className="ms-home-summary-score">
-          <span className="ms-home-summary-value">{storeHealthScore}</span>
-          <span className="ms-home-summary-max">/100</span>
-        </div>
+    <section className="ms-store-status">
+      <div className="ms-store-status-main">
+        <h2 className="ms-store-status-headline">{copy.verdict}</h2>
+        <p className="ms-store-status-note">{copy.explain}</p>
+      </div>
+      <div className="ms-store-status-score" title={getScoreHint(storeHealthScore)}>
+        <span className="ms-store-status-value">{storeHealthScore}</span>
+        <span className="ms-store-status-max">/100</span>
       </div>
 
-      <dl className="ms-home-summary-stats">
+      <dl className="ms-store-stats">
         <div>
           <dt>Visitors</dt>
           <dd>{visitorCount !== null ? visitorCount : "—"}</dd>
         </div>
         <div>
-          <dt>Conversion</dt>
+          <dt>Sales rate</dt>
           <dd>{sessionConversion !== null ? `${sessionConversion}%` : "—"}</dd>
         </div>
         <div>

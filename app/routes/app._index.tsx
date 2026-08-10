@@ -12,12 +12,15 @@ import { useFetcherToast } from "../hooks/useFetcherToast";
 import { SubmitButton } from "../components/SubmitButton";
 import { AppLink } from "../components/AppLink";
 import { EmptyState } from "../components/ui/EmptyState";
-import { SetupBanner } from "../components/ui/SetupBanner";
-import { HomeMetricsStrip } from "../components/ui/HomeMetricsStrip";
+import { WelcomeScreen } from "../components/ui/WelcomeScreen";
+import { OnboardingChecklist } from "../components/ui/OnboardingChecklist";
+import { HomeHero } from "../components/ui/HomeHero";
+import { StoreDiagnosticPanel } from "../components/ui/StoreDiagnosticPanel";
 import { TrendChart } from "../components/ui/TrendChart";
 import { PriorityActionCard } from "../components/ui/PriorityActionCard";
+import { AdvisorQuickAsk } from "../components/ui/AdvisorQuickAsk";
 import { ProUpgradeCard } from "../components/ui/ProUpgradeCard";
-import { AdReadinessCompact } from "../components/ui/AdReadinessCompact";
+import { MarketingResponsibilityNotice } from "../components/ui/MarketingResponsibilityNotice";
 import { POSITIONING } from "../config/positioning";
 import { getOrCreateShop } from "../services/shop.server";
 import { getStoreHealthSummary } from "../services/analytics.server";
@@ -25,6 +28,7 @@ import {
   generateRecommendations,
   getRecommendations,
 } from "../services/ai.server";
+import { buildOnboardingProgress } from "../services/onboarding.server";
 import { getRevenueTimeline, getVisitorTimeline } from "../services/revenue-timeline.server";
 import { updateRecommendationStatus, sortByPriority } from "../services/recommendations.server";
 import {
@@ -40,10 +44,6 @@ import {
   UsageLimitError,
 } from "../services/usage.server";
 import { buildThemeEmbedActivateUrl } from "../config/theme-embed";
-
-function storefrontUrl(shopDomain: string): string {
-  return `https://${shopDomain}`;
-}
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session, admin } = await authenticate.admin(request);
@@ -62,34 +62,48 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const metrics = health?.metrics ?? null;
   const intelligence = health?.intelligence ?? null;
-  const totalVisitors = metrics?.totalVisitors ?? 0;
+  const hasVisitorData = Boolean(metrics && metrics.totalVisitors > 0);
   const hasShopifyData = Boolean(intelligence?.hasShopifyOrders);
+  const hasData = hasVisitorData || hasShopifyData;
+
   const themeEmbedUrl = buildThemeEmbedActivateUrl(
     session.shop,
     process.env.SHOPIFY_API_KEY ?? "00eb38f774ffba914d98a6800f4c5df5",
   );
 
+  const onboarding = buildOnboardingProgress({
+    hasVisitorData,
+    hasShopifyData,
+    hasRecommendations: recommendations.length > 0,
+    themeEmbedUrl,
+  });
+
   const usageInfo = usageSummary(usage);
-  const topAction = sortByPriority(recommendations)[0] ?? null;
-  const storeDiagnostic = await getStoreDiagnostic(shop.id, session.shop, 30).catch(
-    () => null,
-  );
+  const homeActionLimit =
+    usageInfo.visibleRecommendations === Number.POSITIVE_INFINITY
+      ? 3
+      : Math.min(usageInfo.visibleRecommendations, 3);
+  const priorityActions = sortByPriority(recommendations).slice(0, homeActionLimit);
+  const storeDiagnostic = hasData
+    ? await getStoreDiagnostic(shop.id, session.shop, 30).catch(() => null)
+    : null;
 
   return {
     metrics,
     intelligence,
-    totalVisitors,
+    hasData,
+    hasVisitorData,
     hasShopifyData,
-    topAction,
+    onboarding,
+    priorityActions,
     recommendationCount: recommendations.length,
     storeDiagnostic,
     revenueTimeline,
     visitorTimeline,
     plan: usage.plan,
     usage: usageInfo,
+    homeActionLimit,
     themeEmbedUrl,
-    storefrontUrl: storefrontUrl(session.shop),
-    showTrackingBanner: totalVisitors === 0,
   };
 };
 
@@ -105,7 +119,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       if (usage.plan !== "pro" && usage.plan !== "starter") {
         return {
           success: false,
-          message: "Order sync on Starter or Pro — upgrade on Billing.",
+          message: "Shopify sync is included with Starter or Pro — upgrade on Billing.",
         };
       }
       await assertCanScan(shop.id);
@@ -124,14 +138,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       await assertCanScan(shop.id);
       await generateRecommendations(shop.id);
       await recordScan(shop.id);
-      return { success: true, message: "Your action is ready below." };
+      return {
+        success: true,
+        message: "Your marketing actions are ready below.",
+      };
     }
 
     if (intent === "complete_recommendation") {
       const id = formData.get("recommendationId");
       if (typeof id === "string" && id) {
         await updateRecommendationStatus(shop.id, id, "completed");
-        return { success: true, message: "Marked as done." };
+        return { success: true, message: "Nice — marked as done." };
       }
     }
   } catch (error) {
@@ -149,28 +166,40 @@ export default function Overview() {
   const {
     metrics,
     intelligence,
-    totalVisitors,
+    hasData,
+    hasVisitorData,
     hasShopifyData,
-    topAction,
+    onboarding,
+    priorityActions,
     recommendationCount,
     storeDiagnostic,
     revenueTimeline,
     visitorTimeline,
     plan,
+    homeActionLimit,
     themeEmbedUrl,
-    storefrontUrl,
-    showTrackingBanner,
   } = useLoaderData<typeof loader>();
 
   const fetcher = useShopifyFetcher<typeof action>();
   const isBusy = fetcher.state !== "idle";
   useFetcherToast(fetcher);
 
+  if (!hasData) {
+    return (
+      <s-page heading="Home">
+        <s-section>
+          <WelcomeScreen themeEmbedUrl={themeEmbedUrl} progress={onboarding} />
+        </s-section>
+        <s-section>
+          <OnboardingChecklist progress={onboarding} />
+        </s-section>
+      </s-page>
+    );
+  }
+
   const chartPoints = hasShopifyData
     ? revenueTimeline.map((p) => ({ date: p.date, value: p.revenue }))
     : visitorTimeline.map((p) => ({ date: p.date, value: p.visitors }));
-
-  const healthScore = intelligence?.storeHealthScore ?? 0;
 
   return (
     <s-page heading="Home">
@@ -184,78 +213,95 @@ export default function Overview() {
 
       {(plan === "pro" || plan === "starter") ? (
         <SubmitButton fetcher={fetcher} slot="secondary-actions" intent="sync_shopify">
-          {isBusy ? "Syncing…" : "Sync orders"}
+          {isBusy ? "Syncing…" : "Sync Shopify"}
         </SubmitButton>
       ) : null}
 
-      <s-section>
-        <div className="ms-home-stack">
-          <SetupBanner
-            show={showTrackingBanner}
-            themeEmbedUrl={themeEmbedUrl}
-            storefrontUrl={storefrontUrl}
+      {isBusy ? (
+        <s-section>
+          <div className="ms-status-banner ms-status-banner-animate">
+            <span className="ms-loading">Working on your store data…</span>
+          </div>
+        </s-section>
+      ) : null}
+
+      {!onboarding.isComplete ? (
+        <s-section>
+          <OnboardingChecklist progress={onboarding} />
+        </s-section>
+      ) : null}
+
+      {intelligence ? (
+        <s-section>
+          <HomeHero
+            intelligence={intelligence}
+            visitorCount={hasVisitorData ? metrics!.totalVisitors : null}
+            sessionConversion={hasVisitorData ? metrics!.conversionRate : null}
           />
+        </s-section>
+      ) : null}
 
-          {topAction ? (
-            <section aria-labelledby="today-heading">
-              <h2 id="today-heading" className="ms-home-section-title">
-                {POSITIONING.actionsTitle}
-              </h2>
-              <PriorityActionCard
-                rec={topAction}
-                fetcher={fetcher}
-                rank={1}
-                spotlight
-                compact
-              />
-              {recommendationCount > 1 ? (
-                <AppLink to="/app/recommendations" className="ms-text-link ms-home-more">
-                  {recommendationCount - 1} more →
-                </AppLink>
-              ) : null}
-            </section>
-          ) : (
-            <EmptyState
-              icon="box"
-              title="Ready when you are"
-              description="We sync your Shopify catalog and orders automatically. Tap Scan for your first marketing action."
-              action={
-                <SubmitButton fetcher={fetcher} intent="generate_recommendations">
-                  {isBusy ? "Scanning…" : "Scan for actions"}
-                </SubmitButton>
-              }
-            />
-          )}
+      <s-section heading={POSITIONING.actionsTitle}>
+        <MarketingResponsibilityNotice compact />
+        <p className="ms-section-lead">{POSITIONING.actionsLead}</p>
+        {priorityActions.length > 0 ? (
+          <div className="ms-action-list">
+            {priorityActions.map((rec, i) => (
+              <PriorityActionCard key={rec.id} rec={rec} fetcher={fetcher} rank={i + 1} />
+            ))}
+            {recommendationCount > homeActionLimit ? (
+              <AppLink to="/app/recommendations" className="ms-text-link">
+                View all {recommendationCount} actions →
+              </AppLink>
+            ) : null}
+          </div>
+        ) : (
+          <EmptyState
+            icon="box"
+            title="No marketing actions yet"
+            description="Scan your store data — we'll suggest what to market and fix first."
+            action={
+              <SubmitButton fetcher={fetcher} intent="generate_recommendations">
+                {isBusy ? "Scanning…" : "Scan for actions"}
+              </SubmitButton>
+            }
+          />
+        )}
+      </s-section>
 
-          {intelligence ? (
-            <HomeMetricsStrip
-              intelligence={intelligence}
-              visitorCount={totalVisitors}
-              sessionConversion={metrics?.conversionRate ?? null}
-              healthScore={healthScore}
-            />
-          ) : null}
+      {storeDiagnostic ? (
+        <s-section heading={POSITIONING.diagnosticTitle}>
+          <StoreDiagnosticPanel diagnostic={storeDiagnostic} />
+        </s-section>
+      ) : null}
 
-          {storeDiagnostic?.hasEnoughData ? (
-            <AdReadinessCompact diagnostic={storeDiagnostic} />
-          ) : null}
+      <s-section>
+        <AdvisorQuickAsk />
+      </s-section>
 
-          <details className="ms-home-details">
-            <summary>Last 30 days</summary>
-            <TrendChart
-              title={hasShopifyData ? "Revenue" : "Visitors"}
-              subtitle="Daily"
-              points={chartPoints}
-              currency={hasShopifyData ? intelligence?.primaryCurrency : undefined}
-              valueLabel="Total"
-              emptyMessage="Data appears after orders or store visits."
-              accent="#0d9488"
-            />
-          </details>
-
-          {plan !== "pro" ? <ProUpgradeCard plan={plan} /> : null}
+      <s-section heading="Last 30 days">
+        <div className="ms-home-charts ms-home-charts-compact">
+          <TrendChart
+            title={hasShopifyData ? "Revenue" : "Visitors"}
+            subtitle="Daily trend"
+            points={chartPoints}
+            currency={hasShopifyData ? intelligence?.primaryCurrency : undefined}
+            valueLabel="Total"
+            emptyMessage={
+              hasShopifyData
+                ? "Sync orders to see revenue."
+                : "Turn on tracking and browse your store."
+            }
+            accent="#0d9488"
+          />
         </div>
       </s-section>
+
+      {plan !== "pro" ? (
+        <s-section>
+          <ProUpgradeCard plan={plan} />
+        </s-section>
+      ) : null}
     </s-page>
   );
 }
